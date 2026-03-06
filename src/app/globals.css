@@ -1,26 +1,151 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-available: #15803d;
+  /* Elegant emerald green instead of bright neon */
+  --color-reserved: #b45309;
+  /* Deep amber */
+  --color-sold: #b91c1c;
+  /* Deep brick red */
+
+  /* Luxury Dark Theme Colors */
+  --color-bg: #0a0a0a;
+  --color-bg-light: #121212;
+  --color-glass: rgba(10, 10, 10, 0.75);
+  --color-glass-light: rgba(255, 255, 255, 0.03);
+  --color-accent: #D4AF37;
+  /* Champagne Gold */
+  --color-accent-light: #F2D588;
+  --color-accent-dark: #A67C00;
+
+  --font-serif: var(--font-playfair), serif;
+  --font-sans: var(--font-montserrat), sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-bg);
+  color: #F8F8F8;
+  /* Off-white instead of pure white */
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* Scrollbar - minimal and elegant */
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.3);
+  border-radius: 0px;
+}
+
+/* Typography overrides for luxury feel */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-serif {
+  font-family: var(--font-serif);
+  letter-spacing: -0.02em;
+}
+
+.tracking-widest {
+  letter-spacing: 0.15em;
+}
+
+/* Glassmorphism - Luxury Edition */
+.glass {
+  background: var(--color-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  /* Gold tinted border */
+}
+
+.glass-light {
+  background: var(--color-glass-light);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+/* Lot SVG hover effects */
+.lot-polygon {
+  transition: opacity 0.4s ease, filter 0.4s ease;
+  cursor: pointer;
+}
+
+.lot-polygon:hover {
+  opacity: 0.8 !important;
+  filter: brightness(1.1);
+}
+
+.lot-polygon.selected {
+  filter: brightness(1.3) drop-shadow(0 0 12px rgba(212, 175, 55, 0.4));
+}
+
+/* Pulse animation for available lots - slowed down for elegance */
+@keyframes pulse-available {
+
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 0.75;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.lot-available-pulse {
+  animation: pulse-available 4s ease-in-out infinite;
+}
+
+/* Gradient text - Gold */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-light), #fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Hero section - Moody Dark */
+.hero-gradient {
+  background: linear-gradient(to bottom,
+      rgba(10, 10, 10, 0) 0%,
+      rgba(10, 10, 10, 0.6) 60%,
+      rgba(10, 10, 10, 1) 100%);
+}
+
+/* Shimmer effect - Gold Tint */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.08), transparent);
+  animation: shimmer 3s infinite;
 }
