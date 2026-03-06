@@ -41,7 +41,7 @@
       <polyline id="lote-073" data-lote="073" class="cls-1" points="1985.32 981.94 1251.63 1248.64 1256.01 992.71 1989.69 726.01 1985.32 981.94"/>
     </g>
     <g id="LWPOLYLINE-3" data-name="LWPOLYLINE">
-      <polyline class="cls-1" points="1989.69 726.01 1256.01 992.71 1260.38 736.77 1994.07 470.07 1989.69 726.01"/>
+      <polyline id="lote-072" data-lote="072" class="cls-1" points="1989.69 726.01 1256.01 992.71 1260.38 736.77 1994.07 470.07 1989.69 726.01"/>
     </g>
     <g id="LWPOLYLINE-4" data-name="LWPOLYLINE">
       <polyline class="cls-1" points="1994.07 470.07 1260.38 736.77 1264.76 480.83 1998.44 214.13 1994.07 470.07"/>
