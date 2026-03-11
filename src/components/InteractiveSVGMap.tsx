@@ -29,10 +29,21 @@ export default function InteractiveSVGMap({ svgUrl, lots, selectedLot, onSelectL
             const target = e.currentTarget as SVGElement;
             const loteId = target.getAttribute('data-lote');
             if (loteId) {
-                const clickedLot = lots.find(l => l.id === loteId);
-                if (clickedLot) {
-                    onSelectLot(clickedLot);
+                let clickedLot = lots.find(l => l.id === loteId);
+                // Si el lote está en el SVG pero no en la BD (lots.ts), generamos uno genérico "disponible"
+                if (!clickedLot) {
+                    clickedLot = {
+                        id: loteId,
+                        name: `Lote ${loteId}`,
+                        area: 250,
+                        price: 367500000,
+                        status: "available",
+                        description: "Lote disponible para desarrollo. Ubicación premium.",
+                        features: ["Sujeto a disponibilidad", "Separación $10,000,000"],
+                        zoneId: "zona-custom" // generic fallback
+                    } as Lot;
                 }
+                onSelectLot(clickedLot);
             }
         };
 
@@ -64,9 +75,10 @@ export default function InteractiveSVGMap({ svgUrl, lots, selectedLot, onSelectL
                 const loteId = poly.getAttribute('data-lote');
                 const lotData = lots.find(l => l.id === loteId);
                 const isSelected = selectedLot && selectedLot.id === loteId;
+                const status = lotData ? lotData.status : "available"; // Default a disponible si no existe en BD
 
                 const svgPoly = poly as SVGElement;
-                svgPoly.style.fill = lotData ? STATUS_CONFIG[lotData.status].color : '#cccccc';
+                svgPoly.style.fill = STATUS_CONFIG[status].color;
                 svgPoly.style.opacity = isSelected ? '1' : '0.6';
                 svgPoly.style.transition = 'all 0.3s ease';
                 svgPoly.style.filter = isSelected ? 'drop-shadow(0px 0px 10px rgba(255,255,255,0.9))' : 'none';

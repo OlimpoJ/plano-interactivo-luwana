@@ -11,10 +11,59 @@ export interface Lot {
     features: string[];
     // SVG polygon points (percentages of image dimensions — easy to adjust)
     points: string;
+    zoneId: string;
 }
+
+export type ZoneType = "residential" | "amenity" | "other";
+
+export interface Zone {
+    id: string;
+    name: string;
+    type: ZoneType;
+    svgPath: string; // Path to the SVG or JPG depending on requirements
+    gallery?: string[]; // Array of images for a gallery view
+    lotsRange?: [number, number]; // e.g. [1, 30] for lots 1 through 30
+}
+
+export const ZONES: Record<string, Zone> = {
+    "porteria": {
+        zoneId: "zona-1",
+        id: "porteria", name: "Portería", type: "other", svgPath: "/Render Portería 1.jpg", gallery: ["/Render Portería 1.jpg", "/Render Portería 3.jpg"] },
+    "zona-1": {
+        zoneId: "zona-1",
+        id: "zona-1", name: "Zona 1", type: "residential", lotsRange: [1, 30], svgPath: "/SHOW ROOM LUWANA.svg" },
+    "amenidad-1": {
+        zoneId: "zona-1",
+        id: "amenidad-1", name: "Amenidad 1", type: "amenity", svgPath: "/Render Zona social-Piscina.jpg", gallery: ["/Render Piscina 1.jpg", "/Render Bar.jpg", "/Render Piscina 2.jpg", "/Render Zona social-Piscina.jpg"] },
+    "zona-2": {
+        zoneId: "zona-1",
+        id: "zona-2", name: "Zona 2", type: "residential", lotsRange: [31, 60], svgPath: "/SHOW ROOM LUWANA.svg" },
+    "amenidad-2": {
+        zoneId: "zona-1",
+        id: "amenidad-2", name: "Amenidad 2", type: "amenity", svgPath: "/Render Piscina 2.jpg", gallery: ["/Render Piscina 1.jpg", "/Render Bar.jpg", "/Render Piscina 2.jpg", "/Render Zona social-Piscina.jpg"] },
+    "zona-3": {
+        zoneId: "zona-1",
+        id: "zona-3", name: "Zona 3", type: "residential", lotsRange: [61, 90], svgPath: "/SHOW ROOM LUWANA.svg" },
+    "amenidad-3": {
+        zoneId: "zona-1",
+        id: "amenidad-3", name: "Amenidad 3", type: "amenity", svgPath: "/Render Piscina 2.jpg", gallery: ["/Render Piscina 1.jpg", "/Render Bar.jpg", "/Render Piscina 2.jpg", "/Render Zona social-Piscina.jpg"] },
+    "zona-4": {
+        zoneId: "zona-1",
+        id: "zona-4", name: "Zona 4", type: "residential", lotsRange: [91, 122], svgPath: "/SHOW ROOM LUWANA.svg" },
+    "amenidad-4": {
+        zoneId: "zona-1",
+        id: "amenidad-4", name: "Amenidad 4", type: "amenity", svgPath: "/Render Zona social-Piscina.jpg", gallery: ["/Render Piscina 1.jpg", "/Render Bar.jpg", "/Render Piscina 2.jpg", "/Render Zona social-Piscina.jpg"] },
+    "club-playa": {
+        zoneId: "zona-1",
+        id: "club-playa", name: "Club de Playa", type: "amenity", svgPath: "/Render Bar.jpg", gallery: ["/Render Piscina 1.jpg", "/Render Bar.jpg", "/Render Piscina 2.jpg", "/Render Zona social-Piscina.jpg"] },
+    "playa": {
+        zoneId: "zona-1",
+        id: "playa", name: "Playa: Alma Beach", type: "other", svgPath: "/Render Piscina 1.jpg", gallery: ["/Render Piscina 1.jpg", "/Render Bar.jpg", "/Render Piscina 2.jpg", "/Render Zona social-Piscina.jpg"] },
+};
 
 export const LOTS: Lot[] = [
     {
+        zoneId: "zona-3",
         id: "071",
         name: "Lote 71 — Etapa 1",
         area: 232.24,
@@ -25,8 +74,9 @@ export const LOTS: Lot[] = [
         points: "8,22 18,20 22,32 12,35",
     },
     {
-        id: "073",
-        name: "Lote 73 — Etapa 1",
+        zoneId: "zona-3",
+        id: "072",
+        name: "Lote 72 — Etapa 1",
         area: 232.24,
         price: 341392800,
         status: "reserved",
@@ -35,8 +85,9 @@ export const LOTS: Lot[] = [
         points: "22,20 32,18 36,30 26,33",
     },
     {
-        id: "072",
-        name: "Lote 72 — Etapa 1",
+        zoneId: "zona-3",
+        id: "074",
+        name: "Lote 74 — Etapa 1",
         area: 232.24,
         price: 341392800,
         status: "available",
@@ -45,6 +96,7 @@ export const LOTS: Lot[] = [
         points: "36,18 46,16 50,28 40,31",
     },
     {
+        zoneId: "zona-1",
         id: "L04",
         name: "Lote 04 — Villa Sunset",
         area: 510,
@@ -55,6 +107,7 @@ export const LOTS: Lot[] = [
         points: "50,16 62,14 66,26 54,29",
     },
     {
+        zoneId: "zona-1",
         id: "L05",
         name: "Lote 05 — Villa Mar",
         area: 360,
@@ -65,6 +118,7 @@ export const LOTS: Lot[] = [
         points: "26,34 36,31 40,43 30,46",
     },
     {
+        zoneId: "zona-1",
         id: "L06",
         name: "Lote 06 — Villa Arena",
         area: 395,
@@ -75,6 +129,7 @@ export const LOTS: Lot[] = [
         points: "40,43 50,40 54,52 44,55",
     },
     {
+        zoneId: "zona-1",
         id: "L07",
         name: "Lote 07 — Villa Cielo",
         area: 330,
@@ -85,6 +140,7 @@ export const LOTS: Lot[] = [
         points: "14,36 24,34 28,46 18,49",
     },
     {
+        zoneId: "zona-1",
         id: "L08",
         name: "Lote 08 — Villa Brisa Sur",
         area: 440,
@@ -95,6 +151,7 @@ export const LOTS: Lot[] = [
         points: "54,29 66,27 70,39 58,42",
     },
     {
+        zoneId: "zona-1",
         id: "L09",
         name: "Lote 09 — Villa Selva",
         area: 475,
@@ -105,6 +162,7 @@ export const LOTS: Lot[] = [
         points: "8,50 18,48 22,60 12,63",
     },
     {
+        zoneId: "zona-1",
         id: "L10",
         name: "Lote 10 — Villa Laguna",
         area: 415,
@@ -115,6 +173,7 @@ export const LOTS: Lot[] = [
         points: "62,40 72,38 76,50 66,53",
     },
     {
+        zoneId: "zona-1",
         id: "L11",
         name: "Lote 11 — Villa Nácar",
         area: 350,
@@ -125,6 +184,7 @@ export const LOTS: Lot[] = [
         points: "28,48 38,46 42,58 32,61",
     },
     {
+        zoneId: "zona-1",
         id: "L12",
         name: "Lote 12 — Villa Ébano",
         area: 500,

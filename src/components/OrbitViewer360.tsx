@@ -128,7 +128,7 @@ export default function OrbitViewer360({ lots, selectedLot, onSelectLot }: Orbit
 
     return (
         <div
-            className="relative w-full h-full select-none overflow-hidden bg-[#030810]"
+            className="relative w-full h-full select-none overflow-hidden bg-[var(--color-bg)]"
             style={{ cursor: isDragging ? "grabbing" : "grab" }}
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}

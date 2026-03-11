@@ -1,26 +1,33 @@
 @import "tailwindcss";
 
 :root {
-  --color-available: #15803d;
-  /* Elegant emerald green instead of bright neon */
-  --color-reserved: #b45309;
-  /* Deep amber */
-  --color-sold: #b91c1c;
-  /* Deep brick red */
+  --color-available: #396866;
+  /* Brand Secondary Green - Available */
+  --color-reserved: #C2AC8F;
+  /* Brand Primary Sand - Reserved */
+  --color-sold: #152A2D;
+  /* Brand Primary Dark Green - Sold */
 
   /* Luxury Dark Theme Colors */
-  --color-bg: #0a0a0a;
-  --color-bg-light: #121212;
-  --color-glass: rgba(10, 10, 10, 0.75);
-  --color-glass-light: rgba(255, 255, 255, 0.03);
-  --color-accent: #D4AF37;
-  /* Champagne Gold */
-  --color-accent-light: #F2D588;
-  --color-accent-dark: #A67C00;
+  --color-bg: #152A2D;
+  /* Deep Green */
+  --color-bg-light: #396866;
+  /* Secondary Green */
+  --color-glass: rgba(21, 42, 45, 0.85);
+  /* Tinted dark green glass */
+  --color-glass-light: rgba(57, 104, 102, 0.4);
+  /* Tinted secondary green glass */
+  --color-accent: #C2AC8F;
+  /* Brand Sand */
+  --color-accent-light: #CECDC8;
+  /* Brand Light Sand */
+  --color-accent-dark: #899984;
+  /* Brand muted olive */
 
-  --font-serif: var(--font-playfair), serif;
-  --font-sans: var(--font-montserrat), sans-serif;
+  --font-serif: "Felix Titling", var(--font-playfair), serif;
+  --font-sans: "Segoe UI", var(--font-montserrat), sans-serif;
 }
+
 
 * {
   box-sizing: border-box;

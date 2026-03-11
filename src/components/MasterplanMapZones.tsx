@@ -51,9 +51,9 @@ export default function MasterplanMapZones({ onSelectZone }: MasterplanMapZonesP
                             {/* Hotspot polygon */}
                             <polygon
                                 points={zone.points}
-                                fill="#D4AF37"
+                                fill="var(--color-accent)"
                                 fillOpacity={isHovered ? 0.3 : 0}
-                                stroke={isHovered ? "#D4AF37" : "rgba(255,255,255,0.2)"}
+                                stroke={isHovered ? "var(--color-accent)" : "rgba(255,255,255,0.2)"}
                                 strokeWidth="0.2"
                                 style={{
                                     cursor: "pointer",
