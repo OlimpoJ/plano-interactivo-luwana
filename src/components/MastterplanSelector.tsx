@@ -22,7 +22,7 @@ export default function MastterplanSelector({ onSelectZone }: { onSelectZone: (i
   };
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col items-center justify-center py-20 px-4 sm:px-8">
+    <div className="relative min-h-screen w-full flex flex-col items-center justify-center py-6 sm:py-20 px-2 sm:px-8">
       
       {/* Fondo difuminado (Usamos el mismo JPG del masterplan pero muy difuminado y oscuro) */}
       <div className="absolute inset-0 z-0 overflow-hidden bg-black">
@@ -34,11 +34,11 @@ export default function MastterplanSelector({ onSelectZone }: { onSelectZone: (i
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black/90 pointer-events-none" />
       </div>
 
-      <div className="relative z-10 flex flex-col items-center w-full max-w-[1600px]">
+      <div className="relative z-10 flex flex-col items-center w-full max-w-[1600px] h-full">
         
         {/* Cabecera / Títulos */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif text-white mb-3" style={{ textShadow: "0 4px 20px rgba(0,0,0,0.8)" }}>
+        <div className="text-center mb-4 sm:mb-8">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-serif text-white mb-1 sm:mb-3" style={{ textShadow: "0 4px 20px rgba(0,0,0,0.8)" }}>
             PLANO INTERACTIVO
           </h1>
           <p className="text-[10px] sm:text-xs text-white/70 uppercase tracking-[0.2em] font-medium">
@@ -48,7 +48,7 @@ export default function MastterplanSelector({ onSelectZone }: { onSelectZone: (i
 
         {/* Contenedor Premium del Mapa */}
         <div 
-          className="relative w-full max-w-[1800px] mx-auto rounded-xl sm:rounded-2xl md:rounded-[2rem] overflow-hidden bg-black/50 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col landscape:flex-row h-[65vh] landscape:h-[60vh] md:h-[70vh] lg:h-[80vh]"
+          className="relative w-full max-w-[1800px] mx-auto rounded-xl sm:rounded-2xl md:rounded-[2rem] overflow-hidden bg-black/50 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col landscape:flex-row h-[80vh] landscape:h-[75vh] md:h-[70vh] lg:h-[80vh]"
           onMouseLeave={() => setHoveredZone(null)}
         >
           
