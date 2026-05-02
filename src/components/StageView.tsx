@@ -286,7 +286,21 @@ export default function StageView({ stageId, onBack }: { stageId: string; onBack
             <div className="mt-10 flex flex-col gap-3 pb-8">
               {selectedLotData.status === 'available' && (
                 <button 
-                  onClick={() => window.location.href = "https://patrimofy.com/es/luwana#contacto"}
+                  onClick={() => {
+                    if (window.top !== window.self) {
+                      // Estamos dentro de un iframe
+                      window.parent.postMessage({
+                        type: 'LOT_SELECTED',
+                        payload: {
+                          lotId: selectedLotData.rawId,
+                          price: selectedLotData.totalPrice
+                        }
+                      }, '*');
+                    } else {
+                      // No estamos en un iframe
+                      window.location.href = "https://patrimofy.com/es/luwana#contacto";
+                    }
+                  }}
                   className="w-full py-4 px-4 rounded-full bg-[#CBAA85] hover:bg-[#b59573] text-black transition-colors text-base font-bold tracking-wide shadow-[0_0_20px_rgba(203,170,133,0.3)]"
                 >
                   Me Interesa
