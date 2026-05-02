@@ -74,9 +74,7 @@ export default function MastterplanSelector({ onSelectZone }: { onSelectZone: (i
                   onClick={() => onSelectZone(`etapa-${index + 1}`)}
                 >
                   <picture className="w-full h-full block">
-                    {/* En landscape (pantallas anchas), los contenedores son columnas verticales, usamos imágenes verticales */}
-                    <source media="(orientation: landscape)" srcSet={zone.imgMobile} />
-                    {/* En portrait (celulares/tablets), los contenedores son filas horizontales, usamos imágenes horizontales */}
+                    <source media="(orientation: portrait), (max-width: 768px)" srcSet={zone.imgMobile} />
                     <img
                       src={zone.img}
                       alt={`Masterplan Luwana ${zone.label}`}
