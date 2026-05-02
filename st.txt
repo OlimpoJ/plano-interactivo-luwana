@@ -1,0 +1,35 @@
+On branch main
+Your branch is ahead of 'origin/main' by 3 commits.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   src/components/InteractiveSVGMap.tsx
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	clickable-areas.png
+	debugSVG.js
+	diff.txt
+	fix_svg.js
+	git_history.txt
+	log.txt
+	old_map.tsx
+	post-click.png
+	pre-click.png
+	"public/Grabaci\303\263n de pantalla 2026-04-04 202636.mp4"
+	"public/Grabaci\303\263n de pantalla 2026-04-05 172454.mp4"
+	public/LUWANA GENERAL.jpg
+	st.txt
+	testClick.js
+	testCoords.js
+	testDebug.js
+	testDraw.js
+	testIds.js
+	testMouse.js
+	testMouseVisual.js
+	testZonas.js
+	zonas_marked.png
+
+no changes added to commit (use "git add" and/or "git commit -a")

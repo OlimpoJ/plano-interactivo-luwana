@@ -47,6 +47,7 @@ export default function MasterplanMap({ lots, selectedLot, onSelectLot }: Master
                 style={{ pointerEvents: "all" }}
             >
                 {lots.map((lot) => {
+                    if (!lot.points) return null;
                     const status = STATUS_CONFIG[lot.status];
                     const isSelected = selectedLot?.id === lot.id;
                     const isHovered = hoveredId === lot.id;
@@ -76,6 +77,7 @@ export default function MasterplanMap({ lots, selectedLot, onSelectLot }: Master
 
                 {/* Lot labels */}
                 {lots.map((lot) => {
+                    if (!lot.points) return null;
                     // Calculate centroid
                     const pts = lot.points.split(" ").map(p => {
                         const [x, y] = p.split(",").map(Number);

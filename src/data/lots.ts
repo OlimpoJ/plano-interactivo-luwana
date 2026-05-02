@@ -10,7 +10,7 @@ export interface Lot {
     description: string;
     features: string[];
     // SVG polygon points (percentages of image dimensions — easy to adjust)
-    points: string;
+    points?: string;
     zoneId: string;
 }
 
@@ -21,49 +21,41 @@ export interface Zone {
     name: string;
     type: ZoneType;
     svgPath: string; // Path to the SVG or JPG depending on requirements
+    bgImage?: string; // Background image for SVG overlay zones
     gallery?: string[]; // Array of images for a gallery view
     lotsRange?: [number, number]; // e.g. [1, 30] for lots 1 through 30
 }
 
 export const ZONES: Record<string, Zone> = {
-    "porteria": {
-        zoneId: "zona-1",
-        id: "porteria", name: "Portería", type: "other", svgPath: "/Render Portería 1.jpg", gallery: ["/Render Portería 1.jpg", "/Render Portería 3.jpg"] },
-    "zona-1": {
-        zoneId: "zona-1",
-        id: "zona-1", name: "Zona 1", type: "residential", lotsRange: [1, 30], svgPath: "/SHOW ROOM LUWANA.svg" },
-    "amenidad-1": {
-        zoneId: "zona-1",
-        id: "amenidad-1", name: "Amenidad 1", type: "amenity", svgPath: "/Render Zona social-Piscina.jpg", gallery: ["/Render Piscina 1.jpg", "/Render Bar.jpg", "/Render Piscina 2.jpg", "/Render Zona social-Piscina.jpg"] },
-    "zona-2": {
-        zoneId: "zona-1",
-        id: "zona-2", name: "Zona 2", type: "residential", lotsRange: [31, 60], svgPath: "/SHOW ROOM LUWANA.svg" },
-    "amenidad-2": {
-        zoneId: "zona-1",
-        id: "amenidad-2", name: "Amenidad 2", type: "amenity", svgPath: "/Render Piscina 2.jpg", gallery: ["/Render Piscina 1.jpg", "/Render Bar.jpg", "/Render Piscina 2.jpg", "/Render Zona social-Piscina.jpg"] },
-    "zona-3": {
-        zoneId: "zona-1",
-        id: "zona-3", name: "Zona 3", type: "residential", lotsRange: [61, 90], svgPath: "/SHOW ROOM LUWANA.svg" },
-    "amenidad-3": {
-        zoneId: "zona-1",
-        id: "amenidad-3", name: "Amenidad 3", type: "amenity", svgPath: "/Render Piscina 2.jpg", gallery: ["/Render Piscina 1.jpg", "/Render Bar.jpg", "/Render Piscina 2.jpg", "/Render Zona social-Piscina.jpg"] },
-    "zona-4": {
-        zoneId: "zona-1",
-        id: "zona-4", name: "Zona 4", type: "residential", lotsRange: [91, 122], svgPath: "/SHOW ROOM LUWANA.svg" },
-    "amenidad-4": {
-        zoneId: "zona-1",
-        id: "amenidad-4", name: "Amenidad 4", type: "amenity", svgPath: "/Render Zona social-Piscina.jpg", gallery: ["/Render Piscina 1.jpg", "/Render Bar.jpg", "/Render Piscina 2.jpg", "/Render Zona social-Piscina.jpg"] },
-    "club-playa": {
-        zoneId: "zona-1",
-        id: "club-playa", name: "Club de Playa", type: "amenity", svgPath: "/Render Bar.jpg", gallery: ["/Render Piscina 1.jpg", "/Render Bar.jpg", "/Render Piscina 2.jpg", "/Render Zona social-Piscina.jpg"] },
-    "playa": {
-        zoneId: "zona-1",
-        id: "playa", name: "Playa: Alma Beach", type: "other", svgPath: "/Render Piscina 1.jpg", gallery: ["/Render Piscina 1.jpg", "/Render Bar.jpg", "/Render Piscina 2.jpg", "/Render Zona social-Piscina.jpg"] },
+    "etapa-1": {
+        id: "etapa-1",
+        name: "Etapa 1",
+        type: "residential",
+        svgPath: "/LUWANA 1.svg",
+        bgImage: "/LUWANA_1_bg.jpg",
+        lotsRange: [71, 90],
+    },
+    "etapa-2": {
+        id: "etapa-2",
+        name: "Etapa 2",
+        type: "residential",
+        svgPath: "/LUWANA 2.svg",
+        bgImage: "/LUWANA_2_bg.jpg",
+        lotsRange: [1, 40],
+    },
+    "etapa-3": {
+        id: "etapa-3",
+        name: "Etapa 3",
+        type: "residential",
+        svgPath: "/LUWANA 3.svg",
+        bgImage: "/LUWANA_3_bg.jpg",
+        lotsRange: [41, 70],
+    },
 };
 
 export const LOTS: Lot[] = [
     {
-        zoneId: "zona-3",
+        zoneId: "etapa-1",
         id: "071",
         name: "Lote 71 — Etapa 1",
         area: 232.24,
@@ -71,10 +63,9 @@ export const LOTS: Lot[] = [
         status: "available",
         description: "Lote con un valor de separación de $10,000,000 y valor por M2 de $1,470,000.",
         features: ["Separación $10,000,000", "Valor M² $1,470,000"],
-        points: "8,22 18,20 22,32 12,35",
     },
     {
-        zoneId: "zona-3",
+        zoneId: "etapa-1",
         id: "072",
         name: "Lote 72 — Etapa 1",
         area: 232.24,
@@ -82,10 +73,19 @@ export const LOTS: Lot[] = [
         status: "reserved",
         description: "Lote interior con acceso a zona de amenidades. Rodeado de jardines tropicales.",
         features: ["Jardín tropical", "Acceso amenidades", "Seguridad 24h"],
-        points: "22,20 32,18 36,30 26,33",
     },
     {
-        zoneId: "zona-3",
+        zoneId: "etapa-1",
+        id: "073",
+        name: "Lote 73 — Etapa 1",
+        area: 234.09,
+        price: 344112300,
+        status: "available",
+        description: "Lote con gran frente de calle y orientación privilegiada.",
+        features: ["Separación $10,000,000", "Valor M² $1,470,000", "Excelente frente"],
+    },
+    {
+        zoneId: "etapa-1",
         id: "074",
         name: "Lote 74 — Etapa 1",
         area: 232.24,
@@ -93,106 +93,66 @@ export const LOTS: Lot[] = [
         status: "available",
         description: "Ubicación privilegiada en la primera etapa con excelente frente de calle.",
         features: ["Separación $10,000,000", "Valor M² $1,470,000", "Excelente frente"],
-        points: "36,18 46,16 50,28 40,31",
     },
     {
-        zoneId: "zona-1",
-        id: "L04",
-        name: "Lote 04 — Villa Sunset",
-        area: 510,
-        price: 210000,
+        zoneId: "etapa-1",
+        id: "075",
+        name: "Lote 75 — Etapa 1",
+        area: 234.09,
+        price: 344112300,
+        status: "sold",
+        description: "Lote premium en la primera etapa del proyecto.",
+        features: ["Primera etapa", "Alta valorización"],
+    },
+    {
+        zoneId: "etapa-1",
+        id: "076",
+        name: "Lote 76 — Etapa 1",
+        area: 232.24,
+        price: 341392800,
         status: "available",
-        description: "El lote más grande del proyecto, orientación perfecta para disfrutar atardeceres sobre el Caribe.",
-        features: ["El más grande", "Vista panorámica", "Orientación oeste", "Premium corner"],
-        points: "50,16 62,14 66,26 54,29",
+        description: "Lote disponible con excelente relación costo-beneficio.",
+        features: ["Separación $10,000,000", "Valor M² $1,470,000"],
     },
     {
-        zoneId: "zona-1",
-        id: "L05",
-        name: "Lote 05 — Villa Mar",
-        area: 360,
-        price: 148000,
+        zoneId: "etapa-2",
+        id: "001",
+        name: "Lote 01 — Etapa 2",
+        area: 250.0,
+        price: 367500000,
+        status: "available",
+        description: "Lote de gran extensión en la Etapa 2, ideal para villa de lujo.",
+        features: ["Gran extensión", "Etapa 2", "Acceso amenidades"],
+    },
+    {
+        zoneId: "etapa-2",
+        id: "002",
+        name: "Lote 02 — Etapa 2",
+        area: 238.5,
+        price: 350595000,
         status: "reserved",
-        description: "Lote con frente al sendero peatonal principal. Arquitectura contemporánea caribeña.",
-        features: ["Frente peatonal", "Sendero privado", "Arquitectura premium"],
-        points: "26,34 36,31 40,43 30,46",
+        description: "Lote reservado con vista privilegiada.",
+        features: ["Vista privilegiada", "Etapa 2"],
     },
     {
-        zoneId: "zona-1",
-        id: "L06",
-        name: "Lote 06 — Villa Arena",
-        area: 395,
-        price: 162000,
+        zoneId: "etapa-3",
+        id: "041",
+        name: "Lote 41 — Etapa 3",
+        area: 260.0,
+        price: 382200000,
         status: "available",
-        description: "Acceso directo al club de playa y muelle privado. Inversión de alta rentabilidad.",
-        features: ["Club de playa", "Muelle privado", "Alta rentabilidad", "Acceso exclusivo"],
-        points: "40,43 50,40 54,52 44,55",
+        description: "Lote amplio en la Etapa 3 con acceso directo a amenidades.",
+        features: ["Etapa 3", "Acceso amenidades", "Alta privacidad"],
     },
     {
-        zoneId: "zona-1",
-        id: "L07",
-        name: "Lote 07 — Villa Cielo",
-        area: 330,
-        price: 135000,
+        zoneId: "etapa-3",
+        id: "042",
+        name: "Lote 42 — Etapa 3",
+        area: 245.0,
+        price: 360150000,
         status: "sold",
-        description: "Lote compacto ideal para villa de descanso. Máxima eficiencia de espacio.",
-        features: ["Diseño eficiente", "Fácil mantenimiento", "Ideal 2da vivienda"],
-        points: "14,36 24,34 28,46 18,49",
-    },
-    {
-        zoneId: "zona-1",
-        id: "L08",
-        name: "Lote 08 — Villa Brisa Sur",
-        area: 440,
-        price: 180000,
-        status: "available",
-        description: "Lote sur con vista a jardines centrales y montañas al fondo. Máxima privacidad.",
-        features: ["Vista jardines", "Alta privacidad", "Topografía plana"],
-        points: "54,29 66,27 70,39 58,42",
-    },
-    {
-        zoneId: "zona-1",
-        id: "L09",
-        name: "Lote 09 — Villa Selva",
-        area: 475,
-        price: 195000,
-        status: "reserved",
-        description: "Rodeado de vegetación tropical nativa. El lote más verde del proyecto.",
-        features: ["Vegetación nativa", "Eco-friendly", "Máxima sombra natural"],
-        points: "8,50 18,48 22,60 12,63",
-    },
-    {
-        zoneId: "zona-1",
-        id: "L10",
-        name: "Lote 10 — Villa Laguna",
-        area: 415,
-        price: 170000,
-        status: "sold",
-        description: "Frente al cuerpo de agua central del proyecto. Vistas reflejadas del amanecer.",
-        features: ["Frente laguna", "Vista amanecer", "Ambiente único"],
-        points: "62,40 72,38 76,50 66,53",
-    },
-    {
-        zoneId: "zona-1",
-        id: "L11",
-        name: "Lote 11 — Villa Nácar",
-        area: 350,
-        price: 142000,
-        status: "available",
-        description: "Lote de entrada al proyecto con diseño de portería exclusiva y parque propio.",
-        features: ["Portería propia", "Parque frontal", "Diseño exclusivo"],
-        points: "28,48 38,46 42,58 32,61",
-    },
-    {
-        zoneId: "zona-1",
-        id: "L12",
-        name: "Lote 12 — Villa Ébano",
-        area: 500,
-        price: 205000,
-        status: "sold",
-        description: "Gran lote posterior con total privacidad y espacio para piscina olímpica.",
-        features: ["Total privacidad", "Piscina olímpica posible", "Gran patio trasero"],
-        points: "62,26 74,24 78,36 66,39",
+        description: "Lote premium en ubicación destacada de la Etapa 3.",
+        features: ["Etapa 3", "Ubicación premium"],
     },
 ];
 

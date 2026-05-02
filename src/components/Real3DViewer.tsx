@@ -99,6 +99,7 @@ export default function Real3DViewer({ lots, selectedLot, onSelectLot, viewMode,
                             {isSvg ? (
                                 <InteractiveSVGMap
                                     svgUrl={activeZone.svgPath}
+                                    bgImage={activeZone.bgImage}
                                     lots={lots}
                                     selectedLot={selectedLot}
                                     onSelectLot={onSelectLot}

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 28.3.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 3840 2160" style="enable-background:new 0 0 3840 2160;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;stroke:#FFFFFF;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st1{fill:#FFFFFF;}
+	.st2{fill:#020203;}
+</style>
+<g id="ZONA_3">
+	
+		<image style="overflow:visible;" width="7680" height="4320" xlink:href="/LUWANA_3_bg.jpg" transform="matrix(0.5 0 0 0.5 0 0)">
+	</image>
+	<polyline id="ZONA_E" class="st0" points="2838.7,1556.78 2838.7,1273.94 298.49,1289.19 295.33,787.44 0,790.87 0.61,1546.34 
+		2838.7,1556.78 	"/>
+	<polygon id="ZONA_F" class="st0" points="1735.14,1280.52 1733.68,780.37 295.21,787.45 298.47,1288.34 	"/>
+	<polygon id="ZONA_G" class="st0" points="1735.14,1280.52 1733.68,780.37 2838.7,772.91 2838.7,1273.94 	"/>
+	<rect id="ZONA_H" x="2838.7" y="771.37" class="st0" width="494" height="783.87"/>
+	<rect id="MAR_CARIBE" x="3332.7" class="st0" width="507.3" height="2158.22"/>
+	<polygon id="SERVIDUMBRE" class="st0" points="2208.17,621.87 0,636.83 0,789.33 1287.13,782.51 1733.68,780.37 2208.17,777.17 	
+		"/>
+</g>
+<g id="Numeración">
+	<g>
+		<circle class="st1" cx="1261.02" cy="1087.38" r="30"/>
+		<g>
+			<g>
+				<path class="st2" d="M1269.23,1073.48h-10.84v9.43h10.02v3.14h-10.02v12.27h-3.55v-28.01h14.39V1073.48z"/>
+			</g>
+		</g>
+	</g>
+	<g>
+		<circle class="st1" cx="2299.65" cy="1091.3" r="26.33"/>
+		<g>
+			<g>
+				<path class="st2" d="M2309.3,1099.2c-1.23,0.7-2.54,1.22-3.92,1.58c-1.38,0.35-2.84,0.53-4.37,0.53c-3.63,0-6.52-1.08-8.66-3.24
+					s-3.21-5.21-3.21-9.14c0-3.97,1.19-7.13,3.56-9.49c2.37-2.36,5.43-3.54,9.18-3.54c1.39,0,2.68,0.14,3.85,0.42
+					c1.17,0.28,2.36,0.72,3.56,1.33l-1.25,2.52c-1.01-0.53-1.99-0.9-2.96-1.13c-0.97-0.23-2.04-0.34-3.21-0.34
+					c-2.75,0-5.01,0.88-6.78,2.62c-1.77,1.75-2.65,4.22-2.65,7.41c0,3.23,0.78,5.68,2.34,7.33c1.56,1.65,3.75,2.48,6.57,2.48
+					c0.93,0,1.79-0.09,2.6-0.27c0.8-0.18,1.54-0.46,2.22-0.82v-6.68h-5.35v-2.78h8.48V1099.2z"/>
+			</g>
+		</g>
+	</g>
+	<g>
+		<circle class="st1" cx="2966.46" cy="1091.05" r="26.33"/>
+		<g>
+			<g>
+				<path class="st2" d="M2975.83,1100.65h-3.14v-11.11h-12.48v11.11h-3.12v-24.58h3.12v10.7h12.48v-10.7h3.14V1100.65z"/>
+			</g>
+		</g>
+	</g>
+	<g>
+		<circle class="st1" cx="1261.02" cy="1493.02" r="30"/>
+		<g>
+			<g>
+				<path class="st2" d="M1269.51,1503.96h-15.02v-28.01h14.39v3.16h-10.84v9.02h10.04v3.16h-10.04v9.49h11.46V1503.96z"/>
+			</g>
+		</g>
+	</g>
+</g>
+</svg>

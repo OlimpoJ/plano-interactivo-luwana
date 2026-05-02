@@ -20,6 +20,17 @@ export default function LotPanel({ lot, onClose, viewMode, setViewMode }: LotPan
     const formatPrice = (p: number) =>
         new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(p);
 
+    const handleInterest = () => {
+        // Enviar mensaje a la ventana padre (Patrimofy Web)
+        window.parent.postMessage({
+            type: 'LOT_SELECTED',
+            payload: {
+                lotId: lot.id,
+                price: lot.price
+            }
+        }, '*');
+    };
+
     return (
         <AnimatePresence>
             <motion.div
@@ -155,6 +166,7 @@ export default function LotPanel({ lot, onClose, viewMode, setViewMode }: LotPan
                 {lot.status === "available" && (
                     <div className="px-8 pb-8 pt-4 flex flex-col gap-4 mt-auto bg-[var(--color-bg)] sticky bottom-0 border-t border-white/5">
                         <button
+                            onClick={handleInterest}
                             className="w-full py-4 bg-[var(--color-accent)] text-black text-[10px] tracking-widest font-bold uppercase transition-all hover:bg-[var(--color-accent-light)] border border-[var(--color-accent)]"
                         >
                             Reservar Esta Propiedad
@@ -175,7 +187,10 @@ export default function LotPanel({ lot, onClose, viewMode, setViewMode }: LotPan
                             <p className="text-[#b45309] tracking-widest uppercase text-[10px] font-bold">Reserva Activa</p>
                             <p className="text-white/40 text-xs mt-2 font-light">Contáctanos para ver villas similares</p>
                         </div>
-                        <button className="mt-4 w-full flex items-center justify-center gap-2 py-3 border border-white/20 text-[var(--color-accent-light)] text-[10px] tracking-widest uppercase hover:bg-white/5 hover:border-[var(--color-accent)] transition-all">
+                        <button 
+                            onClick={handleInterest}
+                            className="mt-4 w-full flex items-center justify-center gap-2 py-3 border border-white/20 text-[var(--color-accent-light)] text-[10px] tracking-widest uppercase hover:bg-white/5 hover:border-[var(--color-accent)] transition-all"
+                        >
                             Hablar con Asesor
                         </button>
                     </div>
