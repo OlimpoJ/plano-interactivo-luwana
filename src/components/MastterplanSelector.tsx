@@ -48,7 +48,7 @@ export default function MastterplanSelector({ onSelectZone }: { onSelectZone: (i
 
         {/* Contenedor Premium del Mapa */}
         <div 
-          className="relative w-full max-w-[1800px] mx-auto rounded-xl sm:rounded-2xl md:rounded-[2rem] overflow-hidden bg-black/50 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col landscape:flex-row h-[80vh] landscape:h-[75vh] md:h-[70vh] lg:h-[80vh]"
+          className="relative w-full max-w-[1800px] mx-auto rounded-xl sm:rounded-2xl md:rounded-[2rem] overflow-hidden bg-black/50 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
           onMouseLeave={() => setHoveredZone(null)}
         >
           
@@ -57,12 +57,12 @@ export default function MastterplanSelector({ onSelectZone }: { onSelectZone: (i
             onMouseMove={handleMouseMove}
             className="relative w-full h-full rounded-xl sm:rounded-2xl overflow-hidden bg-black shadow-2xl border border-white/5"
           >
-            {/* 1. Fondo particionado con las 3 imágenes limpias haciéndolas directamente clickeables */}
-            <div className="flex flex-col landscape:flex-row w-full h-full cursor-pointer">
+            {/* 1. Fondo particionado con las 3 imágenes. Usamos el aspect ratio exacto combinado para que las costuras (seams) sean perfectas sin recortes ni distorsión. */}
+            <div className="flex flex-col landscape:flex-row w-full portrait:aspect-[3/16] landscape:aspect-[16/3] cursor-pointer">
               {ZONES.map((zone, index) => (
                 <div 
                   key={zone.id}
-                  className="w-full h-[33.333%] landscape:w-[33.333%] landscape:h-full relative overflow-hidden group"
+                  className="flex-1 relative overflow-hidden group"
                   onMouseEnter={() => {
                     setHoveredZone(zone.label);
                     setHoveredZoneId(zone.id);
@@ -78,7 +78,7 @@ export default function MastterplanSelector({ onSelectZone }: { onSelectZone: (i
                     <img
                       src={zone.img}
                       alt={`Masterplan Luwana ${zone.label}`}
-                      className={`w-full h-full object-cover block transition-transform duration-700 ease-out ${hoveredZoneId === zone.id ? "scale-105" : "scale-100"}`}
+                      className={`w-full h-full object-fill block transition-transform duration-700 ease-out ${hoveredZoneId === zone.id ? "scale-105" : "scale-100"}`}
                     />
                   </picture>
                   {/* Overlay sutil para las etapas NO seleccionadas, dando foco a la seleccionada */}
