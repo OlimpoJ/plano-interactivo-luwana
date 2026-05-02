@@ -73,12 +73,14 @@ export default function MastterplanSelector({ onSelectZone }: { onSelectZone: (i
                   }}
                   onClick={() => onSelectZone(`etapa-${index + 1}`)}
                 >
-                  <picture className="w-full h-full flex items-center justify-center">
-                    <source media="(orientation: portrait) and (max-width: 768px)" srcSet={zone.imgMobile} />
+                  <picture className="w-full h-full block">
+                    {/* En landscape (pantallas anchas), los contenedores son columnas verticales, usamos imágenes verticales */}
+                    <source media="(orientation: landscape)" srcSet={zone.imgMobile} />
+                    {/* En portrait (celulares/tablets), los contenedores son filas horizontales, usamos imágenes horizontales */}
                     <img
                       src={zone.img}
                       alt={`Masterplan Luwana ${zone.label}`}
-                      className={`w-full h-full object-contain block transition-transform duration-700 ease-out ${hoveredZoneId === zone.id ? "scale-105" : "scale-100"}`}
+                      className={`w-full h-full object-cover block transition-transform duration-700 ease-out ${hoveredZoneId === zone.id ? "scale-105" : "scale-100"}`}
                     />
                   </picture>
                   {/* Overlay sutil para las etapas NO seleccionadas, dando foco a la seleccionada */}
