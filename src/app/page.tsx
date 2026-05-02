@@ -40,6 +40,15 @@ export default function Home() {
   const [view, setView] = useState<"hero" | "map" | "stage">("hero");
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('embed') === 'true') {
+        setView("map");
+      }
+    }
+  }, []);
+
   if (view === "stage" && selectedStage) {
     return <StageView stageId={selectedStage} onBack={() => setView("map")} />;
   }
