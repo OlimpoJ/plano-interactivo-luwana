@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 30; // Cachea la respuesta por 30 segundos para evitar Rate Limits de Google Sheets con alto tráfico
 
 export async function GET() {
   try {
