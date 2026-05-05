@@ -8,14 +8,14 @@ export async function GET() {
   try {
     const auth = new google.auth.GoogleAuth({
       credentials: {
-        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        client_email: (process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || '').replace(/^"|"$/g, ''),
+        private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n').replace(/^"|"$/g, ''),
       },
       scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
-    const spreadsheetId = '1e_dxwIK6cjfLmMQqzzlt56-NomUDLX8NZe2WaLnOmto';
+    const spreadsheetId = (process.env.GOOGLE_SHEET_ID || '').replace(/^"|"$/g, '') || '1e_dxwIK6cjfLmMQqzzlt56-NomUDLX8NZe2WaLnOmto';
 
     const info = await sheets.spreadsheets.get({ spreadsheetId });
     const sheetName = info.data.sheets?.[0]?.properties?.title || 'Hoja 1';
