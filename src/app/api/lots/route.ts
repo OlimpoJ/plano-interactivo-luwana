@@ -15,7 +15,11 @@ export async function GET() {
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
-    const spreadsheetId = (process.env.GOOGLE_SHEET_ID || '').replace(/^"|"$/g, '') || '1e_dxwIK6cjfLmMQqzzlt56-NomUDLX8NZe2WaLnOmto';
+    const spreadsheetId = (process.env.GOOGLE_SHEET_ID || '').replace(/^"|"$/g, '');
+    
+    if (!spreadsheetId) {
+      return NextResponse.json({ success: false, error: 'GOOGLE_SHEET_ID environment variable is missing' }, { status: 500 });
+    }
 
     const info = await sheets.spreadsheets.get({ spreadsheetId });
     const sheetName = info.data.sheets?.[0]?.properties?.title || 'Hoja 1';
