@@ -8,7 +8,7 @@ export async function GET() {
   try {
     const auth = new google.auth.GoogleAuth({
       credentials: {
-        client_email: (process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || '').replace(/^"|"$/g, ''),
+        client_email: (process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || 'real-estate-sheets-bot@real-estate-app-master.iam.gserviceaccount.com').replace(/^"|"$/g, ''),
         private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n').replace(/^"|"$/g, ''),
       },
       scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
