@@ -50,7 +50,12 @@ export default function Home() {
   }, []);
 
   if (view === "stage" && selectedStage) {
-    return <StageView stageId={selectedStage} onBack={() => setView("map")} />;
+    const handleNext = () => {
+      if (selectedStage === "etapa-1") setSelectedStage("etapa-2");
+      else if (selectedStage === "etapa-2") setSelectedStage("etapa-3");
+      else if (selectedStage === "etapa-3") setSelectedStage("etapa-1");
+    };
+    return <StageView stageId={selectedStage} onBack={() => setView("map")} onNext={handleNext} />;
   }
 
   if (view === "map") {

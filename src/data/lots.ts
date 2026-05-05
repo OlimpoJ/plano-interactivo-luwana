@@ -1,5 +1,5 @@
 // Demo lot data — replace with real project data from Google Sheets
-export type LotStatus = "available" | "reserved" | "sold";
+export type LotStatus = "available" | "reserved" | "sold" | "common";
 
 export interface Lot {
     id: string;
@@ -171,4 +171,5 @@ export const STATUS_CONFIG: Record<LotStatus, { label: string; color: string; bg
     available: { label: "Disponible", color: "#22c55e", bgClass: "bg-[#22c55e]" }, // Verde
     reserved: { label: "Reservado", color: "#eab308", bgClass: "bg-[#eab308]" },  // Amarillo
     sold: { label: "Vendido", color: "#ef4444", bgClass: "bg-[#ef4444]" },        // Rojo
+    common: { label: "Zona Común", color: "#14b8a6", bgClass: "bg-[#14b8a6]" },   // Turquesa
 };

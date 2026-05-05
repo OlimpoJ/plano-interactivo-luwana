@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const SvgMap = memo(({ svgContent, liveLots, onLotClick, stageNumber }: any) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -22,17 +22,33 @@ const SvgMap = memo(({ svgContent, liveLots, onLotClick, stageNumber }: any) => 
       
       const lotIdRaw = el.getAttribute("id") || el.parentElement?.getAttribute("id") || "";
       const decodedIdRaw = lotIdRaw.replace(/_x([0-9a-fA-F]{2,})_/g, (m, hex) => String.fromCharCode(parseInt(hex, 16)));
+      
+      const specialZones = ['ZONA_A', 'ZONA_B', 'ZONA_C', 'ZONA_D', 'ZONA_E', 'ZONA_F', 'ZONA_G', 'ZONA_H', 'SERVIDUMBRE', 'VÍA'];
+      let isSpecialZone = false;
+      let specialZoneId = "";
+      const upperDecoded = decodedIdRaw.toUpperCase();
+      const upperRawId = lotIdRaw.toUpperCase();
+      
+      for (const zone of specialZones) {
+          if (upperDecoded.startsWith(zone.toUpperCase()) || upperRawId.startsWith(zone.toUpperCase())) {
+              isSpecialZone = true;
+              specialZoneId = zone;
+              break;
+          }
+      }
+
       const matchDigits = decodedIdRaw.match(/\d+/);
       const lotNumStrRaw = matchDigits ? matchDigits[0] : '';
       const parsedLotNum = parseInt(lotNumStrRaw);
       
-      if (!lotNumStrRaw || isNaN(parsedLotNum) || parsedLotNum > 500 || decodedIdRaw.toUpperCase().includes('ZONA')) {
+      // Ensure we ignore background elements but allow special zones
+      if (!isSpecialZone && (!lotNumStrRaw || isNaN(parsedLotNum) || parsedLotNum > 500)) {
         el.style.pointerEvents = "none";
         return;
       }
       
-      const lotData = liveLots.find((l: any) => parseInt(l.id) === parsedLotNum);
-      const status = lotData?.status || "available";
+      const lotData = isSpecialZone ? null : liveLots.find((l: any) => parseInt(l.id) === parsedLotNum);
+      const status = isSpecialZone ? "common" : (lotData?.status || "available");
 
       let baseFill = "rgba(34, 197, 94, 0.35)";
       let baseStroke = "rgba(34, 197, 94, 0.8)";
@@ -49,30 +65,61 @@ const SvgMap = memo(({ svgContent, liveLots, onLotClick, stageNumber }: any) => 
         baseStroke = "rgba(234, 179, 8, 0.8)";
         hoverFill = "rgba(234, 179, 8, 0.6)";
         hoverStroke = "#ffffff";
+      } else if (status === "common") {
+        baseFill = "transparent"; // Transparente para dejar ver el fondo
+        baseStroke = "rgba(255, 255, 255, 0.3)";
+        hoverFill = "rgba(255, 255, 255, 0.15)"; // Efecto de cristal en hover
+        hoverStroke = "#ffffff";
       }
 
-      el.style.opacity = "1"; 
-      el.style.fill = baseFill;
-      el.style.stroke = baseStroke;
-      el.style.strokeWidth = "1";
-      el.style.cursor = "pointer";
-      el.style.pointerEvents = "all";
-      el.style.transition = "all 0.3s ease";
+      el.style.setProperty('opacity', '1', 'important');
+      el.style.setProperty('fill', baseFill, 'important');
+      el.style.setProperty('stroke', baseStroke, 'important');
+      el.style.setProperty('stroke-width', '1px', 'important');
+      el.style.setProperty('cursor', 'pointer', 'important');
+      el.style.setProperty('pointer-events', 'all', 'important');
+      el.style.setProperty('transition', 'all 0.3s ease', 'important');
 
       const handleEnter = (e: Event) => {
-        el.style.fill = hoverFill;
-        el.style.stroke = hoverStroke;
-        el.style.strokeWidth = "2";
+        el.style.setProperty('fill', hoverFill, 'important');
+        el.style.setProperty('stroke', hoverStroke, 'important');
+        el.style.setProperty('stroke-width', '2px', 'important');
       };
 
       const handleLeave = () => {
-        el.style.fill = baseFill;
-        el.style.stroke = baseStroke;
-        el.style.strokeWidth = "1";
+        el.style.setProperty('fill', baseFill, 'important');
+        el.style.setProperty('stroke', baseStroke, 'important');
+        el.style.setProperty('stroke-width', '1px', 'important');
       };
 
       const handleClick = () => {
-        onLotClick(lotData, lotNumStrRaw);
+        if (isSpecialZone) {
+            const nameMap: Record<string, string> = {
+                'ZONA_A': 'Portería',
+                'ZONA_B': 'Zona de Mascotas',
+                'ZONA_C': 'Club House',
+                'ZONA_D': 'Zona Deportiva',
+                'ZONA_E': 'Corredor Playero',
+                'ZONA_F': 'Club de Playa Luwana',
+                'ZONA_G': 'Club de Playa Anaiwa',
+                'ZONA_H': 'Alma Beach',
+                'SERVIDUMBRE': 'Servidumbre',
+                'VÍA': 'Vía Principal'
+            };
+            onLotClick({
+                rawId: nameMap[specialZoneId] || specialZoneId,
+                area: "N/A",
+                statusRaw: "Zona Común",
+                status: "common",
+                pricePerM2: "N/A",
+                totalPrice: "N/A",
+                separation: "N/A",
+                downPayment: "N/A",
+                financing: "N/A"
+            }, specialZoneId);
+        } else {
+            onLotClick(lotData, lotNumStrRaw);
+        }
       };
 
       el.addEventListener("mouseenter", handleEnter);
@@ -118,7 +165,7 @@ const SvgMap = memo(({ svgContent, liveLots, onLotClick, stageNumber }: any) => 
   );
 });
 
-export default function StageView({ stageId, onBack }: { stageId: string; onBack: () => void }) {
+export default function StageView({ stageId, onBack, onNext }: { stageId: string; onBack: () => void; onNext?: () => void }) {
   const [svgContent, setSvgContent] = useState("");
   const [liveLots, setLiveLots] = useState<any[]>([]);
   const [selectedLotData, setSelectedLotData] = useState<any | null>(null);
@@ -177,13 +224,6 @@ export default function StageView({ stageId, onBack }: { stageId: string; onBack
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black/90 pointer-events-none" />
       </div>
 
-      <button 
-        onClick={onBack}
-        className="absolute top-8 left-4 sm:left-8 z-50 flex items-center gap-2 text-[#CBAA85] hover:text-white transition-colors bg-white/5 px-4 py-2 rounded-full border border-white/10 hover:bg-white/10 text-sm sm:text-base font-medium tracking-wide"
-      >
-        <ArrowLeft size={18} /> Volver al Masterplan
-      </button>
-
       <div className="text-center mb-6 sm:mb-8 relative z-10 px-4">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif text-white mb-3" style={{ textShadow: "0 4px 20px rgba(0,0,0,0.8)" }}>
           {stageTitle}
@@ -193,7 +233,26 @@ export default function StageView({ stageId, onBack }: { stageId: string; onBack
         </p>
       </div>
 
-      <div className="relative z-10 w-[95%] sm:w-[80%] max-w-[1600px] mx-auto flex-grow bg-[#141b18] border border-white/10 rounded-2xl sm:rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] mb-10">
+      <div className="relative z-10 w-[95%] sm:w-[80%] max-w-[1600px] mx-auto flex-grow bg-[#141b18] border border-white/10 rounded-2xl sm:rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] mb-10 overflow-hidden">
+        
+        {/* Top Left Navigation Button */}
+        <button 
+          onClick={onBack}
+          className="absolute top-4 left-4 sm:top-6 sm:left-6 z-50 flex items-center gap-2 text-[#CBAA85] hover:text-white transition-all bg-black/60 backdrop-blur-md px-4 py-2 sm:px-5 sm:py-2.5 rounded-full border border-[#CBAA85]/40 hover:bg-[#CBAA85]/20 hover:border-[#CBAA85] text-xs sm:text-sm font-medium tracking-wide shadow-[0_0_15px_rgba(0,0,0,0.5)]"
+        >
+          <ArrowLeft size={16} /> Volver a Vista General
+        </button>
+
+        {/* Top Right Navigation Button */}
+        {onNext && (
+          <button 
+            onClick={onNext}
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 flex items-center gap-2 text-[#CBAA85] hover:text-white transition-all bg-black/60 backdrop-blur-md px-4 py-2 sm:px-5 sm:py-2.5 rounded-full border border-[#CBAA85]/40 hover:bg-[#CBAA85]/20 hover:border-[#CBAA85] text-xs sm:text-sm font-medium tracking-wide shadow-[0_0_15px_rgba(0,0,0,0.5)]"
+          >
+            Siguiente Etapa <ArrowRight size={16} />
+          </button>
+        )}
+
         <SvgMap 
           svgContent={svgContent} 
           liveLots={liveLots} 
@@ -226,6 +285,7 @@ export default function StageView({ stageId, onBack }: { stageId: string; onBack
               <div className={`px-4 py-1.5 rounded-full border text-xs font-bold tracking-widest uppercase
                 ${selectedLotData.status === 'available' ? 'bg-green-500/10 border-green-500/50 text-green-400' :
                   selectedLotData.status === 'reserved' ? 'bg-yellow-500/10 border-yellow-500/50 text-yellow-400' :
+                  selectedLotData.status === 'common' ? 'bg-[#14b8a6]/10 border-[#14b8a6]/50 text-[#14b8a6]' :
                   'bg-red-500/10 border-red-500/50 text-red-400'
                 }`}
               >
@@ -233,55 +293,57 @@ export default function StageView({ stageId, onBack }: { stageId: string; onBack
               </div>
             </div>
 
-            <div className="space-y-5">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white/5 p-4 rounded-xl border border-white/5">
-                  <p className="text-white/50 text-xs uppercase tracking-wider mb-1">Área Total</p>
-                  <p className="text-white font-medium text-lg">{selectedLotData.area} m²</p>
+            {selectedLotData.status !== 'common' && (
+              <div className="space-y-5">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white/5 p-4 rounded-xl border border-white/5">
+                    <p className="text-white/50 text-xs uppercase tracking-wider mb-1">Área Total</p>
+                    <p className="text-white font-medium text-lg">{selectedLotData.area} m²</p>
+                  </div>
+                  <div className="bg-white/5 p-4 rounded-xl border border-white/5">
+                    <p className="text-white/50 text-xs uppercase tracking-wider mb-1">Ubicación</p>
+                    <p className="text-white font-medium capitalize text-lg">{selectedLotData.location?.toLowerCase() || 'Medianero'}</p>
+                  </div>
                 </div>
-                <div className="bg-white/5 p-4 rounded-xl border border-white/5">
-                  <p className="text-white/50 text-xs uppercase tracking-wider mb-1">Ubicación</p>
-                  <p className="text-white font-medium capitalize text-lg">{selectedLotData.location?.toLowerCase() || 'Medianero'}</p>
-                </div>
-              </div>
 
-              <div className="bg-white/5 p-5 rounded-xl border border-[#CBAA85]/30 bg-gradient-to-br from-white/5 to-transparent">
-                <p className="text-[#CBAA85] text-xs uppercase tracking-wider mb-2">Valor Total</p>
-                <p className="text-3xl text-white font-serif">{selectedLotData.totalPrice || 'Por definir'}</p>
-                <p className="text-white/40 text-sm mt-2">Valor x m²: {selectedLotData.pricePerM2}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white/5 p-4 rounded-xl border border-white/5">
-                  <p className="text-white/50 text-[10px] uppercase tracking-wider mb-1">Separación</p>
-                  <p className="text-white text-base font-medium">$ 5.000.000</p>
+                <div className="bg-white/5 p-5 rounded-xl border border-[#CBAA85]/30 bg-gradient-to-br from-white/5 to-transparent">
+                  <p className="text-[#CBAA85] text-xs uppercase tracking-wider mb-2">Valor Total</p>
+                  <p className="text-3xl text-white font-serif">{selectedLotData.totalPrice || 'Por definir'}</p>
+                  <p className="text-white/40 text-sm mt-2">Valor x m²: {selectedLotData.pricePerM2}</p>
                 </div>
-                <div className="bg-white/5 p-4 rounded-xl border border-white/5">
-                  <p className="text-white/50 text-[10px] uppercase tracking-wider mb-1">Cuota Inicial (20%)</p>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white/5 p-4 rounded-xl border border-white/5">
+                    <p className="text-white/50 text-[10px] uppercase tracking-wider mb-1">Separación</p>
+                    <p className="text-white text-base font-medium">$ 5.000.000</p>
+                  </div>
+                  <div className="bg-white/5 p-4 rounded-xl border border-white/5">
+                    <p className="text-white/50 text-[10px] uppercase tracking-wider mb-1">Cuota Inicial (20%)</p>
+                    <p className="text-white text-base font-medium">{selectedLotData.downPayment}</p>
+                  </div>
+                </div>
+                
+                {selectedLotData.financing && selectedLotData.financing !== '' && (
+                  <div className="bg-white/5 p-4 rounded-xl border border-white/5">
+                    <div className="flex justify-between items-center mb-2">
+                      <p className="text-white/50 text-xs uppercase tracking-wider">Financiación (60%)</p>
+                      <p className="text-white text-base font-medium">
+                        {`$ ${(parseInt((selectedLotData.downPayment || '').replace(/[^\d]/g, ''), 10) * 3 || 0).toLocaleString('en-US')}`}
+                      </p>
+                    </div>
+                    <div className="flex justify-between items-center pt-2 border-t border-white/10">
+                      <p className="text-white/50 text-[10px] uppercase tracking-wider">36 Cuotas Mensuales de</p>
+                      <p className="text-white/80 text-sm font-medium">{selectedLotData.financing}</p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-white/5 p-4 rounded-xl border border-white/5 flex justify-between items-center">
+                  <p className="text-white/50 text-xs uppercase tracking-wider">Cuota Final (20%)</p>
                   <p className="text-white text-base font-medium">{selectedLotData.downPayment}</p>
                 </div>
               </div>
-              
-              {selectedLotData.financing && selectedLotData.financing !== '' && (
-                <div className="bg-white/5 p-4 rounded-xl border border-white/5">
-                  <div className="flex justify-between items-center mb-2">
-                    <p className="text-white/50 text-xs uppercase tracking-wider">Financiación (60%)</p>
-                    <p className="text-white text-base font-medium">
-                      {`$ ${(parseInt((selectedLotData.downPayment || '').replace(/[^\d]/g, ''), 10) * 3 || 0).toLocaleString('en-US')}`}
-                    </p>
-                  </div>
-                  <div className="flex justify-between items-center pt-2 border-t border-white/10">
-                    <p className="text-white/50 text-[10px] uppercase tracking-wider">36 Cuotas Mensuales de</p>
-                    <p className="text-white/80 text-sm font-medium">{selectedLotData.financing}</p>
-                  </div>
-                </div>
-              )}
-
-              <div className="bg-white/5 p-4 rounded-xl border border-white/5 flex justify-between items-center">
-                <p className="text-white/50 text-xs uppercase tracking-wider">Cuota Final (20%)</p>
-                <p className="text-white text-base font-medium">{selectedLotData.downPayment}</p>
-              </div>
-            </div>
+            )}
 
             <div className="mt-10 flex flex-col gap-3 pb-8">
               {selectedLotData.status === 'available' && (

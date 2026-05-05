@@ -28,18 +28,29 @@ function svgNumToSheetId(num: string): string {
     return `A-${String(n).padStart(2, '0')}`;
 }
 
-// IDs to skip (non-lot elements)
-const SKIP_IDS = new Set(['ZONA_C', 'ZONA_B', 'VÍA', 'SERVIDUMBRE', 'MAR_CARIBE', 'ZONA_A', 'ZONA_H', 'Numeración']);
+const SKIP_IDS = new Set(['MAR_CARIBE', 'Numeración']);
 
 // Check if an SVG element ID corresponds to a lot
 function getLotIdFromSvgId(rawId: string): string | null {
     if (!rawId) return null;
     // Skip known non-lot IDs
     if (SKIP_IDS.has(rawId)) return null;
-    // Skip long mangled ZONA_B_ IDs (amenity blocks)
-    if (rawId.startsWith('ZONA_B_') && rawId.length > 10) return null;
-
     const decoded = decodeIllustratorId(rawId);
+    
+    // Nombres de zonas especiales
+    const specialZones = ['ZONA_A', 'ZONA_B', 'ZONA_C', 'ZONA_D', 'ZONA_E', 'ZONA_F', 'ZONA_G', 'ZONA_H', 'SERVIDUMBRE', 'VÍA'];
+    
+    const upperDecoded = decoded.toUpperCase();
+    const upperRawId = rawId.toUpperCase();
+
+    // Check if the raw or decoded ID starts with any of the special zones
+    // This handles cases where Illustrator exports 'ZONA_B_00000...'
+    for (const zone of specialZones) {
+        if (upperDecoded.startsWith(zone.toUpperCase()) || upperRawId.startsWith(zone.toUpperCase())) {
+            return zone; // Return the canonical zone ID
+        }
+    }
+
     // Must decode to a valid number (1-999)
     if (/^\d+$/.test(decoded)) {
         return svgNumToSheetId(decoded);
@@ -88,25 +99,40 @@ export default function InteractiveSVGMap({ svgUrl, bgImage, lots, selectedLot, 
             const lotData = lotMap.get(sheetId.toUpperCase()) || lotMap.get(sheetId);
 
             // Assign status color based on live data
-            let status: 'available' | 'reserved' | 'sold' | 'blocked' = 'available';
+            let status: 'available' | 'reserved' | 'sold' | 'blocked' | 'common' = 'available';
             if (lotData) {
                 status = lotData.status;
+            } else {
+                const specialZones = ['ZONA_A', 'ZONA_B', 'ZONA_C', 'ZONA_D', 'ZONA_E', 'ZONA_F', 'ZONA_G', 'ZONA_H', 'SERVIDUMBRE', 'VÍA'];
+                if (specialZones.includes(sheetId)) {
+                    status = 'common';
+                }
             }
 
             const isSelected = selectedLot?.id === sheetId;
 
+            if (status === 'common') {
+                console.log(`[DEBUG] Found special zone: ${rawId} -> mapped to ${sheetId}`);
+            }
+
             const svgShape = shape as SVGElement;
-            const safeStatus = (['available', 'reserved', 'sold'] as const).includes(status as 'available' | 'reserved' | 'sold')
-                ? (status as 'available' | 'reserved' | 'sold')
+            const safeStatus = (['available', 'reserved', 'sold', 'common'] as const).includes(status as any)
+                ? (status as 'available' | 'reserved' | 'sold' | 'common')
                 : 'sold';
-            svgShape.style.fill = STATUS_CONFIG[safeStatus].color;
-            svgShape.style.fillOpacity = isSelected ? '1' : '0.65';
-            svgShape.style.transition = 'all 0.25s ease';
-            svgShape.style.cursor = 'pointer';
-            svgShape.style.stroke = isSelected ? '#fff' : 'rgba(255,255,255,0.3)';
-            svgShape.style.strokeWidth = isSelected ? '3px' : '1px';
+            
+            // Apply styles with !important to override any SVG-level CSS classes or inline styles
+            svgShape.style.setProperty('fill', STATUS_CONFIG[safeStatus].color, 'important');
+            svgShape.style.setProperty('fill-opacity', isSelected ? '1' : '0.65', 'important');
+            svgShape.style.setProperty('transition', 'all 0.25s ease', 'important');
+            svgShape.style.setProperty('cursor', 'pointer', 'important');
+            svgShape.style.setProperty('stroke', isSelected ? '#fff' : 'rgba(255,255,255,0.3)', 'important');
+            svgShape.style.setProperty('stroke-width', isSelected ? '3px' : '1px', 'important');
+            svgShape.style.setProperty('pointer-events', 'all', 'important'); // Force clickability
+
             if (isSelected) {
-                svgShape.style.filter = 'drop-shadow(0px 0px 10px rgba(255,255,255,0.9))';
+                svgShape.style.setProperty('filter', 'drop-shadow(0px 0px 10px rgba(255,255,255,0.9))', 'important');
+            } else {
+                svgShape.style.removeProperty('filter');
             }
 
             // Store sheetId on the element for event handlers
@@ -119,38 +145,68 @@ export default function InteractiveSVGMap({ svgUrl, bgImage, lots, selectedLot, 
                 
                 let clickedLot = lotMap.get(id.toUpperCase()) || lotMap.get(id);
                 if (!clickedLot) {
-                    // Create a fallback lot from the sheet ID
-                    const num = parseInt(id.replace('A-', ''), 10);
-                    clickedLot = {
-                        id,
-                        name: `Lote ${id}`,
-                        area: 300,
-                        price: 0,
-                        status: 'available',
-                        description: 'Lote disponible. Consulta disponibilidad.',
-                        features: [],
-                        zoneId: 'zona-1',
-                    } as Lot;
+                    const specialZoneNames: Record<string, string> = {
+                        'ZONA_A': 'Portería',
+                        'ZONA_B': 'Zona de Mascotas',
+                        'ZONA_C': 'Club House',
+                        'ZONA_D': 'Zona Deportiva',
+                        'ZONA_E': 'Corredor Playero',
+                        'ZONA_F': 'Club de Playa Luwana',
+                        'ZONA_G': 'Club de Playa Anaiwa',
+                        'ZONA_H': 'Alma Beach',
+                        'SERVIDUMBRE': 'Servidumbre',
+                        'VÍA': 'Calle Principal de Luwana'
+                    };
+
+                    if (specialZoneNames[id]) {
+                        clickedLot = {
+                            id,
+                            name: specialZoneNames[id],
+                            area: 0,
+                            price: 0,
+                            status: 'common',
+                            description: 'Zona común del proyecto.',
+                            features: [],
+                            zoneId: 'zona-comun',
+                        } as Lot;
+                    } else {
+                        // Create a fallback lot from the sheet ID
+                        const num = parseInt(id.replace('A-', ''), 10);
+                        clickedLot = {
+                            id,
+                            name: `Lote ${id}`,
+                            area: 300,
+                            price: 0,
+                            status: 'available',
+                            description: 'Lote disponible. Consulta disponibilidad.',
+                            features: [],
+                            zoneId: 'zona-1',
+                        } as Lot;
+                    }
                 }
                 onSelectLot(clickedLot);
             };
 
             const handleHover = (e: MouseEvent) => {
                 const el = e.currentTarget as SVGElement;
-                el.style.fillOpacity = '1';
-                el.style.stroke = '#fff';
-                el.style.strokeWidth = '2px';
-                el.style.filter = 'drop-shadow(0px 0px 6px rgba(255,255,255,0.7))';
+                el.style.setProperty('fill-opacity', '1', 'important');
+                el.style.setProperty('stroke', '#fff', 'important');
+                el.style.setProperty('stroke-width', '2px', 'important');
+                el.style.setProperty('filter', 'drop-shadow(0px 0px 6px rgba(255,255,255,0.7))', 'important');
             };
 
             const handleLeave = (e: MouseEvent) => {
                 const el = e.currentTarget as SVGElement;
                 const id = el.dataset.sheetId;
                 const isSel = selectedLot?.id === id;
-                el.style.fillOpacity = isSel ? '1' : '0.65';
-                el.style.stroke = isSel ? '#fff' : 'rgba(255,255,255,0.3)';
-                el.style.strokeWidth = isSel ? '3px' : '1px';
-                el.style.filter = isSel ? 'drop-shadow(0px 0px 10px rgba(255,255,255,0.9))' : 'none';
+                el.style.setProperty('fill-opacity', isSel ? '1' : '0.65', 'important');
+                el.style.setProperty('stroke', isSel ? '#fff' : 'rgba(255,255,255,0.3)', 'important');
+                el.style.setProperty('stroke-width', isSel ? '3px' : '1px', 'important');
+                if (isSel) {
+                    el.style.setProperty('filter', 'drop-shadow(0px 0px 10px rgba(255,255,255,0.9))', 'important');
+                } else {
+                    el.style.removeProperty('filter');
+                }
             };
 
             svgShape.addEventListener('click', handleClick as EventListener);
