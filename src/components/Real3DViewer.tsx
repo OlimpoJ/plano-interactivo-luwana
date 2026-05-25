@@ -10,14 +10,15 @@ import type { Lot, Zone } from "@/data/lots";
 import InteractiveSVGMap from "@/components/InteractiveSVGMap";
 import ImageCarousel from "@/components/ImageCarousel";
 import { motion, AnimatePresence } from "framer-motion";
+import { getMediaUrl } from "@/utils/media";
 
 function Model({ url }: { url: string }) {
     const { scene } = useGLTF(url);
     return <primitive object={scene} />;
 }
 
-useGLTF.preload("/modelo.glb");
-useGLTF.preload("/casa.glb");
+useGLTF.preload(getMediaUrl("/modelo.glb"));
+useGLTF.preload(getMediaUrl("/casa.glb"));
 
 function Loader() {
     return (
@@ -44,7 +45,7 @@ export default function Real3DViewer({ lots, selectedLot, onSelectLot, viewMode,
     const is3DVilla1 = viewMode === "3d-villa1";
 
     const show3D = is3DMaster || is3DVilla1;
-    const modelUrl = is3DVilla1 ? "/casa.glb" : "/modelo.glb";
+    const modelUrl = is3DVilla1 ? getMediaUrl("/casa.glb") : getMediaUrl("/modelo.glb");
 
     const isSvg = activeZone.svgPath.toLowerCase().endsWith(".svg");
 

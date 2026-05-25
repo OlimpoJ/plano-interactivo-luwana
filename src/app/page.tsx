@@ -36,9 +36,40 @@ function AnimatedCounter({ endValue, duration = 2000 }: { endValue: number; dura
   return <>{count}</>;
 }
 
+import { getMediaUrl } from "@/utils/media";
+
 export default function Home() {
   const [view, setView] = useState<"hero" | "map" | "stage">("hero");
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
+  const [stats, setStats] = useState({
+    total: 122,
+    sold: 101,
+    available: 21
+  });
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const response = await fetch('/api/lots');
+        const data = await response.json();
+        
+        if (data.success && data.lots) {
+          const total = data.lots.length;
+          const available = data.lots.filter((l: any) => l.status === 'available').length;
+          const sold = total - available;
+
+          setStats({
+            total: total > 0 ? total : 122,
+            sold: total > 0 ? sold : 101,
+            available: total > 0 ? available : 21
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching live stats:", error);
+      }
+    }
+    fetchStats();
+  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -80,23 +111,11 @@ export default function Home() {
           playsInline
           className={styles.backgroundVideo}
         >
-          <source src="/showroom loop.mp4" type="video/mp4" />
+          <source src={getMediaUrl('/showroom loop.mp4')} type="video/mp4" />
         </video>
 
         {/* Overlay con Gradientes Premium */}
         <div className={styles.gradientOverlay}></div>
-
-        {/* Logo Superior */}
-        <div className={styles.logoContainer}>
-          <img 
-            src="/LOGO LUWANA BLANCO01.png" 
-            alt="Luwana Alma Beach" 
-            className={styles.logo}
-            onError={(e) => {
-               (e.target as HTMLImageElement).src = "/LOGO SVG.svg";
-            }}
-          />
-        </div>
 
         {/* Estructura Izquierda / Derecha de Patrimofy */}
         <div className={styles.heroContent}>
@@ -119,22 +138,34 @@ export default function Home() {
               </button>
             </div>
           </div>
-
+ 
           <div className={styles.rightColumn}>
+            {/* Logo en la columna derecha, sobre el contador de Disponibles */}
+            <div className={styles.rightLogoContainer}>
+              <img 
+                src="/LOGO LUWANA BLANCO01.png" 
+                alt="Luwana Alma Beach" 
+                className={styles.logo}
+                onError={(e) => {
+                   (e.target as HTMLImageElement).src = "/LOGO SVG.svg";
+                }}
+              />
+            </div>
+
             <div className={styles.statsContainer}>
               <div className={styles.statBox}>
-                <span className={styles.statValue}><AnimatedCounter endValue={122} /></span>
-                <span className={styles.statLabel}>Villas Totales</span>
+                <span className={styles.statValue}><AnimatedCounter endValue={stats.total} /></span>
+                <span className={styles.statLabel}>Lotes Totales</span>
               </div>
               <div className={styles.statDivider}></div>
               <div className={styles.statBox}>
-                <span className={styles.statValue}><AnimatedCounter endValue={31} /></span>
+                <span className={styles.statValue}><AnimatedCounter endValue={stats.sold} /></span>
+                <span className={styles.statLabel}>Vendidos</span>
+              </div>
+              <div className={styles.statDivider}></div>
+              <div className={styles.statBox}>
+                <span className={styles.statValue}><AnimatedCounter endValue={stats.available} /></span>
                 <span className={styles.statLabel}>Disponibles</span>
-              </div>
-              <div className={styles.statDivider}></div>
-              <div className={styles.statBox}>
-                <span className={styles.statValue}>$<AnimatedCounter endValue={250} />M</span>
-                <span className={styles.statLabel}>Inversión</span>
               </div>
             </div>
             <div className={styles.locationSmall}>
