@@ -59,7 +59,7 @@ const stagesData = [
   },
   {
     id: "ZONA_6",
-    name: "Etapa 6",
+    name: "Alma Beach",
     active: true,
     cx: 3339,
     cy: 1040,
@@ -92,7 +92,7 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
       "ZONA_3": { total: 0, available: 0, active: false, name: "Etapa 3" },
       "ZONA_4": { total: 0, available: 0, active: false, name: "Etapa 4" },
       "ZONA_5": { total: 0, available: 0, active: false, name: "Etapa 5" },
-      "ZONA_6": { total: 0, available: 0, active: true, name: "Etapa 6" },
+      "ZONA_6": { total: 0, available: 0, active: true, name: "Alma Beach" },
     };
 
     // Procesar disponibilidad de lotes del Sheet
@@ -137,7 +137,7 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
   };
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-[#070c16] py-12 px-4 select-none">
+    <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-[#070c16] py-12 px-4 lg:p-0 select-none">
       
       {/* Fondo difuminado esmerilado */}
       <div className="absolute inset-0 z-0 overflow-hidden">
@@ -149,7 +149,7 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
         <div className="absolute inset-0 bg-gradient-to-b from-[#070c16]/95 via-[#070c16]/80 to-[#070c16]/95 pointer-events-none" />
       </div>
 
-      <div className="relative z-10 flex flex-col items-center w-full max-w-[1600px] h-full">
+      <div className="relative z-10 flex flex-col items-center w-full max-w-[1600px] lg:max-w-none h-full">
         
         {/* Cabecera Premium de Loom */}
         <div className="text-center mb-8 flex flex-col items-center w-full">
@@ -169,10 +169,10 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
         </div>
 
         {/* Contenedor del Mapa con Marco Centrado y Glassmorphic */}
-        <div className="flex-1 w-full flex items-center justify-center p-2 z-10 overflow-y-auto">
+        <div className="flex-1 w-full flex items-center justify-center p-2 lg:p-0 z-10 overflow-y-auto">
           <div 
             ref={containerRef}
-            className="relative w-full aspect-[3840/1060] max-w-[min(1450px,calc((100vh-220px)*3.62))] rounded-xl overflow-hidden bg-black/40 border border-white/10 shadow-[0_30px_70px_rgba(0,0,0,0.8)]"
+            className="relative w-full aspect-[3840/1060] lg:max-w-none lg:rounded-none rounded-xl overflow-hidden bg-black/40 border border-white/10 lg:border-none shadow-[0_30px_70px_rgba(0,0,0,0.8)] lg:shadow-none"
             onMouseMove={handleMouseMove}
             onMouseLeave={() => setHoveredStage(null)}
           >

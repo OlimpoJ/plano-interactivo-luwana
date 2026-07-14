@@ -93,7 +93,7 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: "100%", opacity: 0.8 }}
         transition={{ type: "spring", damping: 25, stiffness: 150 }}
-        className="fixed top-0 right-0 z-40 h-screen w-full sm:w-[420px] bg-[#0c1524]/90 border-l border-[#dbaa67]/30 shadow-2xl backdrop-blur-md flex flex-col text-white"
+        className="fixed top-0 right-0 z-40 h-[100dvh] w-full sm:w-[420px] bg-[#0c1524]/90 border-l border-[#dbaa67]/30 shadow-2xl backdrop-blur-md flex flex-col text-white"
       >
         {/* Cabecera del Panel */}
         <div className="p-6 border-b border-white/10 flex justify-between items-center relative z-10">
@@ -168,7 +168,7 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
         </div>
 
         {/* Acciones del Panel */}
-        <div className="p-6 border-t border-white/10 space-y-3 bg-[#070c16]/50 relative z-10">
+        <div className="p-6 pb-10 sm:pb-6 border-t border-white/10 space-y-3 bg-[#070c16]/50 relative z-10">
           {lot.status !== "sold" ? (
             <>
               {/* Botón de Showroom (Cargar plantas y Kuula) */}

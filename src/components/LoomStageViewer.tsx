@@ -49,7 +49,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
   const isAmenities = stageId === "etapa_6";
   const svgUrl = isAmenities ? "" : (stageId === "etapa_1" ? "/loom/loom_stage_1.svg" : "/loom/loom_stage_2.svg");
   const bgImage = stageId === "etapa_1" ? "/loom/loom_stage_1_bg.webp" : (stageId === "etapa_2" ? "/loom/loom_stage_2_bg.webp" : "/loom/loom_stage_6_bg.webp");
-  const stageName = stageId === "etapa_1" ? "Etapa 1" : (stageId === "etapa_2" ? "Etapa 2" : "Etapa 6");
+  const stageName = stageId === "etapa_1" ? "Etapa 1" : (stageId === "etapa_2" ? "Etapa 2" : "Alma Beach");
 
   // Navegación de etapas activas
   const activeStages = ["etapa_1", "etapa_2", "etapa_6"];
@@ -398,13 +398,25 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
 
       {/* HUD Superior / Header de la Etapa */}
       <div className="relative z-20 w-full bg-gradient-to-b from-black/80 to-transparent pt-6 pb-4 px-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[#dbaa67] font-semibold">Loom Luxury Residence</span>
-            <span className="text-white/30 text-xs">•</span>
-            <span className="text-[10px] uppercase tracking-[0.2em] text-white/50">{stageName}</span>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={onBack}
+            className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 rounded-full text-[9px] uppercase tracking-wider text-[#dbaa67] hover:text-white font-bold backdrop-blur-md transition-all duration-300 shadow-md cursor-pointer"
+            title="Volver al Master Plan"
+          >
+            <svg className="w-3.5 h-3.5 text-[#dbaa67]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            <span className="hidden sm:inline">Master Plan</span>
+          </button>
+          <div>
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-[10px] uppercase tracking-[0.2em] text-[#dbaa67] font-semibold">Loom Luxury Residence</span>
+              <span className="text-white/30 text-xs">•</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-white/50">{stageName}</span>
+            </div>
+            <h2 className="text-lg sm:text-2xl font-serif tracking-wide text-white uppercase">{isAmenities ? "Club de Playa & Amenidades" : "MAPA DE DISPONIBILIDAD"}</h2>
           </div>
-          <h2 className="text-xl sm:text-2xl font-serif tracking-wide text-white uppercase">{isAmenities ? "Club de Playa & Amenidades" : "MAPA DE DISPONIBILIDAD"}</h2>
         </div>
 
         {/* Panel de Filtros / Resumen de Amenidades */}
@@ -455,8 +467,14 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
       </div>
 
       {/* Área del Plano */}
-      <div className="relative flex-1 w-full flex items-center justify-center p-4 z-10 overflow-y-auto">
-        <div className="relative w-full max-w-[min(1300px,calc((100vh-180px)*16/9))] aspect-[16/9] rounded-xl overflow-visible lg:overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)] border border-white/5 bg-black">
+      <div className="relative flex-1 w-full flex items-center justify-center p-4 lg:p-0 z-10 overflow-y-auto">
+        <div className="relative w-full lg:max-w-none lg:w-full lg:h-[calc(100vh-120px)] lg:aspect-auto aspect-[16/9] rounded-xl lg:rounded-none overflow-visible lg:overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)] lg:shadow-none border border-white/5 lg:border-none bg-black">
+          {/* Ocultar textos nativos del SVG (evita números dobles al hacer zoom) */}
+          <style dangerouslySetInnerHTML={{ __html: `
+            svg text {
+              display: none !important;
+            }
+          `}} />
           
           {/* Fondo de Render de la Etapa */}
           <img
@@ -548,57 +566,31 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
             </>
           )}
 
-          {/* Dock de Control Flotante (Luxury Panel) */}
-          <div className="absolute -top-10 lg:top-auto lg:bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2.5 lg:gap-4 bg-white/[0.08] backdrop-blur-2xl border border-white/20 px-3 py-1.5 lg:px-4 lg:py-2.5 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-fit max-w-[90vw] whitespace-nowrap">
-            {/* Botón Volver */}
+          {/* Flecha Lateral Izquierda (Etapa Anterior) - Translúcida */}
+          {prevStageId && onChangeStage && (
             <button
-              onClick={onBack}
-              className="flex items-center gap-1.5 lg:gap-2 px-2 py-0.5 lg:px-3 lg:py-1 bg-white/10 hover:bg-white/20 text-white/90 hover:text-white rounded-full uppercase tracking-wider text-[9px] lg:text-[10px] transition-all duration-300 font-semibold border border-white/10 active:scale-95"
+              onClick={() => onChangeStage(prevStageId)}
+              className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 rounded-full text-white/80 hover:text-white backdrop-blur-md transition-all duration-300 shadow-lg cursor-pointer"
+              title="Etapa Anterior"
             >
-              <svg className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-[#dbaa67]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"></path>
               </svg>
-              <span>Master Plan</span>
             </button>
+          )}
 
-            {/* Divisor */}
-            <div className="w-[1px] h-3.5 lg:h-4 bg-white/20" />
-
-            {/* Navegador de Etapas */}
-            <div className="flex items-center gap-1 lg:gap-2">
-              {/* Anterior */}
-              <button
-                onClick={() => prevStageId && onChangeStage?.(prevStageId)}
-                disabled={!prevStageId || !onChangeStage}
-                className="p-1 lg:p-1.5 text-white/60 hover:text-white hover:bg-white/10 rounded-full disabled:opacity-20 disabled:pointer-events-none transition-all duration-300 active:scale-95"
-                title="Etapa Anterior"
-              >
-                <svg className="w-3.5 h-3.5 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"></path>
-                </svg>
-              </button>
-
-              {/* Nombre de la Etapa Actual */}
-              <div className="flex items-center gap-1 lg:gap-1.5 px-1 lg:px-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#10b981] animate-pulse"></span>
-                <span className="text-[9px] lg:text-[10px] font-bold uppercase tracking-[0.2em] text-[#dbaa67]">
-                  {stageName}
-                </span>
-              </div>
-
-              {/* Siguiente */}
-              <button
-                onClick={() => nextStageId && onChangeStage?.(nextStageId)}
-                disabled={!nextStageId || !onChangeStage}
-                className="p-1 lg:p-1.5 text-white/60 hover:text-white hover:bg-white/5 rounded-full disabled:opacity-20 disabled:pointer-events-none transition-all duration-300 active:scale-95"
-                title="Siguiente Etapa"
-              >
-                <svg className="w-3.5 h-3.5 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
+          {/* Flecha Lateral Derecha (Etapa Siguiente) - Translúcida */}
+          {nextStageId && onChangeStage && (
+            <button
+              onClick={() => onChangeStage(nextStageId)}
+              className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 rounded-full text-white/80 hover:text-white backdrop-blur-md transition-all duration-300 shadow-lg cursor-pointer"
+              title="Etapa Siguiente"
+            >
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 
