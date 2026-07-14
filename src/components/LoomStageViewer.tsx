@@ -72,6 +72,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
           const parser = new DOMParser();
           const doc = parser.parseFromString(text, "image/svg+xml");
           
+          doc.documentElement.setAttribute("preserveAspectRatio", "xMidYMid slice");
           const viewBoxAttr = doc.documentElement.getAttribute("viewBox") || "0 0 3840 2160";
           const viewBoxParts = viewBoxAttr.split(" ").map(Number);
           const viewBoxWidth = viewBoxParts[2] || 3840;
@@ -319,13 +320,13 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
       if (status === "blocked" && !activeFilters.sold) pinDisplay = "none";
 
       styles += `
-        /* Estado por defecto del lote: completamente transparente con borde blanco sutil (Estilo Luwana) */
+        /* Estado por defecto del lote: completamente transparente sin borde visible */
         g#LOTGROUP_${lotId} path,
         g#LOTGROUP_${lotId} polyline,
         g#LOTGROUP_${lotId} polygon,
         g#LOTGROUP_${lotId} rect:not(.svg-pin-rect) {
           fill: rgba(0, 0, 0, 0) !important;
-          stroke: rgba(255, 255, 255, 0.4) !important;
+          stroke: transparent !important;
           stroke-width: ${isSelected ? '3.5px' : '1.5px'} !important;
           ${isSelected ? `fill: ${baseColor} !important; fill-opacity: 0.25 !important; stroke: ${baseColor} !important;` : ''}
           transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
@@ -480,7 +481,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
           <img
             src={bgImage}
             alt={`Fondo ${stageName}`}
-            className="absolute inset-0 w-full h-full object-fill pointer-events-none"
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
             draggable={false}
           />
 
@@ -489,7 +490,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
               {/* SVG Vectorial Overlay (Capa interactiva de lotes y trazados) */}
               {svgText && (
                 <div
-                  className="absolute inset-0 w-full h-full [&>svg]:w-full [&>svg]:h-full [&>svg]:object-fill z-10 pointer-events-auto"
+                  className="absolute inset-0 w-full h-full [&>svg]:w-full [&>svg]:h-full [&>svg]:object-cover z-10 pointer-events-auto"
                   dangerouslySetInnerHTML={{ __html: svgText }}
                   onMouseOver={(e) => {
                     const target = e.target as SVGElement;
