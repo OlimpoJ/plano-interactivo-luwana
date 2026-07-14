@@ -127,6 +127,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
 
               // Asignar ID al grupo padre de este lote en el SVG para el hover CSS
               const lotGroup = c.parentElement;
+              let closestElement: Element | null = null;
               if (lotGroup) {
                 lotGroup.setAttribute("id", `LOTGROUP_${lotId}`);
                 lotGroup.setAttribute("class", "lot-group-interactive");
@@ -135,7 +136,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                 const shapesContainer = doc.getElementById(`LOTES_${manzana}`) || manzanaGroup;
                 if (shapesContainer) {
                   let minDistance = Infinity;
-                  let closestElement: Element | null = null;
+                  closestElement = null;
 
                   const shapes = shapesContainer.querySelectorAll("rect, path, polygon");
                   shapes.forEach((shape) => {
@@ -224,11 +225,12 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                 pinRect.setAttribute("id", `PIN_RECT_${lotId}`);
                 pinRect.setAttribute("style", "transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none;");
 
-                // Eliminar cualquier elemento vectorizado original (como números o formas de fondo) en el grupo del marcador
+                // Eliminar cualquier elemento vectorizado original (como números o formas de fondo) en el grupo del marcador,
+                // pero conservando la forma del lote que acabamos de asociar (closestElement).
                 const markerGroup = c.parentElement;
                 if (markerGroup) {
                   Array.from(markerGroup.children).forEach((child) => {
-                    if (child !== c) {
+                    if (child !== c && child !== closestElement) {
                       child.remove();
                     }
                   });

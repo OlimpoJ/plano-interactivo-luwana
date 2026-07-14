@@ -303,7 +303,7 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
 
                         {/* Indicador Circular de Disponibilidad */}
                         <circle
-                          cx={isActive ? stage.cx - 120 : stage.cx - 75}
+                          cx={isActive ? stage.cx - 95 : stage.cx - 60}
                           cy={stage.cy}
                           r={isActive ? 12 : 6}
                           fill={isActive ? "#10b981" : "rgba(255, 255, 255, 0.2)"}
@@ -315,7 +315,7 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
                         />
                         {isActive && (
                           <circle
-                            cx={stage.cx - 120}
+                            cx={stage.cx - 95}
                             cy={stage.cy}
                             r="12"
                             fill="none"
@@ -330,7 +330,7 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
 
                         {/* Texto del Rótulo */}
                         <text
-                          x={isActive ? stage.cx - 70 : stage.cx - 45}
+                          x={isActive ? stage.cx - 50 : stage.cx - 30}
                           y={stage.cy}
                           fill={isActive ? "#ffffff" : "rgba(255, 255, 255, 0.35)"}
                           fontSize={isActive ? 32 : 22}
