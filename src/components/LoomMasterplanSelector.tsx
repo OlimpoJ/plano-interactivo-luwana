@@ -1,0 +1,477 @@
+"use client";
+
+import { useEffect, useState, useMemo, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+interface Lot {
+  id: string;
+  rawId: string;
+  area: string;
+  location: string;
+  status: string;
+  statusRaw: string;
+  totalPrice: string;
+  downPayment: string;
+  financing: string;
+  finalPayment: string;
+}
+
+const stagesData = [
+  {
+    id: "ZONA_1",
+    name: "Etapa 1",
+    active: true,
+    cx: 508,
+    cy: 1146,
+    points: "1017.98,1445.32 14.45,1454.13 15.9,1444.36 21.97,1388.42 27.41,1276.1 27.96,1189.33 21.14,1045.23 5.28,911.6 -2.18,868.48 490.2,837.93",
+  },
+  {
+    id: "ZONA_2",
+    name: "Etapa 2",
+    active: true,
+    cx: 1003,
+    cy: 1127,
+    points: "965.47,808.43 490.2,837.93 1017.98,1445.32 1515.09,1440.95",
+  },
+  {
+    id: "ZONA_3",
+    name: "Etapa 3",
+    active: false,
+    cx: 1484,
+    cy: 1116,
+    points: "965.47,808.43 1440.74,778.94 2012.2,1436.58 1515.09,1440.95",
+  },
+  {
+    id: "ZONA_4",
+    name: "Etapa 4",
+    active: false,
+    cx: 1941,
+    cy: 1098,
+    points: "1440.74,778.94 2012.2,1436.58 2437.44,1446.29 2399.42,1302.73 1916.19,754.8",
+  },
+  {
+    id: "ZONA_5",
+    name: "Etapa 5",
+    active: false,
+    cx: 2507,
+    cy: 1081,
+    points: "1916.19,754.8 2755.25,717.93 2919.9,1452.31 2437.44,1446.29 2399.42,1302.73",
+  },
+  {
+    id: "ZONA_6",
+    name: "Etapa 6",
+    active: true,
+    cx: 3339,
+    cy: 1040,
+    points: "2755.25,717.93 3840,636.2 3839.79,1420.08 2919.9,1452.31",
+  },
+];
+
+interface LoomMasterplanSelectorProps {
+  lots: Lot[];
+  onSelectStage: (stageId: string) => void;
+  onBack: () => void;
+}
+
+export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: LoomMasterplanSelectorProps) {
+  const [hoveredStage, setHoveredStage] = useState<{
+    id: string;
+    name: string;
+    total: number;
+    available: number;
+    active: boolean;
+  } | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Estadísticas globales de las etapas calculadas dinámicamente desde el Sheet
+  const stageStats = useMemo(() => {
+    const stats: Record<string, { total: number; available: number; active: boolean; name: string }> = {
+      "ZONA_1": { total: 0, available: 0, active: true, name: "Etapa 1" },
+      "ZONA_2": { total: 0, available: 0, active: true, name: "Etapa 2" },
+      "ZONA_3": { total: 0, available: 0, active: false, name: "Etapa 3" },
+      "ZONA_4": { total: 0, available: 0, active: false, name: "Etapa 4" },
+      "ZONA_5": { total: 0, available: 0, active: false, name: "Etapa 5" },
+      "ZONA_6": { total: 0, available: 0, active: true, name: "Etapa 6" },
+    };
+
+    // Procesar disponibilidad de lotes del Sheet
+    lots.forEach((lot) => {
+      const lotId = lot.id.toUpperCase();
+      let zone = "";
+
+      if (lotId.startsWith("A-") || lotId.startsWith("B-") || lotId.startsWith("C-")) {
+        zone = "ZONA_1";
+      } else if (lotId.startsWith("D-") || lotId.startsWith("E-")) {
+        zone = "ZONA_2";
+      }
+
+      if (zone && stats[zone]) {
+        stats[zone].total += 1;
+        if (lot.status === "available") {
+          stats[zone].available += 1;
+        }
+      }
+    });
+
+    // Fallbacks si el API aún no carga o está vacía
+    if (stats["ZONA_1"].total === 0) stats["ZONA_1"].total = 62;
+    if (stats["ZONA_2"].total === 0) stats["ZONA_2"].total = 58;
+    if (stats["ZONA_3"].total === 0) stats["ZONA_3"].total = 32;
+    if (stats["ZONA_4"].total === 0) stats["ZONA_4"].total = 34;
+    if (stats["ZONA_5"].total === 0) stats["ZONA_5"].total = 36;
+    if (stats["ZONA_6"].total === 0) stats["ZONA_6"].total = 7;
+    stats["ZONA_6"].available = 7;
+
+    return stats;
+  }, [lots]);
+
+  // Trackear posición del cursor
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
+  return (
+    <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-[#070c16] py-12 px-4 select-none">
+      
+      {/* Fondo difuminado esmerilado */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <img
+          src="/loom/loom_masterplan_bg.webp"
+          alt="Blur background"
+          className="w-full h-full object-cover opacity-15 blur-2xl scale-110 pointer-events-none"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#070c16]/95 via-[#070c16]/80 to-[#070c16]/95 pointer-events-none" />
+      </div>
+
+      <div className="relative z-10 flex flex-col items-center w-full max-w-[1600px] h-full">
+        
+        {/* Cabecera Premium de Loom */}
+        <div className="text-center mb-8 flex flex-col items-center w-full">
+          <div className="flex items-center gap-4 mb-2">
+            <span className="h-[1px] w-8 sm:w-16 bg-[#dbaa67]/50"></span>
+            <span className="text-[10px] sm:text-xs text-[#dbaa67] uppercase tracking-[0.3em] font-light">
+              Loom Luxury Residence
+            </span>
+            <span className="h-[1px] w-8 sm:w-16 bg-[#dbaa67]/50"></span>
+          </div>
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-serif text-white tracking-wide mb-3">
+            PLANO DE URBANISMO
+          </h1>
+          <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-[0.2em] font-medium max-w-md">
+            Selecciona una de las etapas disponibles para explorar la disponibilidad de lotes
+          </p>
+        </div>
+
+        {/* Contenedor del Mapa con Marco Centrado y Glassmorphic */}
+        <div className="flex-1 w-full flex items-center justify-center p-2 z-10 overflow-y-auto">
+          <div 
+            ref={containerRef}
+            className="relative w-full aspect-[3840/1060] max-w-[min(1450px,calc((100vh-220px)*3.62))] rounded-xl overflow-hidden bg-black/40 border border-white/10 shadow-[0_30px_70px_rgba(0,0,0,0.8)]"
+            onMouseMove={handleMouseMove}
+            onMouseLeave={() => setHoveredStage(null)}
+          >
+            {/* Estilos CSS Nativos para Hitbox Vectorial */}
+            <style dangerouslySetInnerHTML={{ __html: `
+              svg polygon[id^="ZONA_"] {
+                fill: transparent !important;
+                stroke: transparent !important;
+                cursor: pointer !important;
+                pointer-events: all !important;
+              }
+              svg polygon[id^="ZONA_3"],
+              svg polygon[id^="ZONA_4"],
+              svg polygon[id^="ZONA_5"] {
+                cursor: not-allowed !important;
+              }
+            `}} />
+
+            {/* SVG Visual Overlay (Glassmorphism & Zoom) */}
+            <svg 
+              viewBox="0 550 3840 1060" 
+              className="absolute inset-0 w-full h-full object-fill pointer-events-none z-10"
+            >
+              <defs>
+                {stagesData.map((stage) => (
+                  <clipPath 
+                    key={stage.id} 
+                    id={`clip-${stage.id.toLowerCase().replace('_', '-')}`}
+                  >
+                    <polygon points={stage.points} />
+                  </clipPath>
+                ))}
+              </defs>
+
+              {/* Imagen de Fondo del Masterplan Base */}
+              <image
+                href="/loom/loom_masterplan_bg.webp"
+                x="0"
+                y="0"
+                width="3840"
+                height="2160"
+                pointerEvents="none"
+              />
+
+
+              {stagesData.map((stage) => {
+                const isHovered = hoveredStage?.id === stage.id;
+                const isActive = stage.active;
+                return (
+                  <g 
+                    key={stage.id}
+                    clipPath={`url(#clip-${stage.id.toLowerCase().replace('_', '-')})`}
+                    style={{
+                      opacity: isHovered ? 1 : 0,
+                      transition: "opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+                    }}
+                  >
+                    {/* Imagen de Fondo Duplicada con Zoom y Filtros */}
+                    <image
+                      href="/loom/loom_masterplan_bg.webp"
+                      x="0"
+                      y="0"
+                      width="3840"
+                      height="2160"
+                      style={{
+                        transform: isHovered ? "scale(1.045)" : "scale(1)",
+                        transformOrigin: `${stage.cx}px ${stage.cy}px`,
+                        transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+                        filter: isHovered 
+                          ? (isActive ? "blur(1.5px) brightness(1.15) saturate(1.2)" : "blur(1.5px) brightness(0.8) saturate(0.85)") 
+                          : "none",
+                      }}
+                    />
+
+                    {/* Tinte de Vidrio Glassmorphic */}
+                    <polygon
+                      points={stage.points}
+                      fill={isActive ? "#dbaa67" : "#ffffff"}
+                      fillOpacity={isActive ? 0.14 : 0.06}
+                      stroke={isActive ? "#dbaa67" : "rgba(255,255,255,0.2)"}
+                      strokeWidth={isActive ? 14 : 6}
+                      style={{
+                        transition: "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+                      }}
+                    />
+                  </g>
+                );
+              })}
+            </svg>
+
+            {/* SVG Vectorial Overlay (Rótulos Nativos e Hitboxes) */}
+            <div className="absolute inset-0 w-full h-full z-20">
+              <svg 
+                viewBox="0 550 3840 1060" 
+                className="w-full h-full object-fill"
+              >
+                {/* 1. Rótulos Nativos de Etapa (100% Escala Vectorial, Cero Solapes) */}
+                <g id="ROTULOS" className="pointer-events-none">
+                  {stagesData.map((stage) => {
+                    const isHovered = hoveredStage?.id === stage.id;
+                    const isActive = stage.active;
+                    
+                    // Ocultar etapas inactivas en móviles para evitar saturación
+                    const responsiveClass = isActive ? "" : "hidden md:block";
+
+                    return (
+                      <g 
+                        key={`rotulo-${stage.id}`} 
+                        className={responsiveClass}
+                        style={{ transition: "all 0.3s ease" }}
+                      >
+                        {/* Fondo del Rótulo (Glassmorphic) */}
+                        <rect
+                          x={isActive ? stage.cx - 170 : stage.cx - 110}
+                          y={isActive ? stage.cy - 45 : stage.cy - 30}
+                          width={isActive ? 340 : 220}
+                          height={isActive ? 90 : 60}
+                          rx={isActive ? 45 : 30}
+                          fill={isHovered ? "rgba(7, 12, 22, 0.85)" : (isActive ? "rgba(7, 12, 22, 0.65)" : "rgba(7, 12, 22, 0.45)")}
+                          stroke={isHovered ? "#dbaa67" : (isActive ? "rgba(255, 255, 255, 0.25)" : "rgba(255, 255, 255, 0.1)")}
+                          strokeWidth={isActive ? 4 : 2}
+                          style={{
+                            transform: isHovered ? "scale(1.08)" : "scale(1)",
+                            transformOrigin: `${stage.cx}px ${stage.cy}px`,
+                            transition: "all 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+                          }}
+                        />
+
+                        {/* Indicador Circular de Disponibilidad */}
+                        <circle
+                          cx={isActive ? stage.cx - 95 : stage.cx - 60}
+                          cy={stage.cy}
+                          r={isActive ? 12 : 6}
+                          fill={isActive ? "#10b981" : "rgba(255, 255, 255, 0.2)"}
+                          style={{
+                            transform: isHovered ? "scale(1.08)" : "scale(1)",
+                            transformOrigin: `${stage.cx}px ${stage.cy}px`,
+                            transition: "all 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+                          }}
+                        />
+                        {isActive && (
+                          <circle
+                            cx={stage.cx - 95}
+                            cy={stage.cy}
+                            r="12"
+                            fill="none"
+                            stroke="#10b981"
+                            strokeWidth="3"
+                            className="animate-ping"
+                            style={{
+                              transformOrigin: `${stage.cx}px ${stage.cy}px`,
+                            }}
+                          />
+                        )}
+
+                        {/* Texto del Rótulo */}
+                        <text
+                          x={isActive ? stage.cx + 30 : stage.cx + 15}
+                          y={stage.cy}
+                          fill={isActive ? "#ffffff" : "rgba(255, 255, 255, 0.35)"}
+                          fontSize={isActive ? 32 : 22}
+                          fontWeight={isActive ? "700" : "500"}
+                          letterSpacing={isActive ? "4" : "2"}
+                          textAnchor="middle"
+                          dominantBaseline="central"
+                          style={{
+                            transform: isHovered ? "scale(1.08)" : "scale(1)",
+                            transformOrigin: `${stage.cx}px ${stage.cy}px`,
+                            transition: "all 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+                          }}
+                        >
+                          {stage.name.toUpperCase()}
+                        </text>
+                      </g>
+                    );
+                  })}
+                </g>
+
+                {/* 2. Polígonos Hitbox Invisibles para Clic y Hover (A la cabeza del z-index del SVG) */}
+                <g id="HITBOXES">
+                  {stagesData.map((stage) => {
+                    const stats = stageStats[stage.id];
+                    const isActive = stage.active;
+                    return (
+                      <polygon
+                        key={`hit-${stage.id}`}
+                        points={stage.points}
+                        fill="rgba(0,0,0,0)"
+                        stroke="rgba(0,0,0,0)"
+                        pointerEvents="all"
+                        style={{ cursor: isActive ? "pointer" : "not-allowed" }}
+                        onMouseEnter={() => {
+                          if (stats) {
+                            setHoveredStage({
+                              id: stage.id,
+                              name: stats.name,
+                              total: stats.total,
+                              available: stats.available,
+                              active: stats.active,
+                            });
+                          }
+                        }}
+                        onMouseLeave={() => {
+                          setHoveredStage((prev) => (prev?.id === stage.id ? null : prev));
+                        }}
+                        onClick={() => {
+                          if (isActive) {
+                            onSelectStage(stage.id.toLowerCase().replace("zona_", "etapa_"));
+                          }
+                        }}
+                        onTouchStart={() => {
+                          if (stats) {
+                            setHoveredStage({
+                              id: stage.id,
+                              name: stats.name,
+                              total: stats.total,
+                              available: stats.available,
+                              active: stats.active,
+                            });
+                          }
+                        }}
+                      />
+                    );
+                  })}
+                </g>
+              </svg>
+            </div>
+
+            {/* Tooltip Flotante */}
+            <AnimatePresence>
+              {hoveredStage && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 15 }}
+                  className="absolute z-40 pointer-events-none p-3.5 rounded-lg border bg-[#0c1524]/90 border-[#dbaa67]/40 shadow-2xl backdrop-blur-md min-w-[200px]"
+                  style={{
+                    left: containerRef.current && mousePos.x > containerRef.current.getBoundingClientRect().width / 2
+                      ? mousePos.x - 220
+                      : mousePos.x + 20,
+                    top: mousePos.y - 40,
+                  }}
+                >
+                  <div className="flex justify-between items-center mb-1.5">
+                    <h3 className="font-serif text-white text-sm font-semibold tracking-wide">
+                      {hoveredStage.name}
+                    </h3>
+                    <span 
+                      className={`text-[8px] uppercase tracking-wider px-2 py-0.5 rounded-full font-bold ${
+                        hoveredStage.active 
+                          ? "bg-[#10b981]/25 text-[#10b981] border border-[#10b981]/40" 
+                          : "bg-white/10 text-white/50 border border-white/20"
+                      }`}
+                    >
+                      {hoveredStage.active ? "Activo" : "Próximamente"}
+                    </span>
+                  </div>
+                  {hoveredStage.active ? (
+                    <div className="space-y-1 text-xs text-white/70">
+                      {hoveredStage.id === "ZONA_6" ? (
+                        <p className="flex justify-between">
+                          <span>Amenidades:</span>
+                          <span className="font-semibold text-white">{hoveredStage.total}</span>
+                        </p>
+                      ) : (
+                        <>
+                          <p className="flex justify-between">
+                            <span>Lotes Totales:</span>
+                            <span className="font-semibold text-white">{hoveredStage.total}</span>
+                          </p>
+                          <p className="flex justify-between">
+                            <span>Disponibles:</span>
+                            <span className="font-semibold text-[#10b981]">{hoveredStage.available}</span>
+                          </p>
+                        </>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-white/40 text-[10px] uppercase tracking-wider font-light mt-1">
+                      Esta etapa estará disponible pronto.
+                    </p>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Acciones Inferiores */}
+        <div className="mt-8 flex justify-center">
+          <button 
+            onClick={onBack}
+            className="px-6 py-2.5 bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/10 hover:border-white/20 rounded-md uppercase tracking-[0.2em] text-[10px] transition-all duration-300 font-medium"
+          >
+            Volver al Inicio
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
+}

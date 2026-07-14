@@ -4,8 +4,11 @@ import { google } from 'googleapis';
 export const dynamic = 'force-dynamic';
 export const revalidate = 30; // Cachea la respuesta por 30 segundos para evitar Rate Limits de Google Sheets con alto tráfico
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const project = searchParams.get('project') || 'luwana';
+
     const auth = new google.auth.GoogleAuth({
       credentials: {
         client_email: (process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || 'real-estate-sheets-bot@real-estate-app-master.iam.gserviceaccount.com').replace(/^"|"$/g, ''),
@@ -15,18 +18,30 @@ export async function GET() {
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
-    const spreadsheetId = (process.env.GOOGLE_SHEET_ID || '').replace(/^"|"$/g, '');
     
+    let spreadsheetId = '';
+    let targetSheetName = '';
+    
+    if (project === 'loom') {
+      spreadsheetId = (process.env.GOOGLE_SHEET_ID_LOOM || '1IDsSyLELPYdV6eZFTt6d0Q5C5iWl3bm1ukUgbE-rJoA').replace(/^"|"$/g, '');
+      targetSheetName = 'LISTA DE PRECIO';
+    } else {
+      spreadsheetId = (process.env.GOOGLE_SHEET_ID_LUWANA || process.env.GOOGLE_SHEET_ID || '1e_dxwIK6cjfLmMQqzzlt56-NomUDLX8NZe2WaLnOmto').replace(/^"|"$/g, '');
+    }
+
     if (!spreadsheetId) {
       return NextResponse.json({ success: false, error: 'GOOGLE_SHEET_ID environment variable is missing' }, { status: 500 });
     }
 
-    const info = await sheets.spreadsheets.get({ spreadsheetId });
-    const sheetName = info.data.sheets?.[0]?.properties?.title || 'Hoja 1';
+    let sheetName = targetSheetName;
+    if (!sheetName) {
+      const info = await sheets.spreadsheets.get({ spreadsheetId });
+      sheetName = info.data.sheets?.[0]?.properties?.title || 'Hoja 1';
+    }
 
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A1:Z200`, 
+      range: `${sheetName}!A1:Z250`, 
     });
 
     const rows = response.data.values;
@@ -64,7 +79,7 @@ export async function GET() {
       const idCol = idxId !== -1 ? idxId : 0;
       let rawId = row[idCol].trim();
       const match = rawId.match(/\d+/);
-      const parsedId = match ? parseInt(match[0], 10).toString() : rawId;
+      const parsedId = project === 'loom' ? rawId : (match ? parseInt(match[0], 10).toString() : rawId);
 
       const rawStatus = row[idxStatus !== -1 ? idxStatus : 3] || '';
       const upperStatus = rawStatus.trim().toUpperCase();

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Especificación de Diseño SVG - Loom Luxury Residence</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .serif-title {
+      font-family: 'Playfair Display', serif;
+    }
+  </style>
+</head>
+<body class="bg-[#070c16] text-slate-100 min-h-screen py-16 px-4 sm:px-8 lg:px-16 selection:bg-[#dbaa67]/30 selection:text-white">
+  
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <header class="text-center mb-16 border-b border-white/10 pb-10">
+      <div class="flex justify-center items-center gap-3 mb-3">
+        <span class="h-[1px] w-12 bg-[#dbaa67]/50"></span>
+        <span class="text-xs text-[#dbaa67] uppercase tracking-[0.3em] font-semibold">Loom Luxury Residence</span>
+        <span class="h-[1px] w-12 bg-[#dbaa67]/50"></span>
+      </div>
+      <h1 class="serif-title text-4xl sm:text-5xl font-bold tracking-wide text-white mb-4">ESPECIFICACIÓN TÉCNICA</h1>
+      <p class="text-slate-400 text-sm max-w-xl mx-auto uppercase tracking-wider">
+        Pautas de diseño y exportación de archivos SVG para el plano interactivo del Showroom
+      </p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="space-y-12">
+      
+      <!-- Section 1: Intro -->
+      <section class="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-xl">
+        <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-3">
+          <span class="h-6 w-1 bg-[#dbaa67] rounded"></span>
+          Resumen del Requerimiento
+        </h2>
+        <p class="text-slate-300 text-sm leading-relaxed mb-4">
+          Para que el visor de lotes interactivo pueda leer y renderizar las siguientes etapas (3, 4, 5, etc.) de forma idéntica a la <strong>Etapa 1</strong> (que está correcta), el equipo de diseño debe estructurar el archivo vectorial SVG siguiendo una jerarquía específica de capas, nombres de grupo e IDs limpios.
+        </p>
+        <div class="bg-[#dbaa67]/10 border border-[#dbaa67]/20 p-4 rounded-xl text-xs text-[#dbaa67] leading-relaxed">
+          <strong>Importante:</strong> El SVG de la Etapa 1 se organizó perfectamente separando el dibujo de los terrenos de los números y círculos. La Etapa 2 se exportó sin esta estructura, mezclando los elementos, lo cual requiere que el código intente adivinar la relación por coordenadas.
+        </div>
+      </section>
+
+      <!-- Section 2: Estructura de Capas -->
+      <section class="space-y-6">
+        <h2 class="text-2xl serif-title font-bold text-white flex items-center gap-3">
+          1. Estructura de Capas en Illustrator / Software CAD
+        </h2>
+        <p class="text-slate-300 text-sm leading-relaxed">
+          Cada manzana (por ejemplo, Manzana C) debe agruparse con un ID limpio. Dentro de este grupo de manzana, se debe separar el dibujo geométrico de los terrenos del grupo de círculos/números.
+        </p>
+
+        <!-- Diagrama de Estructura -->
+        <div class="bg-black/50 border border-white/5 rounded-2xl p-6 font-mono text-xs text-emerald-400 space-y-2 shadow-inner">
+          <div>📁 MANZANA_C <span class="text-slate-500">(Grupo principal de la manzana)</span></div>
+          <div class="pl-6">└── 📁 LOTES_C <span class="text-slate-500">(Subgrupo exclusivo con polígonos de terrenos)</span></div>
+          <div class="pl-12">├── 🟦 rect <span class="text-slate-500">(Lote C1 - Forma cerrada)</span></div>
+          <div class="pl-12">├── 🟦 polygon <span class="text-slate-500">(Lote C2 - Forma cerrada)</span></div>
+          <div class="pl-12">└── 🟦 rect <span class="text-slate-500">(Lote C3...)</span></div>
+          <div class="pl-6">├── 📁 grupo <span class="text-slate-500">(Grupo de pin del Lote C1)</span></div>
+          <div class="pl-12">├── 🟢 circle <span class="text-slate-500">(Centro exacto del pin)</span></div>
+          <div class="pl-12">└── 📁 trazado_texto <span class="text-slate-500">(Trazado del número "C1")</span></div>
+          <div class="pl-6">├── 📁 grupo <span class="text-slate-500">(Grupo de pin del Lote C2)</span></div>
+          <div class="pl-12">├── 🟢 circle <span class="text-slate-500">(Centro exacto del pin)</span></div>
+          <div class="pl-12">└── 📁 trazado_texto <span class="text-slate-500">(Trazado del número "C2"...)</span></div>
+        </div>
+      </section>
+
+      <!-- Section 3: Código de Ejemplo -->
+      <section class="space-y-4">
+        <h2 class="text-2xl serif-title font-bold text-white flex items-center gap-3">
+          2. Ejemplo de Código XML del SVG Correcto (Estilo Etapa 1)
+        </h2>
+        <p class="text-slate-300 text-sm leading-relaxed">
+          Al exportar el archivo como SVG, el archivo XML debe lucir estructurado de la siguiente manera:
+        </p>
+
+        <div class="bg-slate-900 border border-white/10 rounded-2xl overflow-hidden shadow-lg">
+          <div class="bg-slate-950 px-4 py-2 text-[10px] text-slate-500 uppercase tracking-widest border-b border-white/5 font-mono">
+            Estructura correcta en XML/SVG
+          </div>
+          <pre class="p-6 overflow-x-auto text-[11px] font-mono text-slate-300 leading-relaxed"><code>&lt;g id="MANZANA_C"&gt;
+  
+  &lt;!-- Grupo exclusivo con los polígonos cerrados de los terrenos --&gt;
+  &lt;g id="LOTES_C"&gt;
+    &lt;rect class="st1" x="1597.4" y="1044.4" width="198.7" height="95.0" /&gt;
+    &lt;polygon class="st1" points="1017.9,1445.3 14.4,1454.1 15.9,1444.3 490.2,837.9" /&gt;
+  &lt;/g&gt;
+
+  &lt;!-- Pines e indicadores (fuera del grupo LOTES_) --&gt;
+  &lt;g&gt;
+    &lt;circle cx="1652.4" cy="1074.4" r="20" /&gt;
+    &lt;!-- Vectorización del texto del número "C1" --&gt;
+  &lt;/g&gt;
+
+&lt;/g&gt;</code></pre>
+        </div>
+      </section>
+
+      <!-- Section 4: Reglas Clave -->
+      <section class="space-y-6">
+        <h2 class="text-2xl serif-title font-bold text-white flex items-center gap-3">
+          3. Reglas Críticas para la Exportación
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <div class="bg-white/5 border border-white/10 rounded-xl p-5 space-y-2">
+            <div class="text-[#dbaa67] font-semibold text-sm flex items-center gap-2">
+              <span class="text-base">🏷️</span> IDs Limpios y Consistentes
+            </div>
+            <p class="text-slate-300 text-xs leading-relaxed">
+              Los IDs de las manzanas deben ser sencillos, ej: <code>MANZANA_C</code>, <code>MANZANA_D</code>. Evitar nombres autogenerados por el software CAD con números infinitos al final (como <code>MANZANA_D_00000057836873..._</code>) causados por copiar y pegar capas.
+            </p>
+          </div>
+
+          <div class="bg-white/5 border border-white/10 rounded-xl p-5 space-y-2">
+            <div class="text-[#dbaa67] font-semibold text-sm flex items-center gap-2">
+              <span class="text-base">🟩</span> Polígonos de Lote Cerrados
+            </div>
+            <p class="text-slate-300 text-xs leading-relaxed">
+              Cada lote debe ser un único elemento cerrado (<code>&lt;rect&gt;</code> o <code>&lt;polygon&gt;</code>). Evitar dibujar las divisiones de los lotes usando líneas separadas o polilíneas abiertas, ya que no se pueden teñir con el color de estado de forma nativa.
+            </p>
+          </div>
+
+          <div class="bg-white/5 border border-white/10 rounded-xl p-5 space-y-2">
+            <div class="text-[#dbaa67] font-semibold text-sm flex items-center gap-2">
+              <span class="text-base">🟢</span> Círculos en el Centro de Lotes
+            </div>
+            <p class="text-slate-300 text-xs leading-relaxed">
+              El círculo de cada lote (que sirve como pin) debe estar posicionado exactamente en el centro físico de su respectivo terreno cerrado. El código calcula la cercanía para asociar el área interactiva.
+            </p>
+          </div>
+
+          <div class="bg-white/5 border border-white/10 rounded-xl p-5 space-y-2">
+            <div class="text-[#dbaa67] font-semibold text-sm flex items-center gap-2">
+              <span class="text-base">🔢</span> Orden Secuencial de Lotes
+            </div>
+            <p class="text-slate-300 text-xs leading-relaxed">
+              El código numera los lotes basándose en el orden en que aparecen los círculos dentro de cada grupo de manzana en el archivo SVG. Deben estar organizados secuencialmente (Lote 1, Lote 2, Lote 3...).
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-20 border-t border-white/10 pt-8 text-center text-slate-500 text-xs">
+      <p>© 2026 Loom Luxury Residence. Documentación de Integración de Showroom.</p>
+    </footer>
+  </div>
+
+</body>
+</html>

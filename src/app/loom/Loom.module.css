@@ -1,0 +1,118 @@
+.heroContainer {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: white;
+}
+
+.backgroundVideo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  z-index: 1;
+}
+
+.gradientOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Una viñeta sutil para aumentar la legibilidad sin tapar el video de fondo */
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.45) 100%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.heroContentCentrado {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5%;
+}
+
+.centerLogoContainer {
+  width: 360px;
+  max-width: 80%;
+  margin-bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logoCentrado {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.5)); /* Ayuda a que los textos dorados destaquen */
+}
+
+.entrarBtn {
+  position: absolute;
+  bottom: 12vh; /* Colocado más abajo para dejar apreciar el video de fondo */
+  background: rgba(7, 12, 22, 0.45); /* Cristal oscuro semitransparente */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #ffffff; /* Texto blanco de alta legibilidad */
+  border: 1px solid rgba(219, 170, 103, 0.4); /* Delicado borde color cobre translúcido */
+  padding: 1.1rem 4.5rem; /* Adaptado al texto "Ingresar al Showroom" */
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  cursor: pointer;
+  border-radius: 0px; /* Completamente rectangular */
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.entrarBtn:hover {
+  background: rgba(219, 170, 103, 0.15); /* Relleno cobre translúcido */
+  color: #dbaa67; /* Texto color cobre de la marca */
+  border-color: #dbaa67; /* Borde de cobre sólido */
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(219, 170, 103, 0.3);
+}
+
+@media (max-width: 992px) {
+  .centerLogoContainer {
+    width: 290px;
+    margin-bottom: 0;
+  }
+
+  .entrarBtn {
+    bottom: 10vh;
+    padding: 1rem 3.5rem;
+    font-size: 0.9rem;
+    letter-spacing: 3px;
+  }
+}
+
+@media (max-width: 768px) {
+  .centerLogoContainer {
+    width: 240px;
+    margin-bottom: 0;
+  }
+
+  .entrarBtn {
+    bottom: 8vh;
+    padding: 0.95rem 3rem;
+    font-size: 0.8rem;
+    letter-spacing: 3px;
+  }
+}

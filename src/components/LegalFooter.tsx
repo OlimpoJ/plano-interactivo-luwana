@@ -1,7 +1,15 @@
+"use client";
 import styles from './LegalFooter.module.css';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function LegalFooter() {
+  const pathname = usePathname();
+  
+  // Ocultar la barra de políticas en todas las rutas del Showroom de Loom
+  if (pathname && pathname.startsWith('/loom')) {
+    return null;
+  }
   return (
     <footer className={styles.footer}>
       <div className={styles.companyInfo}>

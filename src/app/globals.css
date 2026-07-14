@@ -156,3 +156,16 @@ h6,
   background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.08), transparent);
   animation: shimmer 3s infinite;
 }
+
+/* Theme override for Loom Luxury Residence */
+.loom-theme {
+  --color-bg: #070c16;          /* Deep ocean dark navy */
+  --color-bg-light: #0d1627;    /* Lighter navy slate */
+  --color-glass: rgba(7, 12, 22, 0.85);
+  --color-glass-light: rgba(13, 22, 39, 0.4);
+  --color-accent: #dbaa67;      /* Loom Copper/Gold */
+  --color-accent-light: #e5c394; /* Loom light Copper/Gold */
+  --color-accent-dark: #b8863f;  /* Loom dark Copper/Gold */
+  
+  --font-serif: var(--font-playfair), "Felix Titling", serif;
+}
