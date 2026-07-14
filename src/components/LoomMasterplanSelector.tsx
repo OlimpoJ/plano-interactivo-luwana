@@ -137,7 +137,7 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
   };
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-[#070c16] py-12 px-4 lg:p-0 select-none">
+    <div className="h-[100dvh] w-full flex flex-col bg-[#070c16] text-white relative overflow-hidden select-none">
       
       {/* Fondo difuminado esmerilado */}
       <div className="absolute inset-0 z-0 overflow-hidden">
@@ -149,30 +149,28 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
         <div className="absolute inset-0 bg-gradient-to-b from-[#070c16]/95 via-[#070c16]/80 to-[#070c16]/95 pointer-events-none" />
       </div>
 
-      <div className="relative z-10 flex flex-col items-center w-full max-w-[1600px] lg:max-w-none h-full">
+      <div className="relative z-10 flex flex-col items-center w-full max-w-[1600px] mx-auto h-full">
         
-        {/* Cabecera Premium de Loom */}
-        <div className="text-center mb-8 flex flex-col items-center w-full">
-          <div className="flex items-center gap-4 mb-2">
-            <span className="h-[1px] w-8 sm:w-16 bg-[#dbaa67]/50"></span>
-            <span className="text-[10px] sm:text-xs text-[#dbaa67] uppercase tracking-[0.3em] font-light">
+        {/* Header HUD */}
+        <div className="relative w-full bg-gradient-to-b from-[#070c16] via-[#070c16]/90 to-transparent p-6 md:p-8 max-h-[500px]:p-2 flex flex-col items-center text-center z-20">
+          <div className="flex flex-col items-center">
+            <span className="text-[10px] uppercase tracking-[0.2em] text-[#dbaa67] font-semibold mb-1 max-h-[500px]:hidden">
               Loom Luxury Residence
             </span>
-            <span className="h-[1px] w-8 sm:w-16 bg-[#dbaa67]/50"></span>
+            <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl max-h-[500px]:text-lg text-white font-normal tracking-wider uppercase mb-2 max-h-[500px]:mb-0.5">
+              Plano de Urbanismo
+            </h1>
+            <p className="text-[10px] sm:text-xs max-h-[500px]:hidden text-white/50 uppercase tracking-[0.2em] font-medium max-w-md">
+              Selecciona una de las etapas disponibles para explorar la disponibilidad de lotes
+            </p>
           </div>
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-serif text-white tracking-wide mb-3">
-            PLANO DE URBANISMO
-          </h1>
-          <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-[0.2em] font-medium max-w-md">
-            Selecciona una de las etapas disponibles para explorar la disponibilidad de lotes
-          </p>
         </div>
 
         {/* Contenedor del Mapa con Marco Centrado y Glassmorphic */}
-        <div className="flex-1 w-full flex items-center justify-center p-2 lg:p-0 z-10 overflow-y-auto">
+        <div className="flex-1 min-h-0 w-full flex items-center justify-center p-2 lg:p-0 z-10 overflow-hidden">
           <div 
             ref={containerRef}
-            className="relative w-full aspect-[3840/1060] lg:max-w-none lg:rounded-none rounded-xl overflow-hidden bg-black/40 border border-white/10 lg:border-none shadow-[0_30px_70px_rgba(0,0,0,0.8)] lg:shadow-none"
+            className="relative w-full h-full max-w-full max-h-full rounded-xl lg:rounded-none overflow-hidden bg-black/40 border border-white/10 lg:border-none shadow-[0_30px_70px_rgba(0,0,0,0.8)] lg:shadow-none flex items-center justify-center"
             onMouseMove={handleMouseMove}
             onMouseLeave={() => setHoveredStage(null)}
           >
@@ -194,7 +192,8 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
             {/* SVG Visual Overlay (Glassmorphism & Zoom) */}
             <svg 
               viewBox="0 550 3840 1060" 
-              className="absolute inset-0 w-full h-full object-fill pointer-events-none z-10"
+              preserveAspectRatio="xMidYMid meet"
+              className="absolute inset-0 w-full h-full object-contain pointer-events-none z-10"
             >
               <defs>
                 {stagesData.map((stage) => (
@@ -264,10 +263,11 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
             </svg>
 
             {/* SVG Vectorial Overlay (Rótulos Nativos e Hitboxes) */}
-            <div className="absolute inset-0 w-full h-full z-20">
+            <div className="absolute inset-0 w-full h-full z-20 pointer-events-none">
               <svg 
                 viewBox="0 550 3840 1060" 
-                className="w-full h-full object-fill"
+                preserveAspectRatio="xMidYMid meet"
+                className="w-full h-full object-contain pointer-events-auto"
               >
                 {/* 1. Rótulos Nativos de Etapa (100% Escala Vectorial, Cero Solapes) */}
                 <g id="ROTULOS" className="pointer-events-none">
@@ -383,7 +383,15 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
                             onSelectStage(stage.id.toLowerCase().replace("zona_", "etapa_"));
                           }
                         }}
-                        onTouchStart={() => {
+                        onTouchStart={(e) => {
+                          const touch = e.touches[0];
+                          if (touch && containerRef.current) {
+                            const rect = containerRef.current.getBoundingClientRect();
+                            setMousePos({
+                              x: touch.clientX - rect.left,
+                              y: touch.clientY - rect.top,
+                            });
+                          }
                           if (stats) {
                             setHoveredStage({
                               id: stage.id,
@@ -462,10 +470,10 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
         </div>
 
         {/* Acciones Inferiores */}
-        <div className="mt-8 flex justify-center">
+        <div className="mt-8 max-h-[500px]:mt-2 flex justify-center">
           <button 
             onClick={onBack}
-            className="px-6 py-2.5 bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/10 hover:border-white/20 rounded-md uppercase tracking-[0.2em] text-[10px] transition-all duration-300 font-medium"
+            className="px-6 py-2.5 max-h-[500px]:py-1 bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/10 hover:border-white/20 rounded-md uppercase tracking-[0.2em] text-[10px] transition-all duration-300 font-medium"
           >
             Volver al Inicio
           </button>

@@ -72,7 +72,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
           const parser = new DOMParser();
           const doc = parser.parseFromString(text, "image/svg+xml");
           
-          doc.documentElement.setAttribute("preserveAspectRatio", "xMidYMid slice");
+          doc.documentElement.setAttribute("preserveAspectRatio", "xMidYMid meet");
           const viewBoxAttr = doc.documentElement.getAttribute("viewBox") || "0 0 3840 2160";
           const viewBoxParts = viewBoxAttr.split(" ").map(Number);
           const viewBoxWidth = viewBoxParts[2] || 3840;
@@ -223,6 +223,16 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                 pinRect.setAttribute("class", "svg-pin-rect");
                 pinRect.setAttribute("id", `PIN_RECT_${lotId}`);
                 pinRect.setAttribute("style", "transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none;");
+
+                // Eliminar cualquier elemento vectorizado original (como números o formas de fondo) en el grupo del marcador
+                const markerGroup = c.parentElement;
+                if (markerGroup) {
+                  Array.from(markerGroup.children).forEach((child) => {
+                    if (child !== c) {
+                      child.remove();
+                    }
+                  });
+                }
 
                 // Reemplazar la marca original c con la píldora y luego colocar el texto encima
                 c.replaceWith(pinRect);
@@ -398,7 +408,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
       <style dangerouslySetInnerHTML={{ __html: dynamicLotStyles }} />
 
       {/* HUD Superior / Header de la Etapa */}
-      <div className="relative z-20 w-full bg-gradient-to-b from-black/80 to-transparent pt-6 pb-4 px-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="relative z-20 w-full bg-gradient-to-b from-black/80 to-transparent pt-6 pb-4 px-6 max-h-[500px]:pt-2 max-h-[500px]:pb-1 max-h-[500px]:px-3 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 max-h-[500px]:gap-2 max-h-[500px]:flex-row max-h-[500px]:items-center">
         <div className="flex items-center gap-3">
           <button 
             onClick={onBack}
@@ -411,12 +421,12 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
             <span className="hidden sm:inline">Master Plan</span>
           </button>
           <div>
-            <div className="flex items-center gap-2 mb-0.5">
+            <div className="flex items-center gap-2 mb-0.5 max-h-[500px]:hidden">
               <span className="text-[10px] uppercase tracking-[0.2em] text-[#dbaa67] font-semibold">Loom Luxury Residence</span>
               <span className="text-white/30 text-xs">•</span>
               <span className="text-[10px] uppercase tracking-[0.2em] text-white/50">{stageName}</span>
             </div>
-            <h2 className="text-lg sm:text-2xl font-serif tracking-wide text-white uppercase">{isAmenities ? "Club de Playa & Amenidades" : "MAPA DE DISPONIBILIDAD"}</h2>
+            <h2 className="text-lg sm:text-2xl font-serif tracking-wide text-white uppercase max-h-[500px]:text-xs max-h-[500px]:font-sans max-h-[500px]:font-bold">{isAmenities ? "Club de Playa & Amenidades" : "MAPA DE DISPONIBILIDAD"}</h2>
           </div>
         </div>
 
@@ -427,10 +437,10 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
             Amenidades: 7
           </div>
         ) : (
-          <div className="flex flex-wrap gap-3 items-center bg-black/40 border border-white/10 px-4 py-2 rounded-lg backdrop-blur-md">
+          <div className="flex flex-wrap gap-3 max-h-[500px]:gap-1.5 items-center bg-black/40 border border-white/10 px-4 py-2 max-h-[500px]:px-2 max-h-[500px]:py-1 rounded-lg backdrop-blur-md">
             <button 
               onClick={() => setActiveFilters(prev => ({ ...prev, available: !prev.available }))}
-              className={`flex items-center gap-2 text-xs tracking-wider uppercase px-2.5 py-1 rounded border transition-all duration-300 ${
+              className={`flex items-center gap-2 text-xs max-h-[500px]:text-[8px] max-h-[500px]:gap-1 max-h-[500px]:px-1.5 max-h-[500px]:py-0.5 tracking-wider uppercase px-2.5 py-1 rounded border transition-all duration-300 ${
                 activeFilters.available 
                   ? "bg-[#10b981]/20 border-[#10b981]/50 text-[#10b981]" 
                   : "bg-transparent border-white/10 text-white/40"
@@ -442,7 +452,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
             
             <button 
               onClick={() => setActiveFilters(prev => ({ ...prev, reserved: !prev.reserved }))}
-              className={`flex items-center gap-2 text-xs tracking-wider uppercase px-2.5 py-1 rounded border transition-all duration-300 ${
+              className={`flex items-center gap-2 text-xs max-h-[500px]:text-[8px] max-h-[500px]:gap-1 max-h-[500px]:px-1.5 max-h-[500px]:py-0.5 tracking-wider uppercase px-2.5 py-1 rounded border transition-all duration-300 ${
                 activeFilters.reserved 
                   ? "bg-[#f59e0b]/20 border-[#f59e0b]/50 text-[#f59e0b]" 
                   : "bg-transparent border-white/10 text-white/40"
@@ -454,7 +464,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
 
             <button 
               onClick={() => setActiveFilters(prev => ({ ...prev, sold: !prev.sold }))}
-              className={`flex items-center gap-2 text-xs tracking-wider uppercase px-2.5 py-1 rounded border transition-all duration-300 ${
+              className={`flex items-center gap-2 text-xs max-h-[500px]:text-[8px] max-h-[500px]:gap-1 max-h-[500px]:px-1.5 max-h-[500px]:py-0.5 tracking-wider uppercase px-2.5 py-1 rounded border transition-all duration-300 ${
                 activeFilters.sold 
                   ? "bg-[#ef4444]/20 border-[#ef4444]/50 text-[#ef4444]" 
                   : "bg-transparent border-white/10 text-white/40"
@@ -468,8 +478,8 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
       </div>
 
       {/* Área del Plano */}
-      <div className="relative flex-1 w-full flex items-center justify-center p-4 lg:p-0 z-10 overflow-y-auto">
-        <div className="relative w-full lg:max-w-none lg:w-full lg:h-[calc(100vh-120px)] lg:aspect-auto aspect-[16/9] rounded-xl lg:rounded-none overflow-visible lg:overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)] lg:shadow-none border border-white/5 lg:border-none bg-black">
+      <div className="relative flex-1 min-h-0 w-full flex items-center justify-center p-2 sm:p-4 z-10 overflow-hidden">
+        <div className="relative w-full h-full max-w-full max-h-full rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)] bg-black/40 flex items-center justify-center">
           {/* Ocultar textos nativos del SVG (evita números dobles al hacer zoom) */}
           <style dangerouslySetInnerHTML={{ __html: `
             svg text {
@@ -481,7 +491,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
           <img
             src={bgImage}
             alt={`Fondo ${stageName}`}
-            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
             draggable={false}
           />
 
@@ -490,7 +500,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
               {/* SVG Vectorial Overlay (Capa interactiva de lotes y trazados) */}
               {svgText && (
                 <div
-                  className="absolute inset-0 w-full h-full [&>svg]:w-full [&>svg]:h-full [&>svg]:object-cover z-10 pointer-events-auto"
+                  className="absolute inset-0 w-full h-full [&>svg]:w-full [&>svg]:h-full [&>svg]:object-contain z-10 pointer-events-auto"
                   dangerouslySetInnerHTML={{ __html: svgText }}
                   onMouseOver={(e) => {
                     const target = e.target as SVGElement;
