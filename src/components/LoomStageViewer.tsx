@@ -332,15 +332,15 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
       if (status === "blocked" && !activeFilters.sold) pinDisplay = "none";
 
       styles += `
-        /* Estado por defecto del lote: completamente transparente sin borde visible */
+        /* Estado por defecto del lote: resaltado translúcido con su color de estado */
         g#LOTGROUP_${lotId} path,
         g#LOTGROUP_${lotId} polyline,
         g#LOTGROUP_${lotId} polygon,
         g#LOTGROUP_${lotId} rect:not(.svg-pin-rect) {
-          fill: rgba(0, 0, 0, 0) !important;
-          stroke: transparent !important;
+          fill: ${baseColor} !important;
+          fill-opacity: ${opacityDefault} !important;
+          stroke: ${strokeColorDefault} !important;
           stroke-width: ${isSelected ? '3.5px' : '1.5px'} !important;
-          ${isSelected ? `fill: ${baseColor} !important; fill-opacity: 0.25 !important; stroke: ${baseColor} !important;` : ''}
           transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
           pointer-events: all !important;
           cursor: ${cursor} !important;
@@ -433,48 +433,10 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
         </div>
 
         {/* Panel de Filtros / Resumen de Amenidades */}
-        {isAmenities ? (
+        {isAmenities && (
           <div className="bg-[#10b981]/10 border border-[#10b981]/30 px-4 py-2 rounded-lg text-xs font-semibold text-[#10b981] tracking-widest uppercase backdrop-blur-md flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-[#10b981] animate-pulse"></span>
             Amenidades: 7
-          </div>
-        ) : (
-          <div className="flex flex-wrap gap-3 max-h-[500px]:gap-1.5 items-center bg-black/40 border border-white/10 px-4 py-2 max-h-[500px]:px-2 max-h-[500px]:py-1 rounded-lg backdrop-blur-md">
-            <button 
-              onClick={() => setActiveFilters(prev => ({ ...prev, available: !prev.available }))}
-              className={`flex items-center gap-2 text-xs max-h-[500px]:text-[8px] max-h-[500px]:gap-1 max-h-[500px]:px-1.5 max-h-[500px]:py-0.5 tracking-wider uppercase px-2.5 py-1 rounded border transition-all duration-300 ${
-                activeFilters.available 
-                  ? "bg-[#10b981]/20 border-[#10b981]/50 text-[#10b981]" 
-                  : "bg-transparent border-white/10 text-white/40"
-              }`}
-            >
-              <span className="h-2.5 w-2.5 rounded-full bg-[#10b981]"></span>
-              Disponibles ({stats.available})
-            </button>
-            
-            <button 
-              onClick={() => setActiveFilters(prev => ({ ...prev, reserved: !prev.reserved }))}
-              className={`flex items-center gap-2 text-xs max-h-[500px]:text-[8px] max-h-[500px]:gap-1 max-h-[500px]:px-1.5 max-h-[500px]:py-0.5 tracking-wider uppercase px-2.5 py-1 rounded border transition-all duration-300 ${
-                activeFilters.reserved 
-                  ? "bg-[#f59e0b]/20 border-[#f59e0b]/50 text-[#f59e0b]" 
-                  : "bg-transparent border-white/10 text-white/40"
-              }`}
-            >
-              <span className="h-2.5 w-2.5 rounded-full bg-[#f59e0b]"></span>
-              Reservados ({stats.reserved})
-            </button>
-
-            <button 
-              onClick={() => setActiveFilters(prev => ({ ...prev, sold: !prev.sold }))}
-              className={`flex items-center gap-2 text-xs max-h-[500px]:text-[8px] max-h-[500px]:gap-1 max-h-[500px]:px-1.5 max-h-[500px]:py-0.5 tracking-wider uppercase px-2.5 py-1 rounded border transition-all duration-300 ${
-                activeFilters.sold 
-                  ? "bg-[#ef4444]/20 border-[#ef4444]/50 text-[#ef4444]" 
-                  : "bg-transparent border-white/10 text-white/40"
-              }`}
-            >
-              <span className="h-2.5 w-2.5 rounded-full bg-[#ef4444]"></span>
-              Vendidos ({stats.sold})
-            </button>
           </div>
         )}
       </div>
@@ -560,17 +522,6 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                       <p className="flex justify-between gap-4">
                         <span>Área:</span>
                         <span className="font-semibold text-white">{hoveredPin.lotData.area} m²</span>
-                      </p>
-                      <p className="flex justify-between gap-4">
-                        <span>Estado:</span>
-                        <span 
-                          className="font-bold uppercase text-[9px]"
-                          style={{
-                            color: hoveredPin.lotData.status === "available" ? "#10b981" : hoveredPin.lotData.status === "reserved" ? "#f59e0b" : "#ef4444"
-                          }}
-                        >
-                          {hoveredPin.lotData.status === "available" ? "Disponible" : hoveredPin.lotData.status === "reserved" ? "Reservado" : "Vendido"}
-                        </span>
                       </p>
                     </div>
                   </motion.div>
