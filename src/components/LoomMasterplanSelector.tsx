@@ -288,7 +288,7 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
                         <rect
                           x={isActive ? stage.cx - 170 : stage.cx - 110}
                           y={isActive ? stage.cy - 45 : stage.cy - 30}
-                          width={isActive ? 340 : 220}
+                          width={isActive ? 390 : 220}
                           height={isActive ? 90 : 60}
                           rx={isActive ? 45 : 30}
                           fill={isHovered ? "rgba(7, 12, 22, 0.85)" : (isActive ? "rgba(7, 12, 22, 0.65)" : "rgba(7, 12, 22, 0.45)")}
