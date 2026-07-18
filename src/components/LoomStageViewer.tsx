@@ -404,67 +404,69 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
   }, [pins, selectedLot, activeFilters]);
 
   return (
-    <div className="relative h-[100dvh] w-full flex flex-col bg-[#070c16] text-white select-none overflow-hidden">
+    <div className="relative h-[100dvh] w-full bg-[#051415] text-white select-none overflow-hidden">
       
       {/* Estilos dinámicos inyectados */}
       <style dangerouslySetInnerHTML={{ __html: dynamicLotStyles }} />
 
-      {/* HUD Superior / Header de la Etapa */}
-      <div className="relative z-20 w-full bg-gradient-to-b from-black/80 to-transparent pt-6 pb-4 px-6 max-h-[500px]:pt-2 max-h-[500px]:pb-1 max-h-[500px]:px-3 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 max-h-[500px]:gap-2 max-h-[500px]:flex-row max-h-[500px]:items-center">
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={onBack}
-            className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 rounded-full text-[9px] uppercase tracking-wider text-[#dbaa67] hover:text-white font-bold backdrop-blur-md transition-all duration-300 shadow-md cursor-pointer"
-            title="Volver al Master Plan"
-          >
-            <svg className="w-3.5 h-3.5 text-[#dbaa67]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            <span className="hidden sm:inline">Master Plan</span>
-          </button>
-          <div>
-            <div className="flex items-center gap-2 mb-0.5 max-h-[500px]:hidden">
-              <span className="text-[10px] uppercase tracking-[0.2em] text-[#dbaa67] font-semibold">Loom Luxury Residence</span>
-              <span className="text-white/30 text-xs">•</span>
-              <span className="text-[10px] uppercase tracking-[0.2em] text-white/50">{stageName}</span>
-            </div>
-            <h2 className="text-lg sm:text-2xl font-serif tracking-wide text-white uppercase max-h-[500px]:text-xs max-h-[500px]:font-sans max-h-[500px]:font-bold">{isAmenities ? "Club de Playa & Amenidades" : "MAPA DE DISPONIBILIDAD"}</h2>
-          </div>
-        </div>
-
-        {/* Panel de Filtros / Resumen de Amenidades */}
-        {isAmenities && (
-          <div className="bg-[#10b981]/10 border border-[#10b981]/30 px-4 py-2 rounded-lg text-xs font-semibold text-[#10b981] tracking-widest uppercase backdrop-blur-md flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-[#10b981] animate-pulse"></span>
-            Amenidades: 7
-          </div>
-        )}
+      {/* Fondo difuminado esmerilado */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <img
+          src={bgImage}
+          alt="Blur background"
+          className="w-full h-full object-cover opacity-25 blur-3xl scale-110 pointer-events-none"
+        />
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#051415]/80 via-[#0b2426]/60 to-[#051415]/80 pointer-events-none" />
       </div>
 
+      {/* Botón Flotante Master Plan (Sobre la imagen) */}
+      <div className="absolute top-4 left-4 z-30 pointer-events-auto">
+        <button 
+          onClick={onBack}
+          className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 rounded-full text-[9px] uppercase tracking-wider text-[#dbaa67] hover:text-white font-bold backdrop-blur-md transition-all duration-300 shadow-md cursor-pointer"
+          title="Volver al Master Plan"
+        >
+          <svg className="w-3.5 h-3.5 text-[#dbaa67]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          <span className="hidden sm:inline">Master Plan</span>
+        </button>
+      </div>
+
+      {/* Panel de Filtros / Resumen de Amenidades Flotante */}
+      {isAmenities && (
+        <div className="absolute top-4 right-4 z-30 pointer-events-auto bg-[#10b981]/15 border border-[#10b981]/30 px-3 py-1.5 rounded-full text-[9px] font-semibold text-[#10b981] tracking-widest uppercase backdrop-blur-md flex items-center gap-2 shadow-md">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#10b981] animate-pulse"></span>
+          Amenidades: 7
+        </div>
+      )}
+
       {/* Área del Plano */}
-      <div className="relative flex-1 min-h-0 w-full flex items-center justify-center p-2 sm:p-4 z-10 overflow-hidden">
-        <div className="relative w-full h-full max-w-full max-h-full rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)] bg-black/40 flex items-center justify-center">
+      <div className="absolute inset-0 w-full h-full overflow-x-auto overflow-y-hidden lg:overflow-hidden bg-black/40 shadow-[0_20px_50px_rgba(0,0,0,0.6)] scrollbar-none flex items-center lg:block z-10">
           {/* Ocultar textos nativos del SVG (evita números dobles al hacer zoom) */}
           <style dangerouslySetInnerHTML={{ __html: `
             svg text {
               display: none !important;
             }
           `}} />
-          
-          {/* Fondo de Render de la Etapa */}
-          <img
-            src={bgImage}
-            alt={`Fondo ${stageName}`}
-            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            draggable={false}
-          />
 
-          {isAmenities ? null : (
-            <>
-              {/* SVG Vectorial Overlay (Capa interactiva de lotes y trazados) */}
-              {svgText && (
-                <div
-                  className="absolute inset-0 w-full h-full [&>svg]:w-full [&>svg]:h-full [&>svg]:object-contain z-10 pointer-events-auto"
+          {/* Wrapper del Mapa: En móviles tiene proporción 16:9 (1.77) relative to viewport height. En desktop ocupa 100% */}
+          <div className="h-full w-[177.77dvh] lg:w-full relative flex-shrink-0">
+            
+            {/* Fondo de Render de la Etapa */}
+            <img
+              src={bgImage}
+              alt={`Fondo ${stageName}`}
+              className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+              draggable={false}
+            />
+
+            {isAmenities ? null : (
+              <>
+                {/* SVG Vectorial Overlay (Capa interactiva de lotes y trazados) */}
+                {svgText && (
+                  <div
+                    className="absolute inset-0 w-full h-full [&>svg]:w-full [&>svg]:h-full [&>svg]:object-contain z-10 pointer-events-auto"
                   dangerouslySetInnerHTML={{ __html: svgText }}
                   onMouseOver={(e) => {
                     const target = e.target as SVGElement;
@@ -530,6 +532,8 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
             </>
           )}
 
+          </div>
+
           {/* Flecha Lateral Izquierda (Etapa Anterior) - Translúcida */}
           {prevStageId && onChangeStage && (
             <button
@@ -556,7 +560,6 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
             </button>
           )}
         </div>
-      </div>
 
       {/* Leyenda de Brújula (Flotante a la Derecha) */}
       <div className="absolute bottom-7 right-6 z-20 hidden md:flex items-center gap-2 text-white/40 text-[9px] uppercase tracking-widest font-light bg-black/40 border border-white/5 px-3 py-1.5 rounded-full backdrop-blur-md">

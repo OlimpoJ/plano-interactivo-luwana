@@ -159,13 +159,47 @@ h6,
 
 /* Theme override for Loom Luxury Residence */
 .loom-theme {
-  --color-bg: #070c16;          /* Deep ocean dark navy */
-  --color-bg-light: #0d1627;    /* Lighter navy slate */
-  --color-glass: rgba(7, 12, 22, 0.85);
-  --color-glass-light: rgba(13, 22, 39, 0.4);
+  --color-bg: #051415;          /* Deep forest dark green */
+  --color-bg-light: #0b2426;    /* Forest green slate */
+  --color-glass: rgba(5, 20, 21, 0.85); /* Dark green glass */
+  --color-glass-light: rgba(11, 36, 38, 0.4); /* Light green glass */
   --color-accent: #dbaa67;      /* Loom Copper/Gold */
   --color-accent-light: #e5c394; /* Loom light Copper/Gold */
   --color-accent-dark: #b8863f;  /* Loom dark Copper/Gold */
   
   --font-serif: var(--font-playfair), "Felix Titling", serif;
+}
+
+/* Escalado proporcional para Pantallas Gigantes (4K, 5K, 8K) */
+@media (min-width: 2560px) {
+  html {
+    font-size: 24px !important;
+  }
+}
+
+@media (min-width: 3840px) {
+  html {
+    font-size: 32px !important;
+  }
+}
+
+@media (min-width: 5120px) {
+  html {
+    font-size: 48px !important;
+  }
+}
+
+@media (min-width: 7680px) {
+  html {
+    font-size: 64px !important;
+  }
+}
+
+/* Ocultar barra de desplazamiento */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
