@@ -47,6 +47,9 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
   });
 
   const isAmenities = stageId === "etapa_6";
+  const containerWidthClass = selectedLot 
+    ? "w-full landscape:w-[55vw] lg:w-[calc(100%-420px)]" 
+    : "w-full";
   const svgUrl = isAmenities ? "" : (stageId === "etapa_1" ? "/loom/loom_stage_1.svg" : "/loom/loom_stage_2.svg");
   const bgImage = stageId === "etapa_1" ? "/loom/loom_stage_1_bg.webp" : (stageId === "etapa_2" ? "/loom/loom_stage_2_bg.webp" : "/loom/loom_stage_6_bg.webp");
   const stageName = stageId === "etapa_1" ? "Etapa 1" : (stageId === "etapa_2" ? "Etapa 2" : "Alma Beach");
@@ -404,7 +407,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
   }, [pins, selectedLot, activeFilters]);
 
   return (
-    <div className="relative h-[100dvh] w-full bg-[#051415] text-white select-none overflow-hidden">
+    <div className={`relative h-[100dvh] ${containerWidthClass} bg-[#051415] text-white select-none overflow-hidden transition-all duration-500 ease-in-out`}>
       
       {/* Estilos dinámicos inyectados */}
       <style dangerouslySetInnerHTML={{ __html: dynamicLotStyles }} />
@@ -442,7 +445,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
       )}
 
       {/* Área del Plano */}
-      <div className="absolute inset-0 w-full h-full overflow-x-auto overflow-y-hidden lg:overflow-hidden bg-black/40 shadow-[0_20px_50px_rgba(0,0,0,0.6)] scrollbar-none flex items-center lg:block z-10">
+      <div className="absolute inset-0 w-full h-full overflow-hidden bg-black/40 shadow-[0_20px_50px_rgba(0,0,0,0.6)] z-10">
           {/* Ocultar textos nativos del SVG (evita números dobles al hacer zoom) */}
           <style dangerouslySetInnerHTML={{ __html: `
             svg text {
@@ -450,8 +453,8 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
             }
           `}} />
 
-          {/* Wrapper del Mapa: En móviles tiene proporción 16:9 (1.77) relative to viewport height. En desktop ocupa 100% */}
-          <div className="h-full w-[177.77dvh] lg:w-full relative flex-shrink-0">
+          {/* Wrapper del Mapa: Ocupa toda la pantalla y contiene el render y hitboxes */}
+          <div className="w-full h-full relative">
             
             {/* Fondo de Render de la Etapa */}
             <img

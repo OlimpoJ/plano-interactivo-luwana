@@ -93,53 +93,53 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: "100%", opacity: 0.8 }}
         transition={{ type: "spring", damping: 25, stiffness: 150 }}
-        className="fixed top-0 right-0 z-40 h-[100dvh] w-full sm:w-[420px] bg-[#0c1524]/90 border-l border-[#dbaa67]/30 shadow-2xl backdrop-blur-md flex flex-col text-white"
+        className="fixed top-0 right-0 z-40 h-[100dvh] w-[80vw] landscape:w-[45vw] md:w-[360px] lg:w-[420px] bg-[#0c1524]/90 border-l border-[#dbaa67]/30 shadow-2xl backdrop-blur-md flex flex-col text-white"
       >
         {/* Cabecera del Panel */}
-        <div className="p-6 border-b border-white/10 flex justify-between items-center relative z-10">
+        <div className="p-4 sm:p-6 border-b border-white/10 flex justify-between items-center relative z-10">
           <div>
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[#dbaa67] font-semibold">Loom Residence</span>
-            <h2 className="text-2xl font-serif text-white tracking-wide mt-0.5">Lote {lot.rawId}</h2>
+            <span className="text-[8px] sm:text-[10px] uppercase tracking-[0.2em] text-[#dbaa67] font-semibold">Loom Residence</span>
+            <h2 className="text-base sm:text-2xl font-serif text-white tracking-wide mt-0.5">Lote {lot.rawId}</h2>
           </div>
           <button
             onClick={onClose}
             className="p-1.5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-md transition-all duration-300 group"
           >
-            <X className="h-5 w-5 text-white/70 group-hover:text-white" />
+            <X className="h-4.5 w-4.5 sm:h-5 sm:w-5 text-white/70 group-hover:text-white" />
           </button>
         </div>
 
         {/* Cuerpo del Panel */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 relative z-10">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6 relative z-10">
           
           {/* Ficha de Estado */}
-          <div className="flex justify-between items-center bg-black/30 border border-white/5 p-4 rounded-lg">
-            <span className="text-xs uppercase tracking-widest text-white/50">Estado Lote</span>
+          <div className="flex justify-between items-center bg-black/30 border border-white/5 p-3 sm:p-4 rounded-lg">
+            <span className="text-[10px] sm:text-xs uppercase tracking-widest text-white/50">Estado Lote</span>
             {getStatusBadge(lot.status)}
           </div>
 
           {/* Detalles de Dimensiones */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-black/20 border border-white/5 p-4 rounded-lg text-center">
-              <span className="text-[9px] uppercase tracking-widest text-white/40 block mb-1">Área Total</span>
-              <span className="text-lg font-serif text-white font-semibold">{lot.area} m²</span>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            <div className="bg-black/20 border border-white/5 p-3 sm:p-4 rounded-lg text-center">
+              <span className="text-[8px] sm:text-[9px] uppercase tracking-widest text-white/40 block mb-1">Área Total</span>
+              <span className="text-sm sm:text-lg font-serif text-white font-semibold">{lot.area} m²</span>
             </div>
-            <div className="bg-black/20 border border-white/5 p-4 rounded-lg text-center">
-              <span className="text-[9px] uppercase tracking-widest text-white/40 block mb-1">Ubicación</span>
-              <span className="text-sm font-semibold uppercase tracking-wider text-white mt-1.5 block">{lot.location || "MEDIANERO"}</span>
+            <div className="bg-black/20 border border-white/5 p-3 sm:p-4 rounded-lg text-center">
+              <span className="text-[8px] sm:text-[9px] uppercase tracking-widest text-white/40 block mb-1">Ubicación</span>
+              <span className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-white mt-1 block">{lot.location || "MEDIANERO"}</span>
             </div>
           </div>
 
           {/* Sección Financiera (Branding Premium de Loom) */}
-          <div className="bg-black/35 border border-[#dbaa67]/15 rounded-lg p-5 space-y-4">
+          <div className="bg-black/35 border border-[#dbaa67]/15 rounded-lg p-4 sm:p-5 space-y-3 sm:space-y-4">
             <h3 className="text-[10px] uppercase tracking-[0.25em] text-[#dbaa67] border-b border-[#dbaa67]/10 pb-2 font-semibold">
               Estructura Financiera (COP)
             </h3>
             
-            <div className="space-y-3.5 text-xs">
+            <div className="space-y-2.5 text-[10px] sm:text-xs">
               <div className="flex justify-between">
                 <span className="text-white/60">Precio Total:</span>
-                <span className="font-serif text-white text-base font-semibold tracking-wide">
+                <span className="font-serif text-white text-xs sm:text-base font-semibold tracking-wide">
                   {lot.totalPrice || "Consultar"}
                 </span>
               </div>
@@ -160,7 +160,7 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
 
           {/* Alerta de Atribución */}
           {referrer && (
-            <div className="bg-[#dbaa67]/10 border border-[#dbaa67]/30 rounded-lg p-3.5 text-[10px] text-white/70 leading-relaxed uppercase tracking-wider text-center">
+            <div className="bg-[#dbaa67]/10 border border-[#dbaa67]/30 rounded-lg p-2.5 text-[8px] sm:text-[10px] text-white/70 leading-relaxed uppercase tracking-wider text-center">
               Asesoría exclusiva comercializada por <strong className="text-white">{referrer === "patrimofy" ? "Patrimofy" : "Chichaus"}</strong>
             </div>
           )}
@@ -168,29 +168,29 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
         </div>
 
         {/* Acciones del Panel */}
-        <div className="p-6 pb-10 sm:pb-6 border-t border-white/10 space-y-3 bg-[#070c16]/50 relative z-10">
+        <div className="p-4 pb-6 sm:p-6 border-t border-white/10 space-y-2 bg-[#070c16]/50 relative z-10">
           {lot.status !== "sold" ? (
             <>
               {/* Botón de Showroom (Cargar plantas y Kuula) */}
               <button
                 onClick={() => onEnterShowroom(lot)}
-                className="w-full py-3 bg-[#dbaa67] hover:bg-[#cba875] text-[#070c16] hover:text-black font-semibold rounded-md uppercase tracking-[0.15em] text-xs transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-[#dbaa67]/10"
+                className="w-full py-2 sm:py-3 bg-[#dbaa67] hover:bg-[#cba875] text-[#070c16] hover:text-black font-semibold rounded-md uppercase tracking-[0.15em] text-[10px] sm:text-xs transition-all duration-300 flex items-center justify-center gap-1.5 shadow-lg shadow-[#dbaa67]/10"
               >
-                <Layout className="h-4.5 w-4.5" />
+                <Layout className="h-4 w-4" />
                 Ingresar al Showroom
               </button>
 
               {/* Botón de Contacto */}
               <button
                 onClick={handleSeparateClick}
-                className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold rounded-md uppercase tracking-[0.15em] text-xs transition-all duration-300 flex items-center justify-center gap-2"
+                className="w-full py-2 sm:py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold rounded-md uppercase tracking-[0.15em] text-[10px] sm:text-xs transition-all duration-300 flex items-center justify-center gap-1.5"
               >
-                <Phone className="h-4 w-4 text-[#dbaa67]" />
+                <Phone className="h-3.5 w-3.5 text-[#dbaa67]" />
                 Separar Lote
               </button>
             </>
           ) : (
-            <div className="w-full py-3 text-center text-white/40 uppercase tracking-widest text-[10px] border border-white/5 rounded bg-white/5">
+            <div className="w-full py-2 sm:py-3 text-center text-white/40 uppercase tracking-widest text-[9px] sm:text-[10px] border border-white/5 rounded bg-white/5">
               Lote no disponible
             </div>
           )}

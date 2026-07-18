@@ -159,10 +159,9 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
         </button>
       </div>
 
-      {/* Contenedor del Mapa con Marco Centrado y Glassmorphic */}
       <div 
         ref={containerRef}
-        className="absolute inset-0 w-full h-full overflow-x-auto overflow-y-hidden lg:overflow-hidden scrollbar-none flex items-center lg:block z-10"
+        className="absolute inset-0 w-full h-full overflow-hidden z-10"
         onMouseMove={handleMouseMove}
         onMouseLeave={() => setHoveredStage(null)}
       >
@@ -181,8 +180,8 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
               }
             `}} />
 
-            {/* Wrapper del Mapa: En móviles tiene proporción 3.62 relative to viewport height. En desktop ocupa 100% */}
-            <div className="h-full w-[362dvh] lg:w-full relative flex-shrink-0">
+            {/* Wrapper del Mapa: Ocupa toda la pantalla y contiene el render y hitboxes */}
+            <div className="w-full h-full relative">
 
               {/* SVG Visual Overlay (Glassmorphism & Zoom) */}
               <svg 
