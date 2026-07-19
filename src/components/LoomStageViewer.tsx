@@ -48,7 +48,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
 
   const isAmenities = stageId === "etapa_6";
   const containerWidthClass = selectedLot 
-    ? "w-full landscape:w-[55vw] lg:w-[calc(100%-26.25rem)]" 
+    ? "w-full max-md:landscape:w-[55vw]" 
     : "w-full";
   const svgUrl = isAmenities ? "" : (stageId === "etapa_1" ? "/loom/loom_stage_1.svg" : "/loom/loom_stage_2.svg");
   const bgImage = stageId === "etapa_1" ? "/loom/loom_stage_1_bg.webp" : (stageId === "etapa_2" ? "/loom/loom_stage_2_bg.webp" : "/loom/loom_stage_6_bg.webp");
