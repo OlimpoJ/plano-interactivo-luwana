@@ -81,33 +81,65 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
           const viewBoxWidth = viewBoxParts[2] || 3840;
           const viewBoxHeight = viewBoxParts[3] || 2160;
 
-          const circles = doc.querySelectorAll("circle");
-          const finalPins: ParsedPin[] = [];
-          const counters: Record<string, number> = {};
-
-          circles.forEach((c) => {
+          const circleElements = Array.from(doc.querySelectorAll("circle"));
+          const parsedCircles = circleElements.map((c) => {
             let parent: HTMLElement | null = c.parentElement;
             let manzana = "";
             let manzanaGroup: HTMLElement | null = null;
 
             while (parent) {
               const id = parent.getAttribute("id") || "";
-              if (id.includes("MANZANA_A")) { manzana = "A"; manzanaGroup = parent; break; }
-              if (id.includes("MANZANA_B")) { manzana = "B"; manzanaGroup = parent; break; }
-              if (id.includes("MANZANA_C")) { manzana = "C"; manzanaGroup = parent; break; }
-              if (id.includes("MANZANA_D")) { manzana = "D"; manzanaGroup = parent; break; }
-              if (id.includes("MANZANA_E")) { manzana = "E"; manzanaGroup = parent; break; }
+              if (id.includes("MANZANA_A") || id.includes("MANZONA_A")) { manzana = "A"; manzanaGroup = parent; break; }
+              if (id.includes("MANZANA_B") || id.includes("MANZONA_B")) { manzana = "B"; manzanaGroup = parent; break; }
+              if (id.includes("MANZANA_C") || id.includes("MANZONA_C")) { manzana = "C"; manzanaGroup = parent; break; }
+              if (id.includes("MANZANA_D") || id.includes("MANZONA_D")) { manzana = "D"; manzanaGroup = parent; break; }
+              if (id.includes("MANZANA_E") || id.includes("MANZONA_E")) { manzana = "E"; manzanaGroup = parent; break; }
               parent = parent.parentElement;
             }
+            const cx = parseFloat(c.getAttribute("cx") || "0");
+            const cy = parseFloat(c.getAttribute("cy") || "0");
+            return { element: c, manzana, manzanaGroup, cx, cy };
+          });
+
+          let sortedCircles = [...parsedCircles];
+          if (stageId === "etapa_1") {
+            const mzACircles = parsedCircles.filter(c => c.manzana === 'A').sort((a, b) => b.cy - a.cy);
+            
+            const mzBCircles = parsedCircles.filter(c => c.manzana === 'B');
+            const mzBSmall = mzBCircles.filter(c => c.cy > 1650).sort((a, b) => a.cx - b.cx);
+            const mzBStrips = mzBCircles.filter(c => c.cy <= 1650);
+            const mzBStrip1 = mzBStrips.filter(c => (c.cy - 1.15 * c.cx) > 60).sort((a, b) => b.cy - a.cy);
+            const mzBStrip2 = mzBStrips.filter(c => (c.cy - 1.15 * c.cx) <= 60).sort((a, b) => b.cy - a.cy);
+            const sortedB = [...mzBStrip1, ...mzBSmall, ...mzBStrip2];
+            
+            const mzCCircles = parsedCircles.filter(c => c.manzana === 'C');
+            const mzCGroup1 = mzCCircles.filter(c => (c.cy - 1.15 * c.cx) < -600).sort((a, b) => b.cy - a.cy);
+            const mzCGroup2 = mzCCircles.filter(c => (c.cy - 1.15 * c.cx) >= -600).sort((a, b) => b.cy - a.cy);
+            const sortedC = [...mzCGroup1, ...mzCGroup2];
+            
+            sortedCircles = [
+              ...mzACircles,
+              ...sortedB,
+              ...sortedC,
+              ...parsedCircles.filter(c => c.manzana !== 'A' && c.manzana !== 'B' && c.manzana !== 'C')
+            ];
+          }
+
+          const finalPins: ParsedPin[] = [];
+          const counters: Record<string, number> = {};
+
+          sortedCircles.forEach((sc) => {
+            const c = sc.element;
+            const manzana = sc.manzana;
+            const manzanaGroup = sc.manzanaGroup;
+            const cx = sc.cx;
+            const cy = sc.cy;
 
             if (manzana) {
               if (!counters[manzana]) counters[manzana] = 0;
               counters[manzana] += 1;
               const num = counters[manzana];
               const lotId = `${manzana}-${num}`;
-
-              const cx = parseFloat(c.getAttribute("cx") || "0");
-              const cy = parseFloat(c.getAttribute("cy") || "0");
               const xPercent = (cx / viewBoxWidth) * 100;
               const yPercent = (cy / viewBoxHeight) * 100;
 
