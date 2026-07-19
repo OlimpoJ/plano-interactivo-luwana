@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className={`${playfair.variable} ${montserrat.variable}`}>
+    <html lang="es" className={`${playfair.variable} ${montserrat.variable}`} suppressHydrationWarning>
       <body>
         <ClientScripts />
         {children}
