@@ -64,7 +64,7 @@ export async function GET(request: Request) {
     const idxArea = getColIdx(['AREA M2', 'AREA']);
     const idxLocation = getColIdx(['UBICACIÓN', 'UBICACION']);
     const idxStatus = getColIdx(['ESTADO']);
-    const idxPriceM2 = getColIdx(['VALOR M2']);
+    const idxPriceM2 = getColIdx(['VALOR X M2', 'VALOR M2', 'VALOR/M2']);
     const idxSeparation = getColIdx(['SEPARACIÓN', 'SEPARACION']);
     const idxTotalPrice = getColIdx(['VALOR LOTE', 'VALOR TOTAL']);
     const idxDownPayment = getColIdx(['CUOTA INICIAL']);
@@ -79,7 +79,15 @@ export async function GET(request: Request) {
       const idCol = idxId !== -1 ? idxId : 0;
       let rawId = row[idCol].trim();
       const match = rawId.match(/\d+/);
-      const parsedId = project === 'loom' ? rawId : (match ? parseInt(match[0], 10).toString() : rawId);
+      let parsedId = rawId;
+      if (project === 'loom') {
+        const parts = rawId.split('-');
+        if (parts.length === 2 && match) {
+          parsedId = `${parts[0].trim().toUpperCase()}-${parseInt(match[0], 10)}`;
+        }
+      } else {
+        parsedId = match ? parseInt(match[0], 10).toString() : rawId;
+      }
 
       const rawStatus = row[idxStatus !== -1 ? idxStatus : 3] || '';
       const upperStatus = rawStatus.trim().toUpperCase();

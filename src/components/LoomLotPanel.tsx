@@ -15,6 +15,8 @@ interface Lot {
   downPayment: string;
   financing: string;
   finalPayment: string;
+  pricePerM2?: string;
+  separation?: string;
 }
 
 interface LoomLotPanelProps {
@@ -63,22 +65,22 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
     switch (status) {
       case "available":
         return (
-          <div className="flex items-center gap-1.5 bg-[#10b981]/15 text-[#10b981] border border-[#10b981]/30 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">
-            <CheckCircle className="h-3.5 w-3.5" />
+          <div className="flex items-center gap-1 bg-[#10b981]/15 text-[#10b981] border border-[#10b981]/30 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+            <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             Disponible
           </div>
         );
       case "reserved":
         return (
-          <div className="flex items-center gap-1.5 bg-[#f59e0b]/15 text-[#f59e0b] border border-[#f59e0b]/30 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">
-            <Clock className="h-3.5 w-3.5 animate-pulse" />
+          <div className="flex items-center gap-1 bg-[#f59e0b]/15 text-[#f59e0b] border border-[#f59e0b]/30 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+            <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 animate-pulse" />
             Reservado
           </div>
         );
       default:
         return (
-          <div className="flex items-center gap-1.5 bg-white/10 text-white/50 border border-white/10 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">
-            <AlertCircle className="h-3.5 w-3.5" />
+          <div className="flex items-center gap-1 bg-white/10 text-white/50 border border-white/10 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+            <AlertCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             Vendido
           </div>
         );
@@ -96,62 +98,75 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
         className="fixed top-0 right-0 z-40 h-[100dvh] w-[80vw] max-md:landscape:w-[45vw] md:w-[22.5rem] lg:w-[26.25rem] bg-[#0c1524]/90 border-l border-[#dbaa67]/30 shadow-2xl backdrop-blur-md flex flex-col text-white"
       >
         {/* Cabecera del Panel */}
-        <div className="p-4 sm:p-6 border-b border-white/10 flex justify-between items-center relative z-10">
-          <div>
-            <span className="text-[8px] sm:text-[10px] uppercase tracking-[0.2em] text-[#dbaa67] font-semibold">Loom Residence</span>
-            <h2 className="text-base sm:text-2xl font-serif text-white tracking-wide mt-0.5">Lote {lot.rawId}</h2>
+        <div className="p-3 sm:p-5 border-b border-white/10 flex justify-between items-center relative z-10 bg-[#070c16]/30">
+          <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
+            <div>
+              <span className="text-[8px] sm:text-[10px] uppercase tracking-[0.2em] text-[#dbaa67] font-semibold block">Loom Residence</span>
+              <h2 className="text-base sm:text-2xl font-serif text-white tracking-wide mt-0.5">Lote {lot.rawId}</h2>
+            </div>
+            {/* Badge de Estado Integrado en el Header */}
+            <div>
+              {getStatusBadge(lot.status)}
+            </div>
           </div>
           <button
             onClick={onClose}
             className="p-1.5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-md transition-all duration-300 group"
           >
-            <X className="h-4.5 w-4.5 sm:h-5 sm:w-5 text-white/70 group-hover:text-white" />
+            <X className="h-4 w-4 sm:h-5 sm:w-5 text-white/70 group-hover:text-white" />
           </button>
         </div>
 
         {/* Cuerpo del Panel */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6 relative z-10">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-5 space-y-2.5 sm:space-y-4 relative z-10">
           
-          {/* Ficha de Estado */}
-          <div className="flex justify-between items-center bg-black/30 border border-white/5 p-3 sm:p-4 rounded-lg">
-            <span className="text-[10px] sm:text-xs uppercase tracking-widest text-white/50">Estado Lote</span>
-            {getStatusBadge(lot.status)}
-          </div>
-
-          {/* Detalles de Dimensiones */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
-            <div className="bg-black/20 border border-white/5 p-3 sm:p-4 rounded-lg text-center">
-              <span className="text-[8px] sm:text-[9px] uppercase tracking-widest text-white/40 block mb-1">Área Total</span>
-              <span className="text-sm sm:text-lg font-serif text-white font-semibold">{lot.area} m²</span>
+          {/* Cinta Compacta de Dimensiones */}
+          <div className="grid grid-cols-2 bg-black/25 border border-white/5 p-2 sm:p-3 rounded-lg text-center items-center">
+            <div className="border-r border-white/5 pr-2">
+              <span className="text-[8px] sm:text-[9px] uppercase tracking-widest text-white/40 block">Área Total</span>
+              <span className="text-xs sm:text-base font-serif text-white font-semibold mt-0.5 block">{lot.area} m²</span>
             </div>
-            <div className="bg-black/20 border border-white/5 p-3 sm:p-4 rounded-lg text-center">
-              <span className="text-[8px] sm:text-[9px] uppercase tracking-widest text-white/40 block mb-1">Ubicación</span>
-              <span className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-white mt-1 block">{lot.location || "MEDIANERO"}</span>
+            <div className="pl-2">
+              <span className="text-[8px] sm:text-[9px] uppercase tracking-widest text-white/40 block">Ubicación</span>
+              <span className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-white mt-0.5 block">{lot.location || "MEDIANERO"}</span>
             </div>
           </div>
 
           {/* Sección Financiera (Branding Premium de Loom) */}
-          <div className="bg-black/35 border border-[#dbaa67]/15 rounded-lg p-4 sm:p-5 space-y-3 sm:space-y-4">
-            <h3 className="text-[10px] uppercase tracking-[0.25em] text-[#dbaa67] border-b border-[#dbaa67]/10 pb-2 font-semibold">
+          <div className="bg-black/35 border border-[#dbaa67]/15 rounded-lg p-3 sm:p-4 space-y-2 sm:space-y-3">
+            <h3 className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-[#dbaa67] border-b border-[#dbaa67]/10 pb-1 font-semibold">
               Estructura Financiera (COP)
             </h3>
             
-            <div className="space-y-2.5 text-[10px] sm:text-xs">
-              <div className="flex justify-between">
+            <div className="space-y-1.5 sm:space-y-2 text-[10px] sm:text-xs">
+              <div className="flex justify-between items-center">
                 <span className="text-white/60">Precio Total:</span>
-                <span className="font-serif text-white text-xs sm:text-base font-semibold tracking-wide">
+                <span className="font-serif text-white text-xs sm:text-sm font-semibold tracking-wide">
                   {lot.totalPrice || "Consultar"}
                 </span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
+                <span className="text-white/60">Valor M²:</span>
+                <span className="text-white font-medium">{lot.pricePerM2 || "Consultar"}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-white/60">Separación:</span>
+                <span className="text-white font-medium flex items-center gap-1">
+                  {lot.separation || "$10,000,000"} 
+                  <span className="text-[7.5px] sm:text-[8.5px] text-[#dbaa67]/90 font-normal normal-case">
+                    (hace parte de la inicial)
+                  </span>
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
                 <span className="text-white/60">Cuota Inicial (20%):</span>
                 <span className="text-white font-medium">{lot.downPayment || "Consultar"}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-white/60">Cuota Financiación (36 meses):</span>
+              <div className="flex justify-between items-center">
+                <span className="text-white/60">Cuota Financiación (36 m.):</span>
                 <span className="text-white font-medium">{lot.financing || "Consultar"}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-white/60">Cuota Final (Saldo):</span>
                 <span className="text-white font-medium">{lot.finalPayment || "Consultar"}</span>
               </div>
@@ -160,40 +175,37 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
 
           {/* Alerta de Atribución */}
           {referrer && (
-            <div className="bg-[#dbaa67]/10 border border-[#dbaa67]/30 rounded-lg p-2.5 text-[8px] sm:text-[10px] text-white/70 leading-relaxed uppercase tracking-wider text-center">
+            <div className="bg-[#dbaa67]/10 border border-[#dbaa67]/30 rounded-lg p-2 text-[8px] sm:text-[10px] text-white/70 leading-relaxed uppercase tracking-wider text-center">
               Asesoría exclusiva comercializada por <strong className="text-white">{referrer === "patrimofy" ? "Patrimofy" : "Chichaus"}</strong>
             </div>
           )}
 
-        </div>
+          {/* Botones de Acción */}
+          <div className="pt-1 space-y-1.5">
+            {lot.status !== "sold" ? (
+              <>
+                <button
+                  onClick={() => onEnterShowroom(lot)}
+                  className="w-full py-2 sm:py-2.5 bg-[#dbaa67] hover:bg-[#cba875] text-[#070c16] hover:text-black font-semibold rounded-md uppercase tracking-[0.12em] sm:tracking-[0.15em] text-[10px] sm:text-xs transition-all duration-300 flex items-center justify-center gap-1.5 shadow-lg shadow-[#dbaa67]/10"
+                >
+                  <Layout className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  Ingresar al Showroom
+                </button>
+                <button
+                  onClick={handleSeparateClick}
+                  className="w-full py-2 sm:py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold rounded-md uppercase tracking-[0.12em] sm:tracking-[0.15em] text-[10px] sm:text-xs transition-all duration-300 flex items-center justify-center gap-1.5"
+                >
+                  <Phone className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#dbaa67]" />
+                  Separar Lote
+                </button>
+              </>
+            ) : (
+              <div className="w-full py-2 sm:py-2.5 text-center text-white/40 uppercase tracking-widest text-[9px] sm:text-[10px] border border-white/5 rounded bg-white/5">
+                Lote no disponible
+              </div>
+            )}
+          </div>
 
-        {/* Acciones del Panel */}
-        <div className="p-4 pb-6 sm:p-6 border-t border-white/10 space-y-2 bg-[#070c16]/50 relative z-10">
-          {lot.status !== "sold" ? (
-            <>
-              {/* Botón de Showroom (Cargar plantas y Kuula) */}
-              <button
-                onClick={() => onEnterShowroom(lot)}
-                className="w-full py-2 sm:py-3 bg-[#dbaa67] hover:bg-[#cba875] text-[#070c16] hover:text-black font-semibold rounded-md uppercase tracking-[0.15em] text-[10px] sm:text-xs transition-all duration-300 flex items-center justify-center gap-1.5 shadow-lg shadow-[#dbaa67]/10"
-              >
-                <Layout className="h-4 w-4" />
-                Ingresar al Showroom
-              </button>
-
-              {/* Botón de Contacto */}
-              <button
-                onClick={handleSeparateClick}
-                className="w-full py-2 sm:py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold rounded-md uppercase tracking-[0.15em] text-[10px] sm:text-xs transition-all duration-300 flex items-center justify-center gap-1.5"
-              >
-                <Phone className="h-3.5 w-3.5 text-[#dbaa67]" />
-                Separar Lote
-              </button>
-            </>
-          ) : (
-            <div className="w-full py-2 sm:py-3 text-center text-white/40 uppercase tracking-widest text-[9px] sm:text-[10px] border border-white/5 rounded bg-white/5">
-              Lote no disponible
-            </div>
-          )}
         </div>
       </motion.div>
 

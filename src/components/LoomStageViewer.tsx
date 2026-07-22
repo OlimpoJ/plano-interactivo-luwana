@@ -17,6 +17,51 @@ interface Lot {
   finalPayment: string;
 }
 
+function decodeSvgNumber(g: HTMLElement): number | null {
+  const paths = Array.from(g.querySelectorAll("path"));
+  if (paths.length === 0) return null;
+  
+  let numberStr = "";
+  
+  paths.forEach((p) => {
+    const d = p.getAttribute("d") || "";
+    // Strip all whitespace
+    const noWhitespace = d.replace(/\s+/g, '');
+    // Remove absolute M starting coordinates
+    const clean = noWhitespace.replace(/^M\s*[-+]?[0-9]*\.?[0-9]+[\s,]+[-+]?[0-9]*\.?[0-9]+/i, '').trim();
+    
+    const len = clean.length;
+    const cmds = clean.split(/[a-df-z]/i).length;
+    const startsWith = clean.substring(0, 5).toLowerCase();
+
+    let digit = "";
+    if ((cmds === 20 || cmds === 21) && startsWith.startsWith("c-")) digit = "0";
+    else if ((cmds === 11 || cmds === 12) && startsWith.startsWith("h-")) digit = "1";
+    else if ((cmds === 31 || cmds === 32) && startsWith.startsWith("v-")) digit = "2";
+    else if ((cmds === 32 || cmds === 33) && startsWith.startsWith("l0")) digit = "3";
+    else if (cmds === 24 && startsWith.startsWith("v")) digit = "4";
+    else if (cmds === 24 && startsWith.startsWith("l")) digit = "5";
+    else if (cmds === 34 && startsWith.startsWith("c")) digit = "6";
+    else if (cmds === 11 && startsWith.startsWith("c-")) digit = "7";
+    else if (cmds === 38 && startsWith.startsWith("c0")) digit = "8";
+    else if (cmds === 30 && startsWith.startsWith("c0")) digit = "9";
+    
+    if (digit) {
+      numberStr += digit;
+    }
+  });
+  
+  if (!numberStr) return null;
+  
+  // Clean leading 0
+  if (numberStr.startsWith("0") && numberStr.length > 1) {
+    numberStr = numberStr.substring(1);
+  }
+  
+  const parsed = parseInt(numberStr, 10);
+  return isNaN(parsed) ? null : parsed;
+}
+
 interface LoomStageViewerProps {
   stageId: string; // "etapa_1", "etapa_2", or "etapa_6"
   lots: Lot[];
@@ -101,34 +146,10 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
             return { element: c, manzana, manzanaGroup, cx, cy };
           });
 
-          let sortedCircles = [...parsedCircles];
-          if (stageId === "etapa_1") {
-            const mzACircles = parsedCircles.filter(c => c.manzana === 'A').sort((a, b) => b.cy - a.cy);
-            
-            const mzBCircles = parsedCircles.filter(c => c.manzana === 'B');
-            const mzBSmall = mzBCircles.filter(c => c.cy > 1650).sort((a, b) => a.cx - b.cx);
-            const mzBStrips = mzBCircles.filter(c => c.cy <= 1650);
-            const mzBStrip1 = mzBStrips.filter(c => (c.cy - 1.15 * c.cx) > 60).sort((a, b) => b.cy - a.cy);
-            const mzBStrip2 = mzBStrips.filter(c => (c.cy - 1.15 * c.cx) <= 60).sort((a, b) => b.cy - a.cy);
-            const sortedB = [...mzBStrip1, ...mzBSmall, ...mzBStrip2];
-            
-            const mzCCircles = parsedCircles.filter(c => c.manzana === 'C');
-            const mzCGroup1 = mzCCircles.filter(c => (c.cy - 1.15 * c.cx) < -600).sort((a, b) => b.cy - a.cy);
-            const mzCGroup2 = mzCCircles.filter(c => (c.cy - 1.15 * c.cx) >= -600).sort((a, b) => b.cy - a.cy);
-            const sortedC = [...mzCGroup1, ...mzCGroup2];
-            
-            sortedCircles = [
-              ...mzACircles,
-              ...sortedB,
-              ...sortedC,
-              ...parsedCircles.filter(c => c.manzana !== 'A' && c.manzana !== 'B' && c.manzana !== 'C')
-            ];
-          }
-
           const finalPins: ParsedPin[] = [];
           const counters: Record<string, number> = {};
 
-          sortedCircles.forEach((sc) => {
+          parsedCircles.forEach((sc) => {
             const c = sc.element;
             const manzana = sc.manzana;
             const manzanaGroup = sc.manzanaGroup;
@@ -136,9 +157,22 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
             const cy = sc.cy;
 
             if (manzana) {
-              if (!counters[manzana]) counters[manzana] = 0;
-              counters[manzana] += 1;
-              const num = counters[manzana];
+              // Try to decode visually from the SVG path group
+              const circleParent = c.parentElement;
+              let decodedNum: number | null = null;
+              if (circleParent) {
+                decodedNum = decodeSvgNumber(circleParent);
+              }
+
+              let num = 0;
+              if (decodedNum !== null) {
+                num = decodedNum;
+              } else {
+                if (!counters[manzana]) counters[manzana] = 0;
+                counters[manzana] += 1;
+                num = counters[manzana];
+              }
+
               const lotId = `${manzana}-${num}`;
               const xPercent = (cx / viewBoxWidth) * 100;
               const yPercent = (cy / viewBoxHeight) * 100;
