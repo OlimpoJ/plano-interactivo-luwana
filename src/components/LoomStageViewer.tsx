@@ -62,6 +62,91 @@ function decodeSvgNumber(g: HTMLElement): number | null {
   return isNaN(parsed) ? null : parsed;
 }
 
+function getShapeCentroid(shape: Element): { x: number; y: number } | null {
+  const tagName = shape.tagName.toLowerCase();
+  
+  if (tagName === "rect") {
+    const rx = parseFloat(shape.getAttribute("x") || "0");
+    const ry = parseFloat(shape.getAttribute("y") || "0");
+    const rw = parseFloat(shape.getAttribute("width") || "0");
+    const rh = parseFloat(shape.getAttribute("height") || "0");
+    return { x: rx + rw / 2, y: ry + rh / 2 };
+  }
+  
+  if (tagName === "polygon") {
+    const pointsAttr = shape.getAttribute("points") || "";
+    const coords = pointsAttr.trim().split(/[\s,]+/).map(Number).filter(n => !isNaN(n));
+    if (coords.length < 2) return null;
+    let sumX = 0, sumY = 0, count = 0;
+    for (let i = 0; i < coords.length; i += 2) {
+      if (coords[i] !== undefined && coords[i+1] !== undefined) {
+        sumX += coords[i];
+        sumY += coords[i+1];
+        count++;
+      }
+    }
+    return count > 0 ? { x: sumX / count, y: sumY / count } : null;
+  }
+  
+  if (tagName === "path") {
+    const d = shape.getAttribute("d") || "";
+    const absCoords: { x: number; y: number }[] = [];
+    const cmdRegex = /([MLHVCSQTAZmlhvcsqtaz])([^MLHVCSQTAZmlhvcsqtaz]*)/g;
+    let cmdMatch: RegExpExecArray | null;
+    let currX = 0, currY = 0;
+    
+    while ((cmdMatch = cmdRegex.exec(d)) !== null) {
+      const cmd = cmdMatch[1];
+      const nums = cmdMatch[2].trim().split(/[\s,]+/).map(Number).filter((n) => !isNaN(n));
+      
+      if (cmd === 'M' || cmd === 'L') {
+        for (let i = 0; i < nums.length; i += 2) {
+          if (nums[i] !== undefined && nums[i+1] !== undefined) {
+            currX = nums[i]; currY = nums[i+1];
+            absCoords.push({ x: currX, y: currY });
+          }
+        }
+      } else if (cmd === 'm' || cmd === 'l') {
+        for (let i = 0; i < nums.length; i += 2) {
+          if (nums[i] !== undefined && nums[i+1] !== undefined) {
+            currX += nums[i]; currY += nums[i+1];
+            absCoords.push({ x: currX, y: currY });
+          }
+        }
+      } else if (cmd === 'H') {
+        if (nums[0] !== undefined) { currX = nums[0]; absCoords.push({ x: currX, y: currY }); }
+      } else if (cmd === 'h') {
+        if (nums[0] !== undefined) { currX += nums[0]; absCoords.push({ x: currX, y: currY }); }
+      } else if (cmd === 'V') {
+        if (nums[0] !== undefined) { currY = nums[0]; absCoords.push({ x: currX, y: currY }); }
+      } else if (cmd === 'v') {
+        if (nums[0] !== undefined) { currY += nums[0]; absCoords.push({ x: currX, y: currY }); }
+      } else if (cmd === 'C') {
+        for (let i = 0; i < nums.length; i += 6) {
+          if (nums[i+4] !== undefined && nums[i+5] !== undefined) {
+            currX = nums[i+4]; currY = nums[i+5];
+            absCoords.push({ x: currX, y: currY });
+          }
+        }
+      } else if (cmd === 'c') {
+        for (let i = 0; i < nums.length; i += 6) {
+          if (nums[i+4] !== undefined && nums[i+5] !== undefined) {
+            currX += nums[i+4]; currY += nums[i+5];
+            absCoords.push({ x: currX, y: currY });
+          }
+        }
+      }
+    }
+    
+    if (absCoords.length === 0) return null;
+    let sumX = 0, sumY = 0;
+    absCoords.forEach((pt) => { sumX += pt.x; sumY += pt.y; });
+    return { x: sumX / absCoords.length, y: sumY / absCoords.length };
+  }
+  
+  return null;
+}
+
 interface LoomStageViewerProps {
   stageId: string; // "etapa_1", "etapa_2", or "etapa_6"
   lots: Lot[];
@@ -202,7 +287,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                 lotGroup.setAttribute("class", "lot-group-interactive");
 
                 // Encontrar y mover la geometría del lote (rect, path, polygon) más cercana a este grupo
-                const shapesContainer = doc.getElementById(`LOTES_${manzana}`) || manzanaGroup;
+                const shapesContainer = doc.getElementById(`LOTES_${manzana}`) || manzanaGroup || doc.documentElement;
                 if (shapesContainer) {
                   let minDistance = Infinity;
                   closestElement = null;
@@ -214,53 +299,12 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                     if (pGroup && pGroup.querySelector("circle")) {
                       return;
                     }
-                    let sx = 0, sy = 0;
-                    const tagName = shape.tagName.toLowerCase();
-                    if (tagName === "rect") {
-                      const rx = parseFloat(shape.getAttribute("x") || "0");
-                      const ry = parseFloat(shape.getAttribute("y") || "0");
-                      const rw = parseFloat(shape.getAttribute("width") || "0");
-                      const rh = parseFloat(shape.getAttribute("height") || "0");
-                      sx = rx + rw / 2;
-                      sy = ry + rh / 2;
-                    } else if (tagName === "polygon") {
-                      const pointsAttr = shape.getAttribute("points") || "";
-                      const coords = pointsAttr.trim().split(/[\s,]+/).map(Number).filter(n => !isNaN(n));
-                      if (coords.length >= 2) {
-                        let sumX = 0, sumY = 0, count = 0;
-                        for (let i = 0; i < coords.length; i += 2) {
-                          sumX += coords[i];
-                          sumY += coords[i+1];
-                          count++;
-                        }
-                        sx = sumX / count;
-                        sy = sumY / count;
-                      } else {
-                        return;
-                      }
-                    } else if (tagName === "path") {
-                      const d = shape.getAttribute("d") || "";
-                      const coords = d.match(/[-+]?[0-9]*\.?[0-9]+/g)?.map(Number) || [];
-                      if (coords.length >= 2) {
-                        let minX = Infinity, maxX = -Infinity;
-                        let minY = Infinity, maxY = -Infinity;
-                        for (let i = 0; i < coords.length; i += 2) {
-                          if (coords[i] !== undefined && coords[i+1] !== undefined) {
-                            minX = Math.min(minX, coords[i]);
-                            maxX = Math.max(maxX, coords[i]);
-                            minY = Math.min(minY, coords[i+1]);
-                            maxY = Math.max(maxY, coords[i+1]);
-                          }
-                        }
-                        sx = (minX + maxX) / 2;
-                        sy = (minY + maxY) / 2;
-                      } else {
-                        return;
-                      }
-                    }
+                    
+                    const centroid = getShapeCentroid(shape);
+                    if (!centroid) return;
 
-                    const dist = Math.sqrt((sx - cx) ** 2 + (sy - cy) ** 2);
-                    if (dist < minDistance) {
+                    const dist = Math.sqrt((centroid.x - cx) ** 2 + (centroid.y - cy) ** 2);
+                    if (dist < minDistance && dist < 150) {
                       minDistance = dist;
                       closestElement = shape;
                     }
