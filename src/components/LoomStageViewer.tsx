@@ -70,7 +70,19 @@ function getShapeCentroid(shape: Element): { x: number; y: number } | null {
     const ry = parseFloat(shape.getAttribute("y") || "0");
     const rw = parseFloat(shape.getAttribute("width") || "0");
     const rh = parseFloat(shape.getAttribute("height") || "0");
-    return { x: rx + rw / 2, y: ry + rh / 2 };
+    let cx = rx + rw / 2;
+    let cy = ry + rh / 2;
+
+    const transform = shape.getAttribute("transform") || "";
+    const matrixMatch = transform.match(/matrix\(([^)]+)\)/);
+    if (matrixMatch) {
+      const [a, b, c, d, e, f] = matrixMatch[1].split(/[\s,]+/).map(Number);
+      if (!isNaN(a) && !isNaN(f)) {
+        cx = a * cx + c * cy + e;
+        cy = b * cx + d * cy + f;
+      }
+    }
+    return { x: cx, y: cy };
   }
   
   if (tagName === "polygon") {
@@ -234,6 +246,21 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
           const finalPins: ParsedPin[] = [];
           const counters: Record<string, number> = {};
 
+          interface CircleItem {
+            element: Element;
+            manzana: string;
+            manzanaGroup: HTMLElement | null;
+            cx: number;
+            cy: number;
+            lotId: string;
+            xPercent: number;
+            yPercent: number;
+            lotData: Lot;
+            lotGroup: HTMLElement;
+          }
+
+          const circleItems: CircleItem[] = [];
+
           parsedCircles.forEach((sc) => {
             const c = sc.element;
             const manzana = sc.manzana;
@@ -241,13 +268,9 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
             const cx = sc.cx;
             const cy = sc.cy;
 
-            if (manzana) {
-              // Try to decode visually from the SVG path group
+            if (manzana && c.parentElement) {
               const circleParent = c.parentElement;
-              let decodedNum: number | null = null;
-              if (circleParent) {
-                decodedNum = decodeSvgNumber(circleParent);
-              }
+              let decodedNum: number | null = decodeSvgNumber(circleParent);
 
               let num = 0;
               if (decodedNum !== null) {
@@ -262,7 +285,6 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
               const xPercent = (cx / viewBoxWidth) * 100;
               const yPercent = (cy / viewBoxHeight) * 100;
 
-              // Buscar datos del lote en el array del Sheets
               let lotData = lots.find((l) => l.id.toUpperCase() === lotId.toUpperCase());
               if (!lotData) {
                 lotData = {
@@ -279,80 +301,22 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                 };
               }
 
-              // Asignar ID al grupo padre de este lote en el SVG para el hover CSS
               const lotGroup = c.parentElement;
-              let closestElement: Element | null = null;
-              if (lotGroup) {
-                lotGroup.setAttribute("id", `LOTGROUP_${lotId}`);
-                lotGroup.setAttribute("class", "lot-group-interactive");
+              lotGroup.setAttribute("id", `LOTGROUP_${lotId}`);
+              lotGroup.setAttribute("class", "lot-group-interactive");
 
-                // Encontrar y mover la geometría del lote (rect, path, polygon) más cercana a este grupo
-                const shapesContainer = doc.getElementById(`LOTES_${manzana}`) || manzanaGroup || doc.documentElement;
-                if (shapesContainer) {
-                  let minDistance = Infinity;
-                  closestElement = null;
-
-                  const shapes = shapesContainer.querySelectorAll("rect, path, polygon");
-                  shapes.forEach((shape) => {
-                    // Ignorar formas que pertenecen a un grupo de pin (que contiene un círculo)
-                    const pGroup = shape.closest("g");
-                    if (pGroup && pGroup.querySelector("circle")) {
-                      return;
-                    }
-                    
-                    const centroid = getShapeCentroid(shape);
-                    if (!centroid) return;
-
-                    const dist = Math.sqrt((centroid.x - cx) ** 2 + (centroid.y - cy) ** 2);
-                    if (dist < minDistance && dist < 450) {
-                      minDistance = dist;
-                      closestElement = shape;
-                    }
-                  });
-
-                  if (closestElement) {
-                    // Mover la geometría al principio del grupo para que quede de fondo
-                    lotGroup.insertBefore(closestElement, lotGroup.firstChild);
-                  }
-                }
-                
-                // Reemplazar el círculo original por nuestro texto y píldora glassmorphic
-                const pinText = doc.createElementNS("http://www.w3.org/2000/svg", "text");
-                pinText.setAttribute("x", cx.toString());
-                pinText.setAttribute("y", cy.toString());
-                pinText.setAttribute("text-anchor", "middle");
-                pinText.setAttribute("dominant-baseline", "central");
-                pinText.setAttribute("class", "svg-pin-text");
-                pinText.setAttribute("id", `PIN_${lotId}`);
-                pinText.setAttribute("font-size", "24");
-                pinText.setAttribute("style", "transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none;");
-                pinText.textContent = lotId.replace("-", ""); // ej: C31
-
-                const pinRect = doc.createElementNS("http://www.w3.org/2000/svg", "rect");
-                pinRect.setAttribute("x", (cx - 55).toString());
-                pinRect.setAttribute("y", (cy - 30).toString());
-                pinRect.setAttribute("width", "110");
-                pinRect.setAttribute("height", "60");
-                pinRect.setAttribute("rx", "30");
-                pinRect.setAttribute("class", "svg-pin-rect");
-                pinRect.setAttribute("id", `PIN_RECT_${lotId}`);
-                pinRect.setAttribute("style", "transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none;");
-
-                // Eliminar cualquier elemento vectorizado original (como números o formas de fondo) en el grupo del marcador,
-                // pero conservando la forma del lote que acabamos de asociar (closestElement).
-                const markerGroup = c.parentElement;
-                if (markerGroup) {
-                  Array.from(markerGroup.children).forEach((child) => {
-                    if (child !== c && child !== closestElement) {
-                      child.remove();
-                    }
-                  });
-                }
-
-                // Reemplazar la marca original c con la píldora y luego colocar el texto encima
-                c.replaceWith(pinRect);
-                pinRect.after(pinText);
-              }
+              circleItems.push({
+                element: c,
+                manzana,
+                manzanaGroup,
+                cx,
+                cy,
+                lotId,
+                xPercent,
+                yPercent,
+                lotData,
+                lotGroup,
+              });
 
               finalPins.push({
                 cx,
@@ -364,6 +328,104 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                 lotData,
               });
             }
+          });
+
+          // 2. Recolectar todas las formas geométricas candidatas para lotes
+          const candidateShapes: { element: Element; centroid: { x: number; y: number } }[] = [];
+          const allShapes = doc.querySelectorAll("rect, path, polygon");
+
+          allShapes.forEach((shape) => {
+            const pGroup = shape.closest("g");
+            if (pGroup && (pGroup.querySelector("circle") || pGroup.parentElement?.querySelector("circle"))) {
+              return;
+            }
+            const shapeClass = shape.getAttribute("class") || "";
+            if (shape.tagName.toLowerCase() === "path" && !shapeClass) {
+              return;
+            }
+            if (shapeClass.includes("st2") || shapeClass.includes("svg-pin")) {
+              return;
+            }
+            const centroid = getShapeCentroid(shape);
+            if (centroid) {
+              candidateShapes.push({ element: shape, centroid });
+            }
+          });
+
+          // 3. Crear todas las parejas posibles (Círculo, Forma) con su distancia
+          interface Pair {
+            circle: CircleItem;
+            shape: Element;
+            dist: number;
+          }
+          const allPairs: Pair[] = [];
+
+          circleItems.forEach((c) => {
+            candidateShapes.forEach((s) => {
+              const dist = Math.sqrt((s.centroid.x - c.cx) ** 2 + (s.centroid.y - c.cy) ** 2);
+              if (dist < 450) {
+                allPairs.push({ circle: c, shape: s.element, dist });
+              }
+            });
+          });
+
+          // Sort por distancia de menor a mayor
+          allPairs.sort((a, b) => a.dist - b.dist);
+
+          // 4. Asignación global voraz 1 a 1 de mínima distancia
+          const assignedCircleLotIds = new Set<string>();
+          const assignedShapeElements = new Set<Element>();
+          const assignedLotShapes = new Map<HTMLElement, Element>();
+
+          allPairs.forEach((pair) => {
+            if (assignedCircleLotIds.has(pair.circle.lotId) || assignedShapeElements.has(pair.shape)) {
+              return;
+            }
+            assignedCircleLotIds.add(pair.circle.lotId);
+            assignedShapeElements.add(pair.shape);
+            assignedLotShapes.set(pair.circle.lotGroup, pair.shape);
+            
+            // Mover la geometría al principio del grupo del lote asignado
+            pair.circle.lotGroup.insertBefore(pair.shape, pair.circle.lotGroup.firstChild);
+          });
+
+          // 5. Inyectar pins visuales glassmorphic en cada grupo de lote y limpiar números vectoriales obsoletos
+          circleItems.forEach((item) => {
+            const { cx, cy, lotId, lotGroup, element: c } = item;
+
+            const assignedShape = assignedLotShapes.get(lotGroup);
+
+            // Eliminar cualquier número o trazo vectorial nativo del marcador dentro de lotGroup,
+            // dejando ÚNICAMENTE la forma del lote que acabamos de asociar.
+            Array.from(lotGroup.children).forEach((child) => {
+              if (child !== c && child !== assignedShape) {
+                child.remove();
+              }
+            });
+
+            const pinText = doc.createElementNS("http://www.w3.org/2000/svg", "text");
+            pinText.setAttribute("x", cx.toString());
+            pinText.setAttribute("y", cy.toString());
+            pinText.setAttribute("text-anchor", "middle");
+            pinText.setAttribute("dominant-baseline", "central");
+            pinText.setAttribute("class", "svg-pin-text");
+            pinText.setAttribute("id", `PIN_${lotId}`);
+            pinText.setAttribute("font-size", "24");
+            pinText.setAttribute("style", "transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none;");
+            pinText.textContent = lotId.replace("-", "");
+
+            const pinRect = doc.createElementNS("http://www.w3.org/2000/svg", "rect");
+            pinRect.setAttribute("x", (cx - 55).toString());
+            pinRect.setAttribute("y", (cy - 30).toString());
+            pinRect.setAttribute("width", "110");
+            pinRect.setAttribute("height", "60");
+            pinRect.setAttribute("rx", "30");
+            pinRect.setAttribute("class", "svg-pin-rect");
+            pinRect.setAttribute("id", `PIN_RECT_${lotId}`);
+            pinRect.setAttribute("style", "transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none;");
+
+            c.replaceWith(pinRect);
+            pinRect.after(pinText);
           });
 
           // Serializar el SVG modificado
