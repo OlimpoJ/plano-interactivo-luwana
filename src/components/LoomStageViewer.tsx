@@ -304,7 +304,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                     if (!centroid) return;
 
                     const dist = Math.sqrt((centroid.x - cx) ** 2 + (centroid.y - cy) ** 2);
-                    if (dist < minDistance && dist < 150) {
+                    if (dist < minDistance && dist < 450) {
                       minDistance = dist;
                       closestElement = shape;
                     }
