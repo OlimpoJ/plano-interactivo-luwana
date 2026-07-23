@@ -324,26 +324,31 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
                   className="space-y-4"
                 >
                   <div className="flex justify-between items-center border-b border-white/10 pb-3">
-                    <h3 className="text-sm font-serif font-bold text-white uppercase tracking-wider">
-                      Recorrido Virtual Inmersivo 360°
+                    <h3 className="text-sm font-serif font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                      <span>Recorrido Virtual 360° Interactivo</span>
+                      <span className="px-2 py-0.5 bg-[#10b981]/20 border border-[#10b981]/40 text-[#10b981] text-[9px] font-mono rounded-full">EN VIVO</span>
                     </h3>
-                    <span className="text-[10px] text-[#dbaa67] uppercase tracking-widest font-semibold">
-                      Experiencia 3D
-                    </span>
+                    <a
+                      href="https://360.buenaventura.com.pa/#/u/7295/lakeshore-Lote71/-/plans-3d/1"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] text-[#dbaa67] hover:underline uppercase tracking-widest font-semibold flex items-center gap-1"
+                    >
+                      <span>Abrir en nueva pestaña</span>
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
                   </div>
 
-                  <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-black/60 min-h-[300px] flex flex-col justify-center items-center text-center p-8">
-                    <img
-                      src="/loom/placeholder_missing.svg"
-                      alt="Tour 360 no disponible"
-                      className="max-w-[320px] w-full rounded-xl border border-white/10 shadow-2xl mb-4"
+                  <div className="relative rounded-2xl overflow-hidden border border-white/15 bg-black/80 aspect-[16/10] sm:aspect-[16/9] min-h-[360px] shadow-2xl">
+                    <iframe
+                      src="https://360.buenaventura.com.pa/#/u/7295/lakeshore-Lote71/-/plans-3d/1"
+                      title="Tour Virtual 360° Buenaventura / Loom"
+                      className="w-full h-full border-none"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; xr-spatial-tracking"
+                      allowFullScreen
                     />
-                    <h4 className="text-sm font-bold text-[#dbaa67] uppercase tracking-widest mb-1">
-                      RECORRIDO 360° EN PRODUCCIÓN
-                    </h4>
-                    <p className="text-xs text-white/50 max-w-md uppercase tracking-wider leading-relaxed">
-                      El visor panorámico interactivas de las villas estará disponible próximamente en alta definición.
-                    </p>
                   </div>
                 </motion.div>
               )}
