@@ -4,6 +4,7 @@ import styles from "./Loom.module.css";
 import LoomMasterplanSelector from "@/components/LoomMasterplanSelector";
 import LoomStageViewer from "@/components/LoomStageViewer";
 import LoomLotPanel from "@/components/LoomLotPanel";
+import LoomShowroomView from "@/components/LoomShowroomView";
 import LoomOrientationWrapper from "@/components/LoomOrientationWrapper";
 import { AnimatePresence } from "framer-motion";
 
@@ -101,25 +102,12 @@ export default function LoomShowroom() {
   return (
     <LoomOrientationWrapper>
       {view === "showroom" && selectedLot ? (
-        /* Vista del Showroom Expandido de la Villa */
-        <div className="min-h-screen bg-[#070c16] flex flex-col justify-center items-center text-white p-6">
-          <div className="max-w-md text-center space-y-6">
-            <span className="text-[10px] uppercase tracking-[0.35em] text-[#dbaa67] font-semibold">Loom Luxury Residence</span>
-            <h2 className="text-3xl font-serif text-white tracking-wide">Showroom de Villa</h2>
-            <p className="text-sm text-white/50 leading-relaxed uppercase tracking-wider">
-              Lote seleccionado: <strong className="text-[#dbaa67]">{selectedLot.rawId}</strong>
-            </p>
-            <div className="bg-black/35 border border-white/5 p-6 rounded-lg text-xs leading-relaxed text-white/40 uppercase tracking-widest">
-              Visor de plantas, axonometrías y tour 360° en construcción.
-            </div>
-            <button 
-              onClick={() => setView("stage")} 
-              className="px-6 py-2.5 bg-[#dbaa67] hover:bg-[#cba875] text-[#070c16] hover:text-black font-semibold rounded uppercase tracking-[0.15em] text-xs transition-all duration-300"
-            >
-              Volver al Mapa
-            </button>
-          </div>
-        </div>
+        /* Vista del Showroom Interactivo de la Villa */
+        <LoomShowroomView
+          selectedLot={selectedLot}
+          stageId={selectedStage || "etapa_1"}
+          onBack={() => setView("stage")}
+        />
       ) : view === "stage" && selectedStage ? (
         /* Vista de Lotes por Etapa */
         <div className="relative w-full min-h-screen bg-[#070c16] overflow-hidden flex flex-col">
