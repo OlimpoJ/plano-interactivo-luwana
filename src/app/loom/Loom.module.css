@@ -63,11 +63,11 @@
 .entrarBtn {
   position: absolute;
   bottom: 12vh; /* Colocado más abajo para dejar apreciar el video de fondo */
-  background: rgba(7, 12, 22, 0.45); /* Cristal oscuro semitransparente */
+  background: rgba(7, 12, 22, 0.55); /* Cristal oscuro semitransparente */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   color: #ffffff; /* Texto blanco de alta legibilidad */
-  border: 1px solid rgba(219, 170, 103, 0.4); /* Delicado borde color cobre translúcido */
+  border: 1px solid rgba(179, 95, 39, 0.5); /* Delicado borde color cobre terracota oficial */
   padding: 1.1rem 4.5rem; /* Adaptado al texto "Ingresar al Showroom" */
   font-size: 0.95rem;
   font-weight: 500;
@@ -77,16 +77,16 @@
   border-radius: 0px; /* Completamente rectangular */
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05);
-  font-family: inherit;
+  font-family: var(--font-sans);
   white-space: nowrap;
 }
 
 .entrarBtn:hover {
-  background: rgba(219, 170, 103, 0.15); /* Relleno cobre translúcido */
-  color: #dbaa67; /* Texto color cobre de la marca */
-  border-color: #dbaa67; /* Borde de cobre sólido */
+  background: rgba(179, 95, 39, 0.2); /* Relleno cobre translúcido */
+  color: #EBD9AB; /* Texto color oro arena de la marca */
+  border-color: #B35F27; /* Borde de cobre sólido */
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(219, 170, 103, 0.3);
+  box-shadow: 0 8px 35px rgba(179, 95, 39, 0.35);
 }
 
 @media (max-width: 992px) {

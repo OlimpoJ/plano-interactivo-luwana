@@ -1,31 +1,53 @@
 @import "tailwindcss";
 
+/* Official Loom Brand Manual Fonts */
+@font-face {
+  font-family: 'Branch';
+  src: url('/fonts/Branch.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Galano Grotesque';
+  src: url('/fonts/GalanoGrotesqueRegular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Galano Grotesque';
+  src: url('/fonts/GalanoGrotesqueMedium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --color-available: #396866;
-  /* Brand Secondary Green - Available */
-  --color-reserved: #C2AC8F;
-  /* Brand Primary Sand - Reserved */
-  --color-sold: #152A2D;
-  /* Brand Primary Dark Green - Sold */
+  /* Official Loom Brand Palette */
+  --color-loom-copper: #B35F27;
+  --color-loom-gold: #EBD9AB;
+  --color-loom-sand: #DDCFBC;
+  --color-loom-sage: #699385;
+  --color-loom-dark: #0A0D0B;
 
-  /* Luxury Dark Theme Colors */
-  --color-bg: #152A2D;
-  /* Deep Green */
-  --color-bg-light: #396866;
-  /* Secondary Green */
-  --color-glass: rgba(21, 42, 45, 0.85);
-  /* Tinted dark green glass */
-  --color-glass-light: rgba(57, 104, 102, 0.4);
-  /* Tinted secondary green glass */
-  --color-accent: #C2AC8F;
-  /* Brand Sand */
-  --color-accent-light: #CECDC8;
-  /* Brand Light Sand */
-  --color-accent-dark: #899984;
-  /* Brand muted olive */
+  --color-available: #699385;
+  --color-reserved: #EBD9AB;
+  --color-sold: #181C19;
 
-  --font-serif: "Felix Titling", var(--font-playfair), serif;
-  --font-sans: "Segoe UI", var(--font-montserrat), sans-serif;
+  /* Luxury Dark Theme Colors (Warm Graphite Charcoal) */
+  --color-bg: #0A0D0B;
+  --color-bg-light: #141715;
+  --color-glass: rgba(10, 13, 11, 0.92);
+  --color-glass-light: rgba(179, 95, 39, 0.15);
+  --color-accent: #B35F27;
+  --color-accent-light: #EBD9AB;
+  --color-accent-dark: #699385;
+
+  --font-serif: "Branch", "Playfair Display", Georgia, serif;
+  --font-sans: "Galano Grotesque", "Inter", system-ui, sans-serif;
 }
 
 

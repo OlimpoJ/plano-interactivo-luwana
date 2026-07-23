@@ -64,20 +64,20 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
   const currentAxonometrics = villa1Axonometrics;
 
   return (
-    <div className="relative w-full min-h-screen bg-[#051415] text-white flex flex-col overflow-x-hidden font-sans select-none">
+    <div className="relative w-full min-h-screen bg-[#0A0D0B] text-white flex flex-col overflow-x-hidden font-sans select-none">
       
       {/* Dynamic Background Blur */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#051415] via-[#070c16] to-[#0b2426]" />
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#dbaa67]/5 rounded-full blur-[140px]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0A0D0B] via-[#121513] to-[#0A0D0B]" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#B35F27]/10 rounded-full blur-[140px]" />
       </div>
 
       {/* Top Navigation Bar */}
-      <header className="relative z-30 w-full px-4 sm:px-8 py-4 bg-[#070c16]/80 backdrop-blur-xl border-b border-white/10 flex flex-wrap justify-between items-center gap-4">
+      <header className="relative z-30 w-full px-4 sm:px-8 py-4 bg-[#0A0D0B]/90 backdrop-blur-xl border-b border-white/10 flex flex-wrap justify-between items-center gap-4">
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 px-3.5 py-1.5 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 rounded-full text-xs font-bold text-[#dbaa67] uppercase tracking-wider transition-all duration-300 shadow-md cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-1.5 bg-[#B35F27]/20 hover:bg-[#B35F27]/30 active:scale-95 border border-[#B35F27]/50 rounded-full text-xs font-bold text-[#EBD9AB] uppercase tracking-wider transition-all duration-300 shadow-md cursor-pointer"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -88,9 +88,9 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
           <div className="hidden sm:block h-6 w-[1px] bg-white/15" />
 
           <div>
-            <span className="text-[9px] uppercase tracking-[0.3em] text-[#dbaa67] font-semibold block">Loom Luxury Residence</span>
+            <span className="text-[9px] uppercase tracking-[0.35em] text-[#EBD9AB] font-semibold block font-sans">Loom Luxury Residence</span>
             <h1 className="text-sm sm:text-base font-serif font-bold text-white tracking-wide">
-              Showroom Interactivo &bull; Lote <span className="text-[#dbaa67]">{selectedLot.rawId}</span>
+              Showroom Interactivo &bull; Lote <span className="text-[#EBD9AB]">{selectedLot.rawId}</span>
             </h1>
           </div>
         </div>
@@ -101,7 +101,7 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
             <span>Área Lote:</span>
             <strong className="text-white font-semibold">{selectedLot.area} m²</strong>
           </div>
-          <span className="px-3 py-1 bg-[#10b981]/20 border border-[#10b981]/40 text-[#10b981] text-[10px] font-bold uppercase tracking-widest rounded-full">
+          <span className="px-3 py-1 bg-[#699385]/20 border border-[#699385]/40 text-[#699385] text-[10px] font-bold uppercase tracking-widest rounded-full">
             {selectedLot.statusRaw || "DISPONIBLE"}
           </span>
         </div>
@@ -114,8 +114,8 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
         <section className="lg:col-span-7 flex flex-col gap-6">
           
           {/* Villa Model Selector Bar */}
-          <div className="bg-[#070c16]/70 border border-white/10 rounded-2xl p-2 backdrop-blur-md">
-            <span className="text-[10px] uppercase tracking-[0.25em] text-[#dbaa67] font-bold block mb-2 px-3 pt-1">
+          <div className="bg-[#0A0D0B]/80 border border-white/10 rounded-2xl p-2 backdrop-blur-md">
+            <span className="text-[10px] uppercase tracking-[0.25em] text-[#EBD9AB] font-bold block mb-2 px-3 pt-1">
               Seleccionar Modelo de Villa
             </span>
             <div className="grid grid-cols-2 gap-2">
@@ -123,24 +123,24 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
                 onClick={() => setSelectedVilla("luxury")}
                 className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all duration-300 cursor-pointer ${
                   selectedVilla === "luxury"
-                    ? "bg-[#dbaa67]/20 border-[#dbaa67] text-white shadow-lg shadow-[#dbaa67]/10"
+                    ? "bg-[#B35F27]/25 border-[#B35F27] text-white shadow-lg shadow-[#B35F27]/20"
                     : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white"
                 }`}
               >
-                <span className="text-xs font-bold uppercase tracking-wider">Luxury Residence</span>
-                <span className="text-[10px] text-[#dbaa67] mt-0.5 font-mono">353.17 m² &bull; 3 Niveles</span>
+                <span className="text-xs font-serif font-bold uppercase tracking-wider">Luxury Residence</span>
+                <span className="text-[10px] text-[#EBD9AB] mt-0.5 font-mono">353.17 m² &bull; 3 Niveles</span>
               </button>
 
               <button
                 onClick={() => setSelectedVilla("garden")}
                 className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all duration-300 cursor-pointer ${
                   selectedVilla === "garden"
-                    ? "bg-[#dbaa67]/20 border-[#dbaa67] text-white shadow-lg shadow-[#dbaa67]/10"
+                    ? "bg-[#B35F27]/25 border-[#B35F27] text-white shadow-lg shadow-[#B35F27]/20"
                     : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white"
                 }`}
               >
-                <span className="text-xs font-bold uppercase tracking-wider">Garden Edition</span>
-                <span className="text-[10px] text-[#dbaa67] mt-0.5 font-mono">274.04 m² &bull; Jardín Biofílico</span>
+                <span className="text-xs font-serif font-bold uppercase tracking-wider">Garden Edition</span>
+                <span className="text-[10px] text-[#EBD9AB] mt-0.5 font-mono">274.04 m² &bull; Jardín Biofílico</span>
               </button>
             </div>
           </div>
@@ -328,23 +328,12 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
                       <span>Recorrido Virtual 360° Interactivo</span>
                       <span className="px-2 py-0.5 bg-[#10b981]/20 border border-[#10b981]/40 text-[#10b981] text-[9px] font-mono rounded-full">EN VIVO</span>
                     </h3>
-                    <a
-                      href="https://360.buenaventura.com.pa/#/u/7295/lakeshore-Lote71/-/plans-3d/1"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[10px] text-[#dbaa67] hover:underline uppercase tracking-widest font-semibold flex items-center gap-1"
-                    >
-                      <span>Abrir en nueva pestaña</span>
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    </a>
                   </div>
 
                   <div className="relative rounded-2xl overflow-hidden border border-white/15 bg-black/80 aspect-[16/10] sm:aspect-[16/9] min-h-[360px] shadow-2xl">
                     <iframe
-                      src="https://360.buenaventura.com.pa/#/u/7295/lakeshore-Lote71/-/plans-3d/1"
-                      title="Tour Virtual 360° Buenaventura / Loom"
+                      src="https://kuula.co/share/collection/7TKQ2?logo=0&info=0&fs=1&vr=0&sd=1&thumbs=1"
+                      title="Tour Virtual 360° Loom"
                       className="w-full h-full border-none"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; xr-spatial-tracking"
                       allowFullScreen

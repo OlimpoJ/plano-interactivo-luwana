@@ -538,7 +538,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
         g#LOTGROUP_${lotId} rect.svg-pin-rect {
           display: ${pinDisplay} !important;
           fill: rgba(7, 12, 22, 0.65) !important;
-          stroke: ${isSelected ? '#dbaa67' : 'rgba(255, 255, 255, 0.25)'} !important;
+          stroke: ${isSelected ? '#EBD9AB' : 'rgba(255, 255, 255, 0.25)'} !important;
           stroke-width: ${isSelected ? '3px' : '1.5px'} !important;
           transform: ${isSelected ? 'scale(1.08)' : 'scale(1)'} !important;
           transform-origin: ${pin.cx}px ${pin.cy}px !important;
@@ -579,7 +579,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
   }, [pins, selectedLot, activeFilters]);
 
   return (
-    <div className={`relative h-[100dvh] ${containerWidthClass} bg-[#051415] text-white select-none overflow-hidden transition-all duration-500 ease-in-out`}>
+    <div className={`relative h-[100dvh] ${containerWidthClass} bg-[#0A0D0B] text-white select-none overflow-hidden transition-all duration-500 ease-in-out`}>
       
       {/* Estilos dinámicos inyectados */}
       <style dangerouslySetInnerHTML={{ __html: dynamicLotStyles }} />
@@ -591,17 +591,17 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
           alt="Blur background"
           className="w-full h-full object-cover opacity-25 blur-3xl scale-110 pointer-events-none"
         />
-        <div className="absolute inset-0 bg-gradient-to-tr from-[#051415]/80 via-[#0b2426]/60 to-[#051415]/80 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#0A0D0B]/80 via-[#121513]/60 to-[#0A0D0B]/80 pointer-events-none" />
       </div>
 
       {/* Botón Flotante Master Plan (Sobre la imagen) */}
       <div className="absolute top-4 left-4 z-30 pointer-events-auto">
         <button 
           onClick={onBack}
-          className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 rounded-full text-[9px] uppercase tracking-wider text-[#dbaa67] hover:text-white font-bold backdrop-blur-md transition-all duration-300 shadow-md cursor-pointer"
+          className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 rounded-full text-[9px] uppercase tracking-wider text-[#EBD9AB] hover:text-white font-bold backdrop-blur-md transition-all duration-300 shadow-md cursor-pointer"
           title="Volver al Master Plan"
         >
-          <svg className="w-3.5 h-3.5 text-[#dbaa67]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <svg className="w-3.5 h-3.5 text-[#EBD9AB]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
           </svg>
           <span className="hidden sm:inline">Master Plan</span>
@@ -610,8 +610,8 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
 
       {/* Panel de Filtros / Resumen de Amenidades Flotante */}
       {isAmenities && (
-        <div className="absolute top-4 right-4 z-30 pointer-events-auto bg-[#10b981]/15 border border-[#10b981]/30 px-3 py-1.5 rounded-full text-[9px] font-semibold text-[#10b981] tracking-widest uppercase backdrop-blur-md flex items-center gap-2 shadow-md">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#10b981] animate-pulse"></span>
+        <div className="absolute top-4 right-4 z-30 pointer-events-auto bg-[#699385]/20 border border-[#699385]/40 px-3 py-1.5 rounded-full text-[9px] font-semibold text-[#699385] tracking-widest uppercase backdrop-blur-md flex items-center gap-2 shadow-md">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#699385] animate-pulse"></span>
           Amenidades: 7
         </div>
       )}
@@ -685,14 +685,14 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    className="absolute z-50 pointer-events-none p-3 rounded-lg border border-[#dbaa67]/25 bg-[#070c16]/65 shadow-2xl shadow-black/90 backdrop-blur-xl text-[11px] text-white/90"
+                    className="absolute z-50 pointer-events-none p-3 rounded-lg border border-[#B35F27]/30 bg-[#070c16]/85 shadow-2xl shadow-black/90 backdrop-blur-xl text-[11px] text-white/90"
                     style={{
                       left: `${hoveredPin.xPercent}%`,
                       top: `${hoveredPin.yPercent - 8}%`,
                       transform: "translateX(-50%)",
                     }}
                   >
-                    <div className="font-bold text-center border-b border-white/10 pb-1 mb-1 tracking-wider">
+                    <div className="font-bold text-center border-b border-white/10 pb-1 mb-1 tracking-wider text-[#EBD9AB]">
                       LOTE {hoveredPin.lotId}
                     </div>
                     <div className="space-y-0.5 min-w-[110px]">
@@ -738,7 +738,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
 
       {/* Leyenda de Brújula (Flotante a la Derecha) */}
       <div className="absolute bottom-7 right-6 z-20 hidden md:flex items-center gap-2 text-white/40 text-[9px] uppercase tracking-widest font-light bg-black/40 border border-white/5 px-3 py-1.5 rounded-full backdrop-blur-md">
-        <Compass className="h-3.5 w-3.5 text-[#dbaa67]" />
+        <Compass className="h-3.5 w-3.5 text-[#EBD9AB]" />
         Norte orientado hacia el mar (arriba)
       </div>
 

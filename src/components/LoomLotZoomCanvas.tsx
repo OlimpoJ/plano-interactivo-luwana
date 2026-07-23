@@ -26,6 +26,7 @@ export default function LoomLotZoomCanvas({ stageId, selectedLot, className = ""
   const [svgContent, setSvgContent] = useState<string>("");
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [isMaximized, setIsMaximized] = useState<boolean>(false);
+  const [cropBox, setCropBox] = useState<{ x: number; y: number; w: number; h: number }>({ x: 0, y: 0, w: 3840, h: 2160 });
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Background image per stage
@@ -95,16 +96,27 @@ export default function LoomLotZoomCanvas({ stageId, selectedLot, className = ""
             else if (letter === "C") { targetCx = 1800; targetCy = 1400; }
           }
 
-          // Calculate tight zoomed viewBox centered on selected lot (~800x500 box)
-          const zoomWidth = 850;
-          const zoomHeight = 550;
-          const newVbX = Math.max(0, targetCx - zoomWidth / 2);
-          const newVbY = Math.max(0, targetCy - zoomHeight / 2);
+          // Calculate tight cropped box focused exclusively on the lot (~500x350 box)
+          const zoomWidth = 500;
+          const zoomHeight = 350;
+          const newVbX = Math.max(0, Math.min((vbW || 3840) - zoomWidth, targetCx - zoomWidth / 2));
+          const newVbY = Math.max(0, Math.min((vbH || 2160) - zoomHeight, targetCy - zoomHeight / 2));
+
+          setCropBox({ x: newVbX, y: newVbY, w: zoomWidth, h: zoomHeight });
 
           doc.documentElement.setAttribute("viewBox", `${newVbX} ${newVbY} ${zoomWidth} ${zoomHeight}`);
           doc.documentElement.setAttribute("preserveAspectRatio", "xMidYMid meet");
 
-          // Styling: highlight all shapes except current lot
+          // Clean up vector overlays: hide non-selected lot pins for a clean focused crop
+          const allLotGroups = Array.from(doc.querySelectorAll("[id*='MANZANA_']"));
+          allLotGroups.forEach((g) => {
+            const gId = g.getAttribute("id") || "";
+            // Keep current lot group visible, dim or hide others
+            if (!gId.toUpperCase().includes(lotIdClean.replace("-", ""))) {
+              g.setAttribute("opacity", "0.35");
+            }
+          });
+
           const serializer = new XMLSerializer();
           setSvgContent(serializer.serializeToString(doc));
         } catch (err) {
@@ -118,6 +130,12 @@ export default function LoomLotZoomCanvas({ stageId, selectedLot, className = ""
   const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.35, 0.7));
   const handleResetZoom = () => setZoomLevel(1);
 
+  // Math for positioning the background render image to align 1:1 with the cropped viewBox
+  const imgWidthPct = (3840 / cropBox.w) * 100;
+  const imgHeightPct = (2160 / cropBox.h) * 100;
+  const imgLeftPct = -(cropBox.x / cropBox.w) * 100;
+  const imgTopPct = -(cropBox.y / cropBox.h) * 100;
+
   return (
     <div
       ref={containerRef}
@@ -125,21 +143,29 @@ export default function LoomLotZoomCanvas({ stageId, selectedLot, className = ""
         isMaximized ? "fixed inset-0 z-50 rounded-none border-none" : "w-full h-full min-h-[380px] lg:min-h-[480px]"
       } ${className}`}
     >
-      {/* Background render image */}
+      {/* Cropped Render Image Container */}
       <div
-        className="w-full h-full relative transition-transform duration-500 ease-out"
+        className="w-full h-full relative transition-transform duration-500 ease-out overflow-hidden"
         style={{ transform: `scale(${zoomLevel})` }}
       >
         <img
           src={bgImage}
-          alt={`Vista enfocada ${selectedLot.rawId}`}
-          className="absolute inset-0 w-full h-full object-cover opacity-85 select-none pointer-events-none"
+          alt={`Recorte centrado ${selectedLot.rawId}`}
+          className="absolute select-none pointer-events-none transition-all duration-500"
+          style={{
+            width: `${imgWidthPct}%`,
+            height: `${imgHeightPct}%`,
+            left: `${imgLeftPct}%`,
+            top: `${imgTopPct}%`,
+            maxWidth: "none",
+            maxHeight: "none",
+          }}
         />
 
-        {/* Dynamic Vector Overlay */}
+        {/* Dynamic Vector Overlay aligned 1:1 */}
         {svgContent && (
           <div
-            className="absolute inset-0 w-full h-full [&>svg]:w-full [&>svg]:h-full [&>svg]:object-cover pointer-events-none opacity-90 drop-shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+            className="absolute inset-0 w-full h-full [&>svg]:w-full [&>svg]:h-full [&>svg]:object-cover pointer-events-none opacity-90 drop-shadow-[0_0_25px_rgba(16,185,129,0.5)]"
             dangerouslySetInnerHTML={{ __html: svgContent }}
           />
         )}

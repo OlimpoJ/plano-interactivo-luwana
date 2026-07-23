@@ -179,14 +179,14 @@ export default function LoomShowroom() {
               {/* Estadísticas de Disponibilidad */}
               <div className="flex gap-8 justify-center my-6 text-center text-xs tracking-[0.2em] uppercase font-light relative z-10">
                 <div>
-                  <span className="text-[#dbaa67] font-semibold text-lg sm:text-2xl block mb-1">
+                  <span className="text-[#EBD9AB] font-semibold text-lg sm:text-2xl block mb-1">
                     <AnimatedCounter endValue={stats.total} />
                   </span>
                   <span className="text-white/40 text-[9px]">Lotes Totales</span>
                 </div>
                 <div className="h-8 w-[1px] bg-white/10 self-center"></div>
                 <div>
-                  <span className="text-[#10b981] font-semibold text-lg sm:text-2xl block mb-1">
+                  <span className="text-[#699385] font-semibold text-lg sm:text-2xl block mb-1">
                     <AnimatedCounter endValue={stats.available} />
                   </span>
                   <span className="text-white/40 text-[9px]">Disponibles</span>

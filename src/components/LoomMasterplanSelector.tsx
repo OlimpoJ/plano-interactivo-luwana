@@ -286,7 +286,7 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
                           height={isActive ? 90 : 60}
                           rx={isActive ? 45 : 30}
                           fill={isHovered ? "rgba(7, 12, 22, 0.85)" : (isActive ? "rgba(7, 12, 22, 0.65)" : "rgba(7, 12, 22, 0.45)")}
-                          stroke={isHovered ? "#dbaa67" : (isActive ? "rgba(255, 255, 255, 0.25)" : "rgba(255, 255, 255, 0.1)")}
+                          stroke={isHovered ? "#EBD9AB" : (isActive ? "rgba(255, 255, 255, 0.25)" : "rgba(255, 255, 255, 0.1)")}
                           strokeWidth={isActive ? 4 : 2}
                           style={{
                             transform: isHovered ? "scale(1.08)" : "scale(1)",
@@ -300,7 +300,7 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
                           cx={isActive ? stage.cx - 95 : stage.cx - 60}
                           cy={stage.cy}
                           r={isActive ? 12 : 6}
-                          fill={isActive ? "#10b981" : "rgba(255, 255, 255, 0.2)"}
+                          fill={isActive ? "#699385" : "rgba(255, 255, 255, 0.2)"}
                           style={{
                             transform: isHovered ? "scale(1.08)" : "scale(1)",
                             transformOrigin: `${stage.cx}px ${stage.cy}px`,
@@ -313,7 +313,7 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
                             cy={stage.cy}
                             r="12"
                             fill="none"
-                            stroke="#10b981"
+                            stroke="#699385"
                             strokeWidth="3"
                             className="animate-ping"
                             style={{
