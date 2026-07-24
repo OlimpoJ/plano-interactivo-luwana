@@ -432,13 +432,26 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
 
             const assignedShape = assignedLotShapes.get(lotGroup);
 
-            // Eliminar cualquier número o trazo vectorial nativo del marcador dentro de lotGroup,
-            // dejando ÚNICAMENTE la forma del lote que acabamos de asociar.
+            // Eliminar cualquier texto/marcador nativo sobrante dentro del grupo del lote,
+            // pero PRESERVAR la geometría interactiva (path, polygon, rect, polyline).
             Array.from(lotGroup.children).forEach((child) => {
-              if (child !== c && child !== assignedShape) {
-                child.remove();
+              if (child === c) return;
+              if (assignedShape && child === assignedShape) return;
+              const tag = child.tagName.toLowerCase();
+              if (["path", "polygon", "rect", "polyline"].includes(tag) && !(child as Element).classList.contains("svg-pin-rect")) {
+                return;
               }
+              child.remove();
             });
+
+            let displayLabel = lotId.replace("-", "");
+            if (lotId === "PORTERIA") displayLabel = "PORTERÍA";
+            if (lotId === "PARQUE_1") displayLabel = "PARQUE 1";
+            if (lotId === "PARQUE_2") displayLabel = "PARQUE 2";
+
+            const isLongLabel = displayLabel.length > 5;
+            const fontSize = isLongLabel ? "16" : "24";
+            const badgeWidth = isLongLabel ? Math.max(155, displayLabel.length * 16 + 32) : 110;
 
             const pinText = doc.createElementNS("http://www.w3.org/2000/svg", "text");
             pinText.setAttribute("x", cx.toString());
@@ -447,14 +460,15 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
             pinText.setAttribute("dominant-baseline", "central");
             pinText.setAttribute("class", "svg-pin-text");
             pinText.setAttribute("id", `PIN_${lotId}`);
-            pinText.setAttribute("font-size", "24");
+            pinText.setAttribute("font-size", fontSize);
+            pinText.setAttribute("font-weight", isLongLabel ? "700" : "600");
             pinText.setAttribute("style", "transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none;");
-            pinText.textContent = lotId.replace("-", "");
+            pinText.textContent = displayLabel;
 
             const pinRect = doc.createElementNS("http://www.w3.org/2000/svg", "rect");
-            pinRect.setAttribute("x", (cx - 55).toString());
+            pinRect.setAttribute("x", (cx - badgeWidth / 2).toString());
             pinRect.setAttribute("y", (cy - 30).toString());
-            pinRect.setAttribute("width", "110");
+            pinRect.setAttribute("width", badgeWidth.toString());
             pinRect.setAttribute("height", "60");
             pinRect.setAttribute("rx", "30");
             pinRect.setAttribute("class", "svg-pin-rect");
@@ -515,12 +529,12 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
 
       let pinColor = "rgba(16, 185, 129, 0.95)"; // Verde
       if (status === ("common" as any) || lotId.includes("PARQUE") || lotId.includes("PORTERIA")) {
-        baseColor = "#699385"; // Verde Biofílico Amenidades
-        opacityDefault = "0.28";
-        opacityHover = "0.55";
-        strokeColorDefault = "rgba(105, 147, 133, 0.6)";
-        strokeColorHover = "rgba(105, 147, 133, 0.95)";
-        pinColor = "#699385";
+        baseColor = "#B35F27"; // Cobre Terracota para Amenidades
+        opacityDefault = "0.30";
+        opacityHover = "0.60";
+        strokeColorDefault = "rgba(179, 95, 39, 0.65)";
+        strokeColorHover = "rgba(179, 95, 39, 0.98)";
+        pinColor = "#B35F27";
         cursor = "pointer";
       } else if (status === "reserved") {
         baseColor = "#f59e0b"; // reserved (Naranja)
@@ -718,7 +732,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                     if (group) {
                       const id = group.getAttribute("id")?.replace("LOTGROUP_", "");
                       const pin = pins.find((p) => p.lotId === id);
-                      if (pin && pin.lotData.status !== "blocked") {
+                      if (pin) {
                         onSelectLot(pin.lotData);
                         
                         // Ocultar el tooltip flotante tras 3 segundos en móviles/tabletas

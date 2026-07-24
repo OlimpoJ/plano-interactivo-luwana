@@ -64,7 +64,7 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
   const getStatusBadge = (status: string) => {
     if (status === "common" || lot.statusRaw === "AMENIDAD" || lot.id?.includes("PARQUE") || lot.id?.includes("PORTERIA")) {
       return (
-        <div className="flex items-center gap-1 bg-[#699385]/20 text-[#699385] border border-[#699385]/40 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+        <div className="flex items-center gap-1 bg-[#B35F27]/15 text-[#B35F27] border border-[#B35F27]/40 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider">
           <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
           Amenidad / Zona Común
         </div>
@@ -110,7 +110,11 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
           <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
             <div>
               <span className="text-[8px] sm:text-[10px] uppercase tracking-[0.2em] text-[#B35F27] font-bold block">Loom Residence</span>
-              <h2 className="text-base sm:text-2xl font-serif text-[#0A0D0B] tracking-wide mt-0.5">Lote {lot.rawId}</h2>
+              <h2 className="text-base sm:text-2xl font-serif text-[#0A0D0B] tracking-wide mt-0.5">
+                {lot.status === "common" || lot.statusRaw === "AMENIDAD" || lot.id?.includes("PARQUE") || lot.id?.includes("PORTERIA") 
+                  ? lot.rawId 
+                  : `Lote ${lot.rawId}`}
+              </h2>
             </div>
             {/* Badge de Estado Integrado en el Header */}
             <div>
@@ -132,7 +136,9 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
           <div className="grid grid-cols-2 bg-white/80 border border-[#0A0D0B]/10 p-2 sm:p-3 rounded-lg text-center items-center shadow-sm">
             <div className="border-r border-[#0A0D0B]/10 pr-2">
               <span className="text-[8px] sm:text-[9px] uppercase tracking-widest text-[#0A0D0B]/50 block">Área Total</span>
-              <span className="text-xs sm:text-base font-serif text-[#0A0D0B] font-semibold mt-0.5 block">{lot.area} m²</span>
+              <span className="text-xs sm:text-base font-serif text-[#0A0D0B] font-semibold mt-0.5 block">
+                {lot.area.includes("m²") || lot.area.includes("Común") ? lot.area : `${lot.area} m²`}
+              </span>
             </div>
             <div className="pl-2">
               <span className="text-[8px] sm:text-[9px] uppercase tracking-widest text-[#0A0D0B]/50 block">Ubicación</span>
@@ -140,46 +146,57 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
             </div>
           </div>
 
-          {/* Sección Financiera (Branding Premium de Loom) */}
-          <div className="bg-white/90 border border-[#B35F27]/25 rounded-lg p-3 sm:p-4 space-y-2 sm:space-y-3 shadow-sm">
-            <h3 className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-[#B35F27] border-b border-[#B35F27]/20 pb-1 font-bold">
-              Estructura Financiera (COP)
-            </h3>
-            
-            <div className="space-y-1.5 sm:space-y-2 text-[10px] sm:text-xs">
-              <div className="flex justify-between items-center">
-                <span className="text-[#0A0D0B]/70">Precio Total:</span>
-                <span className="font-serif text-[#B35F27] text-xs sm:text-sm font-bold tracking-wide">
-                  {lot.totalPrice || "Consultar"}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-[#0A0D0B]/70">Valor M²:</span>
-                <span className="text-[#0A0D0B] font-semibold">{lot.pricePerM2 || "Consultar"}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-[#0A0D0B]/70">Separación:</span>
-                <span className="text-[#0A0D0B] font-semibold flex items-center gap-1">
-                  {lot.separation || "$10,000,000"} 
-                  <span className="text-[7.5px] sm:text-[8.5px] text-[#B35F27] font-normal normal-case">
-                    (hace parte de la inicial)
+          {/* Sección Financiera solo para Lotes (Oculta para Amenidades) */}
+          {!(lot.status === "common" || lot.statusRaw === "AMENIDAD" || lot.id?.includes("PARQUE") || lot.id?.includes("PORTERIA")) ? (
+            <div className="bg-white/90 border border-[#B35F27]/25 rounded-lg p-3 sm:p-4 space-y-2 sm:space-y-3 shadow-sm">
+              <h3 className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-[#B35F27] border-b border-[#B35F27]/20 pb-1 font-bold">
+                Estructura Financiera (COP)
+              </h3>
+              
+              <div className="space-y-1.5 sm:space-y-2 text-[10px] sm:text-xs">
+                <div className="flex justify-between items-center">
+                  <span className="text-[#0A0D0B]/70">Precio Total:</span>
+                  <span className="font-serif text-[#B35F27] text-xs sm:text-sm font-bold tracking-wide">
+                    {lot.totalPrice || "Consultar"}
                   </span>
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-[#0A0D0B]/70">Cuota Inicial (20%):</span>
-                <span className="text-[#0A0D0B] font-semibold">{lot.downPayment || "Consultar"}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-[#0A0D0B]/70">Cuota Financiación (36 m.):</span>
-                <span className="text-[#0A0D0B] font-semibold">{lot.financing || "Consultar"}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-[#0A0D0B]/70">Cuota Final (Saldo):</span>
-                <span className="text-[#0A0D0B] font-semibold">{lot.finalPayment || "Consultar"}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#0A0D0B]/70">Valor M²:</span>
+                  <span className="text-[#0A0D0B] font-semibold">{lot.pricePerM2 || "Consultar"}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#0A0D0B]/70">Separación:</span>
+                  <span className="text-[#0A0D0B] font-semibold flex items-center gap-1">
+                    {lot.separation || "$10,000,000"} 
+                    <span className="text-[7.5px] sm:text-[8.5px] text-[#B35F27] font-normal normal-case">
+                      (hace parte de la inicial)
+                    </span>
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#0A0D0B]/70">Cuota Inicial (20%):</span>
+                  <span className="text-[#0A0D0B] font-semibold">{lot.downPayment || "Consultar"}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#0A0D0B]/70">Cuota Financiación (36 m.):</span>
+                  <span className="text-[#0A0D0B] font-semibold">{lot.financing || "Consultar"}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#0A0D0B]/70">Cuota Final (Saldo):</span>
+                  <span className="text-[#0A0D0B] font-semibold">{lot.finalPayment || "Consultar"}</span>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="bg-white/90 border border-[#B35F27]/25 rounded-lg p-3 sm:p-4 space-y-2 shadow-sm">
+              <h3 className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-[#B35F27] border-b border-[#B35F27]/20 pb-1 font-bold">
+                Detalles de la Amenidad
+              </h3>
+              <p className="text-xs text-[#0A0D0B]/80 leading-relaxed font-sans pt-1">
+                Espacio común equipado diseñado para el confort, esparcimiento y seguridad de todos los propietarios de Loom Residence.
+              </p>
+            </div>
+          )}
 
           {/* Alerta de Atribución */}
           {referrer && (
@@ -190,7 +207,11 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
 
           {/* Botones de Acción */}
           <div className="pt-1 space-y-1.5">
-            {lot.status !== "sold" ? (
+            {lot.status === "common" || lot.statusRaw === "AMENIDAD" || lot.id?.includes("PARQUE") || lot.id?.includes("PORTERIA") ? (
+              <div className="w-full py-2.5 sm:py-3 text-center text-[#B35F27] font-bold uppercase tracking-widest text-[9px] sm:text-[10px] border border-[#B35F27]/30 rounded bg-[#B35F27]/10 shadow-sm">
+                Zona Común Equipada &bull; Proyecto Loom Residence
+              </div>
+            ) : lot.status !== "sold" ? (
               <>
                 <button
                   onClick={() => onEnterShowroom(lot)}
