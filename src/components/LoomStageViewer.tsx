@@ -618,18 +618,18 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
 
       {/* Área del Plano */}
       <div className="absolute inset-0 w-full h-full overflow-hidden bg-black/40 shadow-[0_20px_50px_rgba(0,0,0,0.6)] z-10">
-          {/* Ocultar textos nativos y líneas perimetrales CAD fuera de los lotes */}
+          {/* Ocultar textos nativos y líneas perimetrales CAD fuera de los lotes SOLO en el SVG del mapa */}
           <style dangerouslySetInnerHTML={{ __html: `
-            svg text {
+            .loom-stage-map-svg svg text {
               display: none !important;
             }
 
-            /* Ocultar polígonos y líneas perimetrales (CAD/Illustrator) que no corresponden a lotes */
-            svg path:not(g[id^='LOTGROUP_'] *),
-            svg polyline:not(g[id^='LOTGROUP_'] *),
-            svg polygon:not(g[id^='LOTGROUP_'] *),
-            svg line:not(g[id^='LOTGROUP_'] *),
-            svg rect:not(g[id^='LOTGROUP_'] *) {
+            /* Ocultar polígonos y líneas perimetrales (CAD/Illustrator) que no corresponden a lotes en el mapa */
+            .loom-stage-map-svg svg path:not(g[id^='LOTGROUP_'] *),
+            .loom-stage-map-svg svg polyline:not(g[id^='LOTGROUP_'] *),
+            .loom-stage-map-svg svg polygon:not(g[id^='LOTGROUP_'] *),
+            .loom-stage-map-svg svg line:not(g[id^='LOTGROUP_'] *),
+            .loom-stage-map-svg svg rect:not(g[id^='LOTGROUP_'] *) {
               display: none !important;
               opacity: 0 !important;
               visibility: hidden !important;
@@ -653,7 +653,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                 {/* SVG Vectorial Overlay (Capa interactiva de lotes y trazados) */}
                 {svgText && (
                   <div
-                    className="absolute inset-0 w-full h-full [&>svg]:w-full [&>svg]:h-full [&>svg]:object-contain z-10 pointer-events-auto"
+                    className="loom-stage-map-svg absolute inset-0 w-full h-full [&>svg]:w-full [&>svg]:h-full [&>svg]:object-contain z-10 pointer-events-auto"
                   dangerouslySetInnerHTML={{ __html: svgText }}
                   onMouseOver={(e) => {
                     const target = e.target as SVGElement;
@@ -721,28 +721,28 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
 
           </div>
 
-          {/* Flecha Lateral Izquierda (Etapa Anterior) - Translúcida */}
+          {/* Flecha Lateral Izquierda (Etapa Anterior) */}
           {prevStageId && onChangeStage && (
             <button
               onClick={() => onChangeStage(prevStageId)}
-              className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 bg-[#EDE7E0]/90 hover:bg-[#B35F27] active:scale-95 border border-[#0A0D0B]/15 rounded-full text-[#0A0D0B] hover:text-[#EDE7E0] backdrop-blur-md transition-all duration-300 shadow-lg cursor-pointer"
+              className="group absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 bg-[#EDE7E0] hover:bg-[#B35F27] active:scale-95 border border-[#0A0D0B]/20 rounded-full text-[#0A0D0B] hover:text-[#EDE7E0] backdrop-blur-md transition-all duration-300 shadow-xl cursor-pointer"
               title="Etapa Anterior"
             >
-              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"></path>
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 stroke-[#0A0D0B] group-hover:stroke-[#EDE7E0] transition-colors" fill="none" strokeWidth="3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"></path>
               </svg>
             </button>
           )}
 
-          {/* Flecha Lateral Derecha (Etapa Siguiente) - Translúcida */}
+          {/* Flecha Lateral Derecha (Etapa Siguiente) */}
           {nextStageId && onChangeStage && (
             <button
               onClick={() => onChangeStage(nextStageId)}
-              className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 bg-[#EDE7E0]/90 hover:bg-[#B35F27] active:scale-95 border border-[#0A0D0B]/15 rounded-full text-[#0A0D0B] hover:text-[#EDE7E0] backdrop-blur-md transition-all duration-300 shadow-lg cursor-pointer"
+              className="group absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 bg-[#EDE7E0] hover:bg-[#B35F27] active:scale-95 border border-[#0A0D0B]/20 rounded-full text-[#0A0D0B] hover:text-[#EDE7E0] backdrop-blur-md transition-all duration-300 shadow-xl cursor-pointer"
               title="Etapa Siguiente"
             >
-              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7"></path>
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 stroke-[#0A0D0B] group-hover:stroke-[#EDE7E0] transition-colors" fill="none" strokeWidth="3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path>
               </svg>
             </button>
           )}
