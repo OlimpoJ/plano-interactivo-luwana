@@ -298,7 +298,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                 if (lotId === "PORTERIA") {
                   lotData = {
                     id: "PORTERIA",
-                    rawId: "Portería Principal",
+                    rawId: "Portería",
                     area: "Área Común",
                     location: "Acceso Principal 24/7",
                     status: "common" as any,
@@ -312,7 +312,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                   const pNum = lotId === "PARQUE_1" ? "1" : "2";
                   lotData = {
                     id: lotId,
-                    rawId: `Parque Lineal ${pNum}`,
+                    rawId: `Parque ${pNum}`,
                     area: "686 m²",
                     location: "Zona Verde & Senderos",
                     status: "common" as any,
@@ -764,12 +764,24 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                     }}
                   >
                     <div className="font-bold text-center border-b border-[#0A0D0B]/10 pb-1 mb-1 tracking-wider text-[#B35F27]">
-                      LOTE {hoveredPin.lotId}
+                      {hoveredPin.lotId === "PORTERIA" || hoveredPin.lotData.rawId.toLowerCase().includes("porteria")
+                        ? "PORTERÍA"
+                        : hoveredPin.lotId === "PARQUE_1"
+                        ? "PARQUE 1"
+                        : hoveredPin.lotId === "PARQUE_2"
+                        ? "PARQUE 2"
+                        : hoveredPin.lotId.includes("PARQUE")
+                        ? hoveredPin.lotData.rawId.replace("_", " ").toUpperCase()
+                        : `LOTE ${hoveredPin.lotData.rawId}`}
                     </div>
                     <div className="space-y-0.5 min-w-[110px]">
                       <p className="flex justify-between gap-4">
-                        <span>Área:</span>
-                        <span className="font-semibold text-[#0A0D0B]">{hoveredPin.lotData.area} m²</span>
+                        <span className="text-[#0A0D0B]/60">Área:</span>
+                        <span className="font-semibold">
+                          {hoveredPin.lotData.area.includes("m²") || hoveredPin.lotData.area.includes("Común")
+                            ? hoveredPin.lotData.area
+                            : `${hoveredPin.lotData.area} m²`}
+                        </span>
                       </p>
                     </div>
                   </motion.div>
