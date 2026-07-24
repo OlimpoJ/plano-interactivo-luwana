@@ -62,6 +62,14 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
   };
 
   const getStatusBadge = (status: string) => {
+    if (status === "common" || lot.statusRaw === "AMENIDAD" || lot.id?.includes("PARQUE") || lot.id?.includes("PORTERIA")) {
+      return (
+        <div className="flex items-center gap-1 bg-[#699385]/20 text-[#699385] border border-[#699385]/40 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+          <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+          Amenidad / Zona Común
+        </div>
+      );
+    }
     switch (status) {
       case "available":
         return (
@@ -79,7 +87,7 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
         );
       default:
         return (
-          <div className="flex items-center gap-1 bg-white/10 text-white/50 border border-white/10 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+          <div className="flex items-center gap-1 bg-black/10 text-[#0A0D0B]/50 border border-[#0A0D0B]/10 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
             <AlertCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             Vendido
           </div>

@@ -16,10 +16,20 @@
 		36.8,1923.84 52.23,1781.57 66.08,1495.88 67.47,1275.18 50.11,908.67 9.78,568.78 -9.19,459.12 1243.16,381.4 	"/>
 </g>
 <g id="PARQUE_LINEAL">
-	
+	<g id="LOTGROUP_PARQUE_1">
 		<rect x="1164.53" y="1544.27" transform="matrix(0.7578 -0.6525 0.6525 0.7578 -733.809 1284.4215)" class="st1" width="397.4" height="172.78"/>
-	
+		<circle class="st2" cx="1315" cy="1630" r="24"/>
+	</g>
+	<g id="LOTGROUP_PARQUE_2">
 		<rect x="1536.04" y="1233.49" transform="matrix(0.7578 -0.6525 0.6525 0.7578 -441.0496 1451.5542)" class="st1" width="397.4" height="172.78"/>
+		<circle class="st2" cx="1686" cy="1320" r="24"/>
+	</g>
+</g>
+<g id="PORTERIA_GRUPO">
+	<g id="LOTGROUP_PORTERIA">
+		<polygon points="410,1020 540,940 480,840 350,920" class="st1" />
+		<circle class="st2" cx="445" cy="930" r="24"/>
+	</g>
 </g>
 <g id="MANZANA_C">
 	<g id="LOTES_C">

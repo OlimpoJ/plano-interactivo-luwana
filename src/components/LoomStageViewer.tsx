@@ -231,6 +231,10 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
 
             while (parent) {
               const id = parent.getAttribute("id") || "";
+              if (id.includes("PORTERIA") || id.includes("PORTERÍA")) { manzana = "PORTERIA"; manzanaGroup = parent; break; }
+              if (id.includes("PARQUE_1")) { manzana = "PARQUE_1"; manzanaGroup = parent; break; }
+              if (id.includes("PARQUE_2")) { manzana = "PARQUE_2"; manzanaGroup = parent; break; }
+              if (id.includes("PARQUE")) { manzana = "PARQUE"; manzanaGroup = parent; break; }
               if (id.includes("MANZANA_A") || id.includes("MANZONA_A")) { manzana = "A"; manzanaGroup = parent; break; }
               if (id.includes("MANZANA_B") || id.includes("MANZONA_B")) { manzana = "B"; manzanaGroup = parent; break; }
               if (id.includes("MANZANA_C") || id.includes("MANZONA_C")) { manzana = "C"; manzanaGroup = parent; break; }
@@ -281,24 +285,57 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                 num = counters[manzana];
               }
 
-              const lotId = `${manzana}-${num}`;
+              let lotId = `${manzana}-${num}`;
+              if (manzana === "PORTERIA") lotId = "PORTERIA";
+              if (manzana === "PARQUE_1") lotId = "PARQUE_1";
+              if (manzana === "PARQUE_2") lotId = "PARQUE_2";
+
               const xPercent = (cx / viewBoxWidth) * 100;
               const yPercent = (cy / viewBoxHeight) * 100;
 
               let lotData = lots.find((l) => l.id.toUpperCase() === lotId.toUpperCase());
               if (!lotData) {
-                lotData = {
-                  id: lotId,
-                  rawId: lotId,
-                  area: "250.00",
-                  location: "MEDIANERO",
-                  status: "available",
-                  statusRaw: "DISPONIBLE",
-                  totalPrice: "$250,000,000",
-                  downPayment: "$50,000,000",
-                  financing: "$3,650,000",
-                  finalPayment: "$25,000,000",
-                };
+                if (lotId === "PORTERIA") {
+                  lotData = {
+                    id: "PORTERIA",
+                    rawId: "Portería Principal",
+                    area: "Área Común",
+                    location: "Acceso Principal 24/7",
+                    status: "common" as any,
+                    statusRaw: "AMENIDAD",
+                    totalPrice: "Área Común",
+                    downPayment: "-",
+                    financing: "-",
+                    finalPayment: "-",
+                  };
+                } else if (lotId.includes("PARQUE")) {
+                  const pNum = lotId === "PARQUE_1" ? "1" : "2";
+                  lotData = {
+                    id: lotId,
+                    rawId: `Parque Lineal ${pNum}`,
+                    area: "686 m²",
+                    location: "Zona Verde & Senderos",
+                    status: "common" as any,
+                    statusRaw: "AMENIDAD",
+                    totalPrice: "Área Común",
+                    downPayment: "-",
+                    financing: "-",
+                    finalPayment: "-",
+                  };
+                } else {
+                  lotData = {
+                    id: lotId,
+                    rawId: lotId,
+                    area: "250.00",
+                    location: "MEDIANERO",
+                    status: "available",
+                    statusRaw: "DISPONIBLE",
+                    totalPrice: "$250,000,000",
+                    downPayment: "$50,000,000",
+                    financing: "$3,650,000",
+                    finalPayment: "$25,000,000",
+                  };
+                }
               }
 
               const lotGroup = c.parentElement;
@@ -477,7 +514,15 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
       let cursor = "pointer";
 
       let pinColor = "rgba(16, 185, 129, 0.95)"; // Verde
-      if (status === "reserved") {
+      if (status === ("common" as any) || lotId.includes("PARQUE") || lotId.includes("PORTERIA")) {
+        baseColor = "#699385"; // Verde Biofílico Amenidades
+        opacityDefault = "0.28";
+        opacityHover = "0.55";
+        strokeColorDefault = "rgba(105, 147, 133, 0.6)";
+        strokeColorHover = "rgba(105, 147, 133, 0.95)";
+        pinColor = "#699385";
+        cursor = "pointer";
+      } else if (status === "reserved") {
         baseColor = "#f59e0b"; // reserved (Naranja)
         opacityDefault = "0.16";
         opacityHover = "0.36";
