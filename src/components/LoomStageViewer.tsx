@@ -537,8 +537,8 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
         /* Estilos del rect de fondo glassmorphic (del pin de lote) */
         g#LOTGROUP_${lotId} rect.svg-pin-rect {
           display: ${pinDisplay} !important;
-          fill: rgba(7, 12, 22, 0.65) !important;
-          stroke: ${isSelected ? '#EBD9AB' : 'rgba(255, 255, 255, 0.25)'} !important;
+          fill: rgba(237, 231, 224, 0.92) !important;
+          stroke: ${isSelected ? '#B35F27' : 'rgba(10, 13, 11, 0.25)'} !important;
           stroke-width: ${isSelected ? '3px' : '1.5px'} !important;
           transform: ${isSelected ? 'scale(1.08)' : 'scale(1)'} !important;
           transform-origin: ${pin.cx}px ${pin.cy}px !important;
@@ -548,18 +548,18 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
 
         /* Hover sobre el lote agranda el rect de fondo y cambia el borde al color del estado */
         g#LOTGROUP_${lotId}:hover rect.svg-pin-rect {
-          fill: rgba(7, 12, 22, 0.85) !important;
+          fill: rgba(237, 231, 224, 0.98) !important;
           stroke: ${baseColor} !important;
           stroke-width: 2.5px !important;
           transform: scale(1.08) !important;
         }
 
-        /* Mostrar y animar texto vectorial inyectado (blanco, sin contorno para mejor contraste) */
+        /* Mostrar y animar texto vectorial inyectado */
         g#LOTGROUP_${lotId} text.svg-pin-text {
           display: ${pinDisplay} !important;
           font-size: ${isSelected ? '28px' : '24px'} !important;
           font-weight: 700 !important;
-          fill: #ffffff !important;
+          fill: #0A0D0B !important;
           stroke: none !important;
           transform: ${isSelected ? 'scale(1.08)' : 'scale(1)'} !important;
           transform-origin: ${pin.cx}px ${pin.cy}px !important;
@@ -579,7 +579,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
   }, [pins, selectedLot, activeFilters]);
 
   return (
-    <div className={`relative h-[100dvh] ${containerWidthClass} bg-[#0A0D0B] text-white select-none overflow-hidden transition-all duration-500 ease-in-out`}>
+    <div className={`relative h-[100dvh] ${containerWidthClass} bg-[#EDE7E0] text-[#0A0D0B] select-none overflow-hidden transition-all duration-500 ease-in-out`}>
       
       {/* Estilos dinámicos inyectados */}
       <style dangerouslySetInnerHTML={{ __html: dynamicLotStyles }} />
@@ -591,17 +591,17 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
           alt="Blur background"
           className="w-full h-full object-cover opacity-25 blur-3xl scale-110 pointer-events-none"
         />
-        <div className="absolute inset-0 bg-gradient-to-tr from-[#0A0D0B]/80 via-[#121513]/60 to-[#0A0D0B]/80 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#EDE7E0]/80 via-[#F5F1EC]/60 to-[#EDE7E0]/80 pointer-events-none" />
       </div>
 
       {/* Botón Flotante Master Plan (Sobre la imagen) */}
       <div className="absolute top-4 left-4 z-30 pointer-events-auto">
         <button 
           onClick={onBack}
-          className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 rounded-full text-[9px] uppercase tracking-wider text-[#EBD9AB] hover:text-white font-bold backdrop-blur-md transition-all duration-300 shadow-md cursor-pointer"
+          className="flex items-center justify-center gap-1.5 px-3.5 py-1.5 bg-[#B35F27] hover:bg-[#964d1d] active:scale-95 border border-[#B35F27] rounded-full text-[9px] uppercase tracking-wider text-[#EDE7E0] font-bold backdrop-blur-md transition-all duration-300 shadow-md cursor-pointer"
           title="Volver al Master Plan"
         >
-          <svg className="w-3.5 h-3.5 text-[#EBD9AB]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <svg className="w-3.5 h-3.5 text-[#EDE7E0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
           </svg>
           <span className="hidden sm:inline">Master Plan</span>
@@ -685,20 +685,20 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    className="absolute z-50 pointer-events-none p-3 rounded-lg border border-[#B35F27]/30 bg-[#070c16]/85 shadow-2xl shadow-black/90 backdrop-blur-xl text-[11px] text-white/90"
+                    className="absolute z-50 pointer-events-none p-3 rounded-lg border border-[#B35F27]/30 bg-[#EDE7E0]/95 shadow-xl backdrop-blur-xl text-[11px] text-[#0A0D0B]"
                     style={{
                       left: `${hoveredPin.xPercent}%`,
                       top: `${hoveredPin.yPercent - 8}%`,
                       transform: "translateX(-50%)",
                     }}
                   >
-                    <div className="font-bold text-center border-b border-white/10 pb-1 mb-1 tracking-wider text-[#EBD9AB]">
+                    <div className="font-bold text-center border-b border-[#0A0D0B]/10 pb-1 mb-1 tracking-wider text-[#B35F27]">
                       LOTE {hoveredPin.lotId}
                     </div>
                     <div className="space-y-0.5 min-w-[110px]">
                       <p className="flex justify-between gap-4">
                         <span>Área:</span>
-                        <span className="font-semibold text-white">{hoveredPin.lotData.area} m²</span>
+                        <span className="font-semibold text-[#0A0D0B]">{hoveredPin.lotData.area} m²</span>
                       </p>
                     </div>
                   </motion.div>
@@ -713,7 +713,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
           {prevStageId && onChangeStage && (
             <button
               onClick={() => onChangeStage(prevStageId)}
-              className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 rounded-full text-white/80 hover:text-white backdrop-blur-md transition-all duration-300 shadow-lg cursor-pointer"
+              className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 bg-[#EDE7E0]/90 hover:bg-[#B35F27] active:scale-95 border border-[#0A0D0B]/15 rounded-full text-[#0A0D0B] hover:text-[#EDE7E0] backdrop-blur-md transition-all duration-300 shadow-lg cursor-pointer"
               title="Etapa Anterior"
             >
               <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -726,7 +726,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
           {nextStageId && onChangeStage && (
             <button
               onClick={() => onChangeStage(nextStageId)}
-              className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 rounded-full text-white/80 hover:text-white backdrop-blur-md transition-all duration-300 shadow-lg cursor-pointer"
+              className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 bg-[#EDE7E0]/90 hover:bg-[#B35F27] active:scale-95 border border-[#0A0D0B]/15 rounded-full text-[#0A0D0B] hover:text-[#EDE7E0] backdrop-blur-md transition-all duration-300 shadow-lg cursor-pointer"
               title="Etapa Siguiente"
             >
               <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -737,8 +737,8 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
         </div>
 
       {/* Leyenda de Brújula (Flotante a la Derecha) */}
-      <div className="absolute bottom-7 right-6 z-20 hidden md:flex items-center gap-2 text-white/40 text-[9px] uppercase tracking-widest font-light bg-black/40 border border-white/5 px-3 py-1.5 rounded-full backdrop-blur-md">
-        <Compass className="h-3.5 w-3.5 text-[#EBD9AB]" />
+      <div className="absolute bottom-7 right-6 z-20 hidden md:flex items-center gap-2 text-[#0A0D0B]/70 text-[9px] uppercase tracking-widest font-semibold bg-[#EDE7E0]/90 border border-[#0A0D0B]/10 px-3 py-1.5 rounded-full backdrop-blur-md shadow-sm">
+        <Compass className="h-3.5 w-3.5 text-[#B35F27]" />
         Norte orientado hacia el mar (arriba)
       </div>
 

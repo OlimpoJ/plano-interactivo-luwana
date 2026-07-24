@@ -278,15 +278,15 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
                         className={responsiveClass}
                         style={{ transition: "all 0.3s ease" }}
                       >
-                        {/* Fondo del Rótulo (Glassmorphic) */}
+                        {/* Fondo del Rótulo (Glassmorphic Marfil) */}
                         <rect
                           x={isActive ? stage.cx - 170 : stage.cx - 110}
                           y={isActive ? stage.cy - 45 : stage.cy - 30}
                           width={isActive ? 390 : 220}
                           height={isActive ? 90 : 60}
                           rx={isActive ? 45 : 30}
-                          fill={isHovered ? "rgba(7, 12, 22, 0.85)" : (isActive ? "rgba(7, 12, 22, 0.65)" : "rgba(7, 12, 22, 0.45)")}
-                          stroke={isHovered ? "#EBD9AB" : (isActive ? "rgba(255, 255, 255, 0.25)" : "rgba(255, 255, 255, 0.1)")}
+                          fill={isHovered ? "rgba(237, 231, 224, 0.98)" : (isActive ? "rgba(237, 231, 224, 0.92)" : "rgba(237, 231, 224, 0.75)")}
+                          stroke={isHovered ? "#B35F27" : (isActive ? "rgba(179, 95, 39, 0.5)" : "rgba(10, 13, 11, 0.2)")}
                           strokeWidth={isActive ? 4 : 2}
                           style={{
                             transform: isHovered ? "scale(1.08)" : "scale(1)",
@@ -300,7 +300,7 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
                           cx={isActive ? stage.cx - 95 : stage.cx - 60}
                           cy={stage.cy}
                           r={isActive ? 12 : 6}
-                          fill={isActive ? "#699385" : "rgba(255, 255, 255, 0.2)"}
+                          fill={isActive ? "#699385" : "rgba(10, 13, 11, 0.3)"}
                           style={{
                             transform: isHovered ? "scale(1.08)" : "scale(1)",
                             transformOrigin: `${stage.cx}px ${stage.cy}px`,
@@ -326,7 +326,7 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
                         <text
                           x={isActive ? stage.cx - 50 : stage.cx - 30}
                           y={stage.cy}
-                          fill={isActive ? "#ffffff" : "rgba(255, 255, 255, 0.35)"}
+                          fill={isActive ? "#0A0D0B" : "rgba(10, 13, 11, 0.55)"}
                           fontSize={isActive ? 32 : 22}
                           fontWeight={isActive ? "700" : "500"}
                           letterSpacing={isActive ? "4" : "2"}

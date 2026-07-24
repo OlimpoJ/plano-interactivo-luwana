@@ -27,6 +27,7 @@
 
 :root {
   /* Official Loom Brand Palette */
+  --color-loom-marfil: #EDE7E0;
   --color-loom-copper: #B35F27;
   --color-loom-gold: #EBD9AB;
   --color-loom-sand: #DDCFBC;
@@ -34,17 +35,17 @@
   --color-loom-dark: #0A0D0B;
 
   --color-available: #699385;
-  --color-reserved: #EBD9AB;
-  --color-sold: #181C19;
+  --color-reserved: #B35F27;
+  --color-sold: #66635B;
 
-  /* Luxury Dark Theme Colors (Warm Graphite Charcoal) */
-  --color-bg: #0A0D0B;
-  --color-bg-light: #141715;
-  --color-glass: rgba(10, 13, 11, 0.92);
-  --color-glass-light: rgba(179, 95, 39, 0.15);
+  /* Luxury Light Theme Colors (Marfil Natural & Carbón Oscuro) */
+  --color-bg: #EDE7E0;
+  --color-bg-light: #F5F1EC;
+  --color-glass: rgba(237, 231, 224, 0.92);
+  --color-glass-light: rgba(179, 95, 39, 0.08);
   --color-accent: #B35F27;
   --color-accent-light: #EBD9AB;
-  --color-accent-dark: #699385;
+  --color-accent-dark: #0A0D0B;
 
   --font-serif: "Branch", "Playfair Display", Georgia, serif;
   --font-sans: "Galano Grotesque", "Inter", system-ui, sans-serif;
@@ -60,8 +61,7 @@ body {
   margin: 0;
   padding: 0;
   background: var(--color-bg);
-  color: #F8F8F8;
-  /* Off-white instead of pure white */
+  color: var(--color-loom-dark);
   font-family: var(--font-sans);
   overflow-x: hidden;
 }
