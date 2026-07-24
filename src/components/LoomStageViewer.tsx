@@ -618,10 +618,22 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
 
       {/* Área del Plano */}
       <div className="absolute inset-0 w-full h-full overflow-hidden bg-black/40 shadow-[0_20px_50px_rgba(0,0,0,0.6)] z-10">
-          {/* Ocultar textos nativos del SVG (evita números dobles al hacer zoom) */}
+          {/* Ocultar textos nativos y líneas perimetrales CAD fuera de los lotes */}
           <style dangerouslySetInnerHTML={{ __html: `
             svg text {
               display: none !important;
+            }
+
+            /* Ocultar polígonos y líneas perimetrales (CAD/Illustrator) que no corresponden a lotes */
+            svg path:not(g[id^='LOTGROUP_'] *),
+            svg polyline:not(g[id^='LOTGROUP_'] *),
+            svg polygon:not(g[id^='LOTGROUP_'] *),
+            svg line:not(g[id^='LOTGROUP_'] *),
+            svg rect:not(g[id^='LOTGROUP_'] *) {
+              display: none !important;
+              opacity: 0 !important;
+              visibility: hidden !important;
+              stroke: transparent !important;
             }
           `}} />
 
