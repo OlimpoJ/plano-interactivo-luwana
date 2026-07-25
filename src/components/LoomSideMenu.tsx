@@ -45,13 +45,13 @@ export default function LoomSideMenu({
           className="fixed inset-0 bg-black/60 backdrop-blur-sm cursor-pointer"
         />
 
-        {/* Cajón Lateral Desplegable (Drawer) */}
+        {/* Cajón Lateral Desplegable (Drawer Desplazable) */}
         <motion.div
           initial={{ x: "-100%" }}
           animate={{ x: 0 }}
           exit={{ x: "-100%" }}
           transition={{ type: "spring", damping: 25, stiffness: 180 }}
-          className="relative z-10 w-[88vw] max-w-sm h-full bg-[#EDE7E0] text-[#0A0D0B] border-r border-[#0A0D0B]/15 shadow-2xl flex flex-col justify-between p-6 sm:p-8 backdrop-blur-xl"
+          className="relative z-10 w-[88vw] max-w-sm h-full max-h-[100dvh] overflow-y-auto overscroll-contain touch-pan-y bg-[#EDE7E0] text-[#0A0D0B] border-r border-[#0A0D0B]/15 shadow-2xl flex flex-col justify-between p-5 sm:p-8 backdrop-blur-xl"
         >
           {/* Header del Menú */}
           <div>
