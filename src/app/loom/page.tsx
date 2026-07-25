@@ -6,7 +6,11 @@ import LoomStageViewer from "@/components/LoomStageViewer";
 import LoomLotPanel from "@/components/LoomLotPanel";
 import LoomShowroomView from "@/components/LoomShowroomView";
 import LoomOrientationWrapper from "@/components/LoomOrientationWrapper";
+import LoomSideMenu from "@/components/LoomSideMenu";
+import LoomLocationModal from "@/components/LoomLocationModal";
+import LoomReferralModal from "@/components/LoomReferralModal";
 import { AnimatePresence } from "framer-motion";
+import { Menu, Maximize2, Minimize2 } from "lucide-react";
 
 interface Lot {
   id: string;
@@ -62,6 +66,41 @@ export default function LoomShowroom() {
     available: 87
   });
 
+  // Global Overlay UI States
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLocationOpen, setIsLocationOpen] = useState(false);
+  const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Toggle Pantalla Completa
+  const toggleFullscreen = () => {
+    if (typeof window === "undefined") return;
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().then(() => {
+        setIsFullscreen(true);
+      }).catch((err) => {
+        console.error("Error al activar pantalla completa:", err);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().then(() => {
+          setIsFullscreen(false);
+        }).catch((err) => {
+          console.error("Error al salir de pantalla completa:", err);
+        });
+      }
+    }
+  };
+
+  // Listener para sync de cambios de pantalla completa
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
+
   // Guardar el parámetro de referido ?ref= de la URL
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -99,8 +138,81 @@ export default function LoomShowroom() {
     fetchStats();
   }, []);
 
+  const handleOpenContact = () => {
+    setIsReferralModalOpen(true);
+  };
+
+  const handleNavigateToShowroom = () => {
+    if (!selectedLot) {
+      const sampleLot = lots.find((l) => l.status === "available") || {
+        id: "B-22",
+        rawId: "B-22",
+        area: "252.79",
+        location: "ESQUINERO",
+        status: "available",
+        statusRaw: "DISPONIBLE",
+        totalPrice: "$267,957,400",
+        downPayment: "$53,591,480",
+        financing: "$3,907,712",
+        finalPayment: "$26,795,740",
+      };
+      setSelectedLot(sampleLot as Lot);
+    }
+    setView("showroom");
+  };
+
   return (
     <LoomOrientationWrapper>
+      
+      {/* Controles Flotantes Globales (Menú Hamburguesa & Pantalla Completa) */}
+      <div className="fixed top-4 left-4 z-40 flex items-center gap-2 pointer-events-auto">
+        <button
+          onClick={() => setIsMenuOpen(true)}
+          className="p-2.5 sm:p-3 rounded-full bg-[#EDE7E0]/90 text-[#0A0D0B] border border-[#0A0D0B]/15 shadow-xl backdrop-blur-md hover:bg-[#EDE7E0] hover:text-[#B35F27] transition-all duration-300 group cursor-pointer"
+          title="Menú de Navegación"
+        >
+          <Menu className="h-4 w-4 sm:h-5 sm:w-5 group-hover:scale-110 transition-transform" />
+        </button>
+      </div>
+
+      <div className="fixed top-4 right-4 z-40 flex items-center gap-2 pointer-events-auto">
+        <button
+          onClick={toggleFullscreen}
+          className="p-2.5 sm:p-3 rounded-full bg-[#EDE7E0]/90 text-[#0A0D0B] border border-[#0A0D0B]/15 shadow-xl backdrop-blur-md hover:bg-[#EDE7E0] hover:text-[#B35F27] transition-all duration-300 group cursor-pointer"
+          title={isFullscreen ? "Salir de Pantalla Completa" : "Pantalla Completa"}
+        >
+          {isFullscreen ? (
+            <Minimize2 className="h-4 w-4 sm:h-5 sm:w-5 group-hover:scale-110 transition-transform" />
+          ) : (
+            <Maximize2 className="h-4 w-4 sm:h-5 sm:w-5 group-hover:scale-110 transition-transform" />
+          )}
+        </button>
+      </div>
+
+      {/* Menú Lateral Desplegable */}
+      <LoomSideMenu
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        onNavigateToIntro={() => setView("hero")}
+        onNavigateToMasterplan={() => setView("map")}
+        onNavigateToShowroom={handleNavigateToShowroom}
+        onOpenLocation={() => setIsLocationOpen(true)}
+        onOpenContact={handleOpenContact}
+      />
+
+      {/* Modal de Ubicación (Google Earth & Cartagena) */}
+      <LoomLocationModal
+        isOpen={isLocationOpen}
+        onClose={() => setIsLocationOpen(false)}
+      />
+
+      {/* Modal de Selección de Firma Comercializadora */}
+      <LoomReferralModal
+        isOpen={isReferralModalOpen}
+        onClose={() => setIsReferralModalOpen(false)}
+      />
+
+      {/* Vistas Principales del Showroom */}
       {view === "showroom" && selectedLot ? (
         /* Vista del Showroom Interactivo de la Villa */
         <LoomShowroomView

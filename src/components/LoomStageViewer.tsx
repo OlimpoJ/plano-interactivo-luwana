@@ -653,8 +653,8 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
         <div className="absolute inset-0 bg-gradient-to-tr from-[#EDE7E0]/80 via-[#F5F1EC]/60 to-[#EDE7E0]/80 pointer-events-none" />
       </div>
 
-      {/* Botón Flotante Master Plan (Sobre la imagen) */}
-      <div className="absolute top-4 left-4 z-30 pointer-events-auto">
+      {/* Botón Flotante Master Plan (Sobre la imagen, desplazado para no colisionar con el menú) */}
+      <div className="absolute top-4 left-16 sm:left-18 z-30 pointer-events-auto">
         <button 
           onClick={onBack}
           className="flex items-center justify-center gap-1.5 px-3.5 py-1.5 bg-[#B35F27] hover:bg-[#964d1d] active:scale-95 border border-[#B35F27] rounded-full text-[9px] uppercase tracking-wider text-[#EDE7E0] font-bold backdrop-blur-md transition-all duration-300 shadow-md cursor-pointer"

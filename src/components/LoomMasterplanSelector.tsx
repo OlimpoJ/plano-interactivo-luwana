@@ -149,8 +149,8 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
         <div className="absolute inset-0 bg-gradient-to-tr from-[#051415]/80 via-[#0b2426]/60 to-[#051415]/80 pointer-events-none" />
       </div>
 
-      {/* Botón Flotante Volver al Inicio (Sobre la imagen) */}
-      <div className="absolute top-4 left-4 z-30 pointer-events-auto">
+      {/* Botón Flotante Volver al Inicio (Sobre la imagen, desplazado para no colisionar con el menú) */}
+      <div className="absolute top-4 left-16 sm:left-18 z-30 pointer-events-auto">
         <button 
           onClick={onBack}
           className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 rounded-full text-[9px] uppercase tracking-wider text-[#dbaa67] hover:text-white font-bold backdrop-blur-md transition-all duration-300 shadow-md cursor-pointer"
