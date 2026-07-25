@@ -288,34 +288,34 @@ export default function LoomShowroom() {
                 />
               </div>
 
-              {/* Estadísticas de Disponibilidad (Cajas Translúcidas Cristalinas Estilo iOS) */}
-              <div className="flex gap-2.5 sm:gap-4 justify-center my-6 text-center relative z-10 px-2">
+              {/* Estadísticas de Disponibilidad (Cajas Translúcidas Compactas Estilo iOS Liquid Glass) */}
+              <div className="flex gap-1.5 sm:gap-4 justify-center my-2 sm:my-6 text-center relative z-10 px-2">
                 {/* Lotes Totales */}
-                <div className="px-4 py-3 sm:px-7 sm:py-4 bg-white/10 hover:bg-white/20 border border-white/35 rounded-2xl backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-300 flex-1 sm:flex-initial min-w-[100px] sm:min-w-[130px]">
-                  <span className="text-[#F3E5AB] font-bold text-xl sm:text-3xl block font-serif tracking-wider [text-shadow:_0_2px_8px_rgba(0,0,0,0.9)]">
+                <div className="px-2.5 py-1.5 sm:px-6 sm:py-3.5 bg-white/10 hover:bg-white/20 border border-white/35 rounded-xl sm:rounded-2xl backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition-all duration-300 flex-1 sm:flex-initial min-w-[75px] sm:min-w-[125px]">
+                  <span className="text-[#F3E5AB] font-bold text-sm sm:text-2xl md:text-3xl block font-serif tracking-wider [text-shadow:_0_1.5px_6px_rgba(0,0,0,0.9)]">
                     <AnimatedCounter endValue={stats.total} />
                   </span>
-                  <span className="text-white font-bold text-[8px] sm:text-[10px] uppercase tracking-[0.2em] block mt-1 [text-shadow:_0_1px_4px_rgba(0,0,0,0.9)]">
+                  <span className="text-white font-bold text-[7px] sm:text-[9px] md:text-[10px] uppercase tracking-[0.15em] block mt-0.5 [text-shadow:_0_1px_3px_rgba(0,0,0,0.9)]">
                     Lotes Totales
                   </span>
                 </div>
 
                 {/* Disponibles */}
-                <div className="px-4 py-3 sm:px-7 sm:py-4 bg-white/10 hover:bg-white/20 border border-[#7EF3D0]/60 rounded-2xl backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-300 flex-1 sm:flex-initial min-w-[100px] sm:min-w-[130px]">
-                  <span className="text-[#7EF3D0] font-bold text-xl sm:text-3xl block font-serif tracking-wider [text-shadow:_0_2px_8px_rgba(0,0,0,0.9)]">
+                <div className="px-2.5 py-1.5 sm:px-6 sm:py-3.5 bg-white/10 hover:bg-white/20 border border-[#7EF3D0]/60 rounded-xl sm:rounded-2xl backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition-all duration-300 flex-1 sm:flex-initial min-w-[75px] sm:min-w-[125px]">
+                  <span className="text-[#7EF3D0] font-bold text-sm sm:text-2xl md:text-3xl block font-serif tracking-wider [text-shadow:_0_1.5px_6px_rgba(0,0,0,0.9)]">
                     <AnimatedCounter endValue={stats.available} />
                   </span>
-                  <span className="text-[#7EF3D0] font-bold text-[8px] sm:text-[10px] uppercase tracking-[0.2em] block mt-1 [text-shadow:_0_1px_4px_rgba(0,0,0,0.9)]">
+                  <span className="text-[#7EF3D0] font-bold text-[7px] sm:text-[9px] md:text-[10px] uppercase tracking-[0.15em] block mt-0.5 [text-shadow:_0_1px_3px_rgba(0,0,0,0.9)]">
                     Disponibles
                   </span>
                 </div>
 
                 {/* Vendidos */}
-                <div className="px-4 py-3 sm:px-7 sm:py-4 bg-white/10 hover:bg-white/20 border border-white/35 rounded-2xl backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-300 flex-1 sm:flex-initial min-w-[100px] sm:min-w-[130px]">
-                  <span className="text-white font-bold text-xl sm:text-3xl block font-serif tracking-wider [text-shadow:_0_2px_8px_rgba(0,0,0,0.9)]">
+                <div className="px-2.5 py-1.5 sm:px-6 sm:py-3.5 bg-white/10 hover:bg-white/20 border border-white/35 rounded-xl sm:rounded-2xl backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition-all duration-300 flex-1 sm:flex-initial min-w-[75px] sm:min-w-[125px]">
+                  <span className="text-white font-bold text-sm sm:text-2xl md:text-3xl block font-serif tracking-wider [text-shadow:_0_1.5px_6px_rgba(0,0,0,0.9)]">
                     <AnimatedCounter endValue={stats.sold} />
                   </span>
-                  <span className="text-white/90 font-bold text-[8px] sm:text-[10px] uppercase tracking-[0.2em] block mt-1 [text-shadow:_0_1px_4px_rgba(0,0,0,0.9)]">
+                  <span className="text-white/90 font-bold text-[7px] sm:text-[9px] md:text-[10px] uppercase tracking-[0.15em] block mt-0.5 [text-shadow:_0_1px_3px_rgba(0,0,0,0.9)]">
                     Vendidos
                   </span>
                 </div>
