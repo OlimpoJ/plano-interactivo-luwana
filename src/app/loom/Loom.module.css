@@ -114,3 +114,19 @@
     letter-spacing: 3px;
   }
 }
+
+/* Ocultar las cajas de estadísticas cuando la altura del dispositivo es reducida (celular en horizontal / landscape) */
+@media (max-height: 520px) {
+  .heroStatsContainer {
+    display: none !important;
+  }
+  .centerLogoContainer {
+    width: 210px !important;
+  }
+  .entrarBtn {
+    bottom: 5vh !important;
+    padding: 0.7rem 2.2rem !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 2px !important;
+  }
+}

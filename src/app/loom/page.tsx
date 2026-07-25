@@ -288,8 +288,8 @@ export default function LoomShowroom() {
                 />
               </div>
 
-              {/* Estadísticas de Disponibilidad (Ocultas en versión Móvil por solicitud, visibles en Tablet/Desktop) */}
-              <div className="hidden sm:flex gap-1.5 sm:gap-4 justify-center my-6 text-center relative z-10 px-2">
+              {/* Estadísticas de Disponibilidad (Visibles en Celular Vertical / Ocultas en Celular Horizontal por Altura Reducida) */}
+              <div className={`flex gap-2 sm:gap-4 justify-center my-3 sm:my-6 text-center relative z-10 px-2 ${styles.heroStatsContainer}`}>
                 {/* Lotes Totales */}
                 <div className="px-2.5 py-1.5 sm:px-6 sm:py-3.5 bg-white/10 hover:bg-white/20 border border-white/35 rounded-xl sm:rounded-2xl backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition-all duration-300 flex-1 sm:flex-initial min-w-[75px] sm:min-w-[125px]">
                   <span className="text-[#F3E5AB] font-bold text-sm sm:text-2xl md:text-3xl block font-serif tracking-wider [text-shadow:_0_1.5px_6px_rgba(0,0,0,0.9)]">
