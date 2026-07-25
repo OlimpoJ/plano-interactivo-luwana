@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     
     if (project === 'loom') {
       spreadsheetId = (process.env.GOOGLE_SHEET_ID_LOOM || '1IDsSyLELPYdV6eZFTt6d0Q5C5iWl3bm1ukUgbE-rJoA').replace(/^"|"$/g, '');
-      targetSheetName = 'LISTA DE PRECIO';
+      targetSheetName = 'VER1';
     } else {
       spreadsheetId = (process.env.GOOGLE_SHEET_ID_LUWANA || process.env.GOOGLE_SHEET_ID || '1e_dxwIK6cjfLmMQqzzlt56-NomUDLX8NZe2WaLnOmto').replace(/^"|"$/g, '');
     }
@@ -41,7 +41,7 @@ export async function GET(request: Request) {
 
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A1:Z250`, 
+      range: `${sheetName}!A1:Z500`, 
     });
 
     const rows = response.data.values;
@@ -95,7 +95,7 @@ export async function GET(request: Request) {
       let status = 'available';
       if (upperStatus.includes('VENDIDO')) status = 'sold';
       else if (upperStatus.includes('RESERVADO') || upperStatus.includes('SEPARADO')) status = 'reserved';
-      else if (upperStatus.includes('BLOQUEADO')) status = 'blocked';
+      else if (upperStatus.includes('BLOQUEADO')) status = 'available'; // Bloqueados cuentan como disponibles por instrucción comercial
 
       return {
         id: parsedId, // Use the parsed ID for SVG matching (e.g. "1", "2")

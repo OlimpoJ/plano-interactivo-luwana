@@ -61,9 +61,9 @@ export default function LoomShowroom() {
   const [selectedLot, setSelectedLot] = useState<Lot | null>(null);
   const [lots, setLots] = useState<Lot[]>([]);
   const [stats, setStats] = useState({
-    total: 247,
-    sold: 160,
-    available: 87
+    total: 326,
+    sold: 26,
+    available: 300
   });
 
   // Global Overlay UI States
@@ -123,12 +123,12 @@ export default function LoomShowroom() {
           setLots(data.lots);
           const total = data.lots.length;
           const available = data.lots.filter((l: any) => l.status === 'available').length;
-          const sold = total - available;
+          const sold = data.lots.filter((l: any) => l.status === 'sold').length;
 
           setStats({
-            total: total > 0 ? total : 247,
-            sold: total > 0 ? sold : 160,
-            available: total > 0 ? available : 87
+            total: total > 0 ? total : 326,
+            sold: total > 0 ? sold : 26,
+            available: total > 0 ? available : 300
           });
         }
       } catch (error) {
@@ -288,27 +288,36 @@ export default function LoomShowroom() {
                 />
               </div>
 
-              {/* Estadísticas de Disponibilidad */}
-              <div className="flex gap-8 justify-center my-6 text-center text-xs tracking-[0.2em] uppercase font-light relative z-10">
-                <div>
-                  <span className="text-[#EBD9AB] font-semibold text-lg sm:text-2xl block mb-1">
+              {/* Estadísticas de Disponibilidad (Cajas Translúcidas Cristalinas Estilo iOS) */}
+              <div className="flex gap-2.5 sm:gap-4 justify-center my-6 text-center relative z-10 px-2">
+                {/* Lotes Totales */}
+                <div className="px-4 py-3 sm:px-7 sm:py-4 bg-white/10 hover:bg-white/20 border border-white/35 rounded-2xl backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-300 flex-1 sm:flex-initial min-w-[100px] sm:min-w-[130px]">
+                  <span className="text-[#F3E5AB] font-bold text-xl sm:text-3xl block font-serif tracking-wider [text-shadow:_0_2px_8px_rgba(0,0,0,0.9)]">
                     <AnimatedCounter endValue={stats.total} />
                   </span>
-                  <span className="text-white/40 text-[9px]">Lotes Totales</span>
+                  <span className="text-white font-bold text-[8px] sm:text-[10px] uppercase tracking-[0.2em] block mt-1 [text-shadow:_0_1px_4px_rgba(0,0,0,0.9)]">
+                    Lotes Totales
+                  </span>
                 </div>
-                <div className="h-8 w-[1px] bg-white/10 self-center"></div>
-                <div>
-                  <span className="text-[#699385] font-semibold text-lg sm:text-2xl block mb-1">
+
+                {/* Disponibles */}
+                <div className="px-4 py-3 sm:px-7 sm:py-4 bg-white/10 hover:bg-white/20 border border-[#7EF3D0]/60 rounded-2xl backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-300 flex-1 sm:flex-initial min-w-[100px] sm:min-w-[130px]">
+                  <span className="text-[#7EF3D0] font-bold text-xl sm:text-3xl block font-serif tracking-wider [text-shadow:_0_2px_8px_rgba(0,0,0,0.9)]">
                     <AnimatedCounter endValue={stats.available} />
                   </span>
-                  <span className="text-white/40 text-[9px]">Disponibles</span>
+                  <span className="text-[#7EF3D0] font-bold text-[8px] sm:text-[10px] uppercase tracking-[0.2em] block mt-1 [text-shadow:_0_1px_4px_rgba(0,0,0,0.9)]">
+                    Disponibles
+                  </span>
                 </div>
-                <div className="h-8 w-[1px] bg-white/10 self-center"></div>
-                <div>
-                  <span className="text-white/70 font-semibold text-lg sm:text-2xl block mb-1">
+
+                {/* Vendidos */}
+                <div className="px-4 py-3 sm:px-7 sm:py-4 bg-white/10 hover:bg-white/20 border border-white/35 rounded-2xl backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-300 flex-1 sm:flex-initial min-w-[100px] sm:min-w-[130px]">
+                  <span className="text-white font-bold text-xl sm:text-3xl block font-serif tracking-wider [text-shadow:_0_2px_8px_rgba(0,0,0,0.9)]">
                     <AnimatedCounter endValue={stats.sold} />
                   </span>
-                  <span className="text-white/40 text-[9px]">Vendidos</span>
+                  <span className="text-white/90 font-bold text-[8px] sm:text-[10px] uppercase tracking-[0.2em] block mt-1 [text-shadow:_0_1px_4px_rgba(0,0,0,0.9)]">
+                    Vendidos
+                  </span>
                 </div>
               </div>
 
