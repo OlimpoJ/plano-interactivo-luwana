@@ -175,7 +175,7 @@ export default function LoomShowroom() {
   return (
     <LoomOrientationWrapper>
       
-      {/* Controles Flotantes Globales (Menú Hamburguesa & Pantalla Completa) */}
+      {/* Controles Flotantes Globales (Menú Hamburguesa, Regresar al Master Plan & Pantalla Completa) */}
       <div className="fixed top-4 left-4 z-40 flex items-center gap-2 pointer-events-auto">
         <button
           onClick={() => setIsMenuOpen(true)}
@@ -184,6 +184,26 @@ export default function LoomShowroom() {
         >
           <Menu className="h-4 w-4 sm:h-5 sm:w-5 group-hover:scale-110 transition-transform" />
         </button>
+
+        {view !== "map" && view !== "hero" && (
+          <button
+            onClick={() => setView("map")}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#EDE7E0]/90 text-[#0A0D0B] border border-[#0A0D0B]/15 shadow-xl backdrop-blur-md hover:bg-[#EDE7E0] hover:text-[#B35F27] text-xs font-semibold uppercase tracking-wider transition-all duration-300 cursor-pointer shadow-lg"
+          >
+            <ArrowLeft size={14} />
+            <span>Regresar al Master Plan</span>
+          </button>
+        )}
+
+        {view === "hero" && (
+          <Link
+            href="/"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#EDE7E0]/90 text-[#0A0D0B] border border-[#0A0D0B]/15 shadow-xl backdrop-blur-md hover:bg-[#EDE7E0] hover:text-[#B35F27] text-xs font-semibold uppercase tracking-wider transition-all duration-300 cursor-pointer shadow-lg"
+          >
+            <ArrowLeft size={14} />
+            <span>Volver al Showroom</span>
+          </Link>
+        )}
       </div>
 
       <div className="fixed top-4 right-4 z-40 flex items-center gap-2 pointer-events-auto">
@@ -273,17 +293,6 @@ export default function LoomShowroom() {
       ) : (
         /* Pantalla Hero de Entrada */
         <main className="loom-theme relative w-full min-h-screen bg-black overflow-hidden flex flex-col text-white select-none">
-          {/* Botón Volver al Showroom Principal */}
-          <div className="absolute top-4 left-4 z-40">
-            <Link
-              href="/"
-              className="flex items-center gap-2 px-4 py-2 bg-black/60 hover:bg-black/90 text-white/80 hover:text-white border border-white/20 rounded-full text-xs font-semibold uppercase tracking-wider backdrop-blur-md transition-all duration-300 shadow-lg cursor-pointer"
-            >
-              <ArrowLeft size={14} />
-              <span>Volver al Showroom</span>
-            </Link>
-          </div>
-
           <section className={styles.heroContainer}>
             {/* Video de Fondo de Loom */}
             <video
