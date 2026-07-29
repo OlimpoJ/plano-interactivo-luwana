@@ -914,9 +914,9 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
         </div>
 
       {/* Leyenda de Brújula (Flotante a la Derecha) */}
-      <div className="absolute bottom-7 right-6 z-20 hidden md:flex items-center gap-2 text-[#0A0D0B]/70 text-[9px] uppercase tracking-widest font-semibold bg-[#EDE7E0]/90 border border-[#0A0D0B]/10 px-3 py-1.5 rounded-full backdrop-blur-md shadow-sm">
-        <Compass className="h-3.5 w-3.5 text-[#B35F27]" />
-        Norte orientado hacia el mar (arriba)
+      <div className="absolute bottom-7 right-6 z-20 hidden md:flex items-center gap-2 text-[#0A0D0B]/70 text-[9px] uppercase tracking-widest font-semibold bg-[#EDE7E0]/90 border border-[#0A0D0B]/10 px-3.5 py-1.5 rounded-full backdrop-blur-md shadow-sm">
+        <Compass className="h-3.5 w-3.5 text-[#B35F27] rotate-[45deg]" />
+        Norte orientado hacia el mar (Derecha / Playa)
       </div>
 
     </div>

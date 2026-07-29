@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Compass } from "lucide-react";
 
 interface Lot {
   id: string;
@@ -467,6 +468,12 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
                 </motion.div>
               )}
             </AnimatePresence>
+
+        {/* Leyenda de Brújula (Flotante a la Derecha) */}
+        <div className="absolute bottom-7 right-6 z-20 hidden md:flex items-center gap-2 text-[#0A0D0B]/70 text-[9px] uppercase tracking-widest font-semibold bg-[#EDE7E0]/90 border border-[#0A0D0B]/10 px-3.5 py-1.5 rounded-full backdrop-blur-md shadow-sm">
+          <Compass className="h-3.5 w-3.5 text-[#B35F27] rotate-[45deg]" />
+          Norte orientado hacia el mar (Derecha / Playa)
+        </div>
       </div>
     </div>
   );
