@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Compass } from "lucide-react";
 
@@ -85,7 +85,7 @@ function getShapeCentroid(shape: Element): { x: number; y: number } | null {
     return { x: cx, y: cy };
   }
   
-  if (tagName === "polygon") {
+  if (tagName === "polygon" || tagName === "polyline") {
     const pointsAttr = shape.getAttribute("points") || "";
     const coords = pointsAttr.trim().split(/[\s,]+/).map(Number).filter(n => !isNaN(n));
     if (coords.length < 2) return null;
@@ -185,24 +185,57 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
   const [activeFilters, setActiveFilters] = useState({
     available: true,
     reserved: true,
+    blocked: true,
     sold: true,
   });
 
+  const STAGE_CONFIGS: Record<string, { name: string; svgUrl: string; bgImage: string }> = {
+    etapa_1: { name: "Etapa 1", svgUrl: "/loom/loom_stage_1.svg", bgImage: "/loom/loom_stage_1_bg.webp" },
+    etapa_2: { name: "Etapa 2", svgUrl: "/loom/loom_stage_2.svg", bgImage: "/loom/loom_stage_2_bg.webp" },
+    etapa_3: { name: "Etapa 3", svgUrl: "/loom/loom_stage_3.svg", bgImage: "/loom/loom_stage_3_bg.webp" },
+    etapa_4: { name: "Etapa 4", svgUrl: "/loom/loom_stage_4.svg", bgImage: "/loom/loom_stage_4_bg.webp" },
+    etapa_5: { name: "Etapa 5", svgUrl: "/loom/loom_stage_5.svg", bgImage: "/loom/loom_stage_5_bg.webp" },
+    etapa_6: { name: "Alma Beach", svgUrl: "", bgImage: "/loom/loom_stage_6_bg.webp" },
+  };
+
+  const currentConfig = STAGE_CONFIGS[stageId] || STAGE_CONFIGS["etapa_1"];
   const isAmenities = stageId === "etapa_6";
   const containerWidthClass = selectedLot 
     ? "w-full max-md:landscape:w-[55vw]" 
     : "w-full";
-  const svgUrl = isAmenities ? "" : (stageId === "etapa_1" ? "/loom/loom_stage_1.svg" : "/loom/loom_stage_2.svg");
-  const bgImage = stageId === "etapa_1" ? "/loom/loom_stage_1_bg.webp" : (stageId === "etapa_2" ? "/loom/loom_stage_2_bg.webp" : "/loom/loom_stage_6_bg.webp");
-  const stageName = stageId === "etapa_1" ? "Etapa 1" : (stageId === "etapa_2" ? "Etapa 2" : "Alma Beach");
+  const svgUrl = currentConfig.svgUrl;
+  const bgImage = currentConfig.bgImage;
+  const stageName = currentConfig.name;
 
-  // Navegación de etapas activas
-  const activeStages = ["etapa_1", "etapa_2", "etapa_6"];
+  // Navegación de etapas activas (Etapas 1 a 5 y Alma Beach)
+  const activeStages = ["etapa_1", "etapa_2", "etapa_3", "etapa_4", "etapa_5", "etapa_6"];
   const currentStageIndex = activeStages.indexOf(stageId);
   const prevStageId = currentStageIndex > 0 ? activeStages[currentStageIndex - 1] : null;
   const nextStageId = currentStageIndex < activeStages.length - 1 ? activeStages[currentStageIndex + 1] : null;
 
-  // Cargar y procesar el SVG de la etapa de forma síncrona en un solo paso para evitar bucles infinitos
+  // Cache en memoria RAM para cargar todas las etapas instantáneamente (0ms de retraso)
+  const svgCacheRef = useRef<Record<string, { svgText: string; pins: ParsedPin[] }>>({});
+
+  // Pre-cargar todas las imágenes WebP y SVGs de todas las etapas en segundo plano al montar el componente
+  useEffect(() => {
+    activeStages.forEach((stId) => {
+      const cfg = STAGE_CONFIGS[stId];
+      if (cfg) {
+        // Pre-cargar imagen de fondo WebP en la caché del navegador
+        const img = new Image();
+        img.src = cfg.bgImage;
+
+        // Pre-cargar SVG de la etapa en caché de memoria
+        if (cfg.svgUrl && !svgCacheRef.current[cfg.svgUrl]) {
+          fetch(cfg.svgUrl)
+            .then((res) => res.text())
+            .catch(() => {});
+        }
+      }
+    });
+  }, []);
+
+  // Cargar y procesar el SVG de la etapa
   useEffect(() => {
     if (!svgUrl) {
       setSvgText("");
@@ -223,23 +256,29 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
           const viewBoxWidth = viewBoxParts[2] || 3840;
           const viewBoxHeight = viewBoxParts[3] || 2160;
 
-          const circleElements = Array.from(doc.querySelectorAll("circle"));
+          const interactiveContainer = doc.querySelector("#INTERACTIVE_LOT_GROUPS");
+          const circleElements = Array.from(
+            interactiveContainer ? interactiveContainer.querySelectorAll("circle") : doc.querySelectorAll("circle")
+          );
           const parsedCircles = circleElements.map((c) => {
             let parent: HTMLElement | null = c.parentElement;
             let manzana = "";
             let manzanaGroup: HTMLElement | null = null;
 
             while (parent) {
-              const id = parent.getAttribute("id") || "";
+              const id = (parent.getAttribute("id") || "").toUpperCase();
               if (id.includes("PORTERIA") || id.includes("PORTERÍA")) { manzana = "PORTERIA"; manzanaGroup = parent; break; }
               if (id.includes("PARQUE_1")) { manzana = "PARQUE_1"; manzanaGroup = parent; break; }
               if (id.includes("PARQUE_2")) { manzana = "PARQUE_2"; manzanaGroup = parent; break; }
               if (id.includes("PARQUE")) { manzana = "PARQUE"; manzanaGroup = parent; break; }
-              if (id.includes("MANZANA_A") || id.includes("MANZONA_A")) { manzana = "A"; manzanaGroup = parent; break; }
-              if (id.includes("MANZANA_B") || id.includes("MANZONA_B")) { manzana = "B"; manzanaGroup = parent; break; }
-              if (id.includes("MANZANA_C") || id.includes("MANZONA_C")) { manzana = "C"; manzanaGroup = parent; break; }
-              if (id.includes("MANZANA_D") || id.includes("MANZONA_D")) { manzana = "D"; manzanaGroup = parent; break; }
-              if (id.includes("MANZANA_E") || id.includes("MANZONA_E")) { manzana = "E"; manzanaGroup = parent; break; }
+              if (id.includes("CLUB") || id.includes("HOUSE") || id.includes("CASA_CLUB")) { manzana = "CLUB_HOUSE"; manzanaGroup = parent; break; }
+              
+              const mzMatch = id.match(/(?:MANZANA|MANZONA|LOTES|TEXTOS|LOTGROUP)_?([A-L])/i);
+              if (mzMatch) {
+                manzana = mzMatch[1].toUpperCase();
+                manzanaGroup = parent;
+                break;
+              }
               parent = parent.parentElement;
             }
             const cx = parseFloat(c.getAttribute("cx") || "0");
@@ -274,10 +313,18 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
 
             if (manzana && c.parentElement) {
               const circleParent = c.parentElement;
-              let decodedNum: number | null = decodeSvgNumber(circleParent);
+              const dataLot = c.getAttribute("data-lot") || circleParent.getAttribute("data-lot") || circleParent.getAttribute("id") || "";
+              let decodedNum: number | null = null;
+
+              const idNumMatch = dataLot.match(/(?:[A-L]|g)[-_]?(\d+)/i);
+              if (idNumMatch) {
+                decodedNum = parseInt(idNumMatch[1], 10);
+              } else {
+                decodedNum = decodeSvgNumber(circleParent);
+              }
 
               let num = 0;
-              if (decodedNum !== null) {
+              if (decodedNum !== null && decodedNum > 0) {
                 num = decodedNum;
               } else {
                 if (!counters[manzana]) counters[manzana] = 0;
@@ -289,6 +336,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
               if (manzana === "PORTERIA") lotId = "PORTERIA";
               if (manzana === "PARQUE_1") lotId = "PARQUE_1";
               if (manzana === "PARQUE_2") lotId = "PARQUE_2";
+              if (manzana === "CLUB_HOUSE") lotId = "CLUB_HOUSE";
 
               const xPercent = (cx / viewBoxWidth) * 100;
               const yPercent = (cy / viewBoxHeight) * 100;
@@ -322,6 +370,19 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                     financing: "-",
                     finalPayment: "-",
                   };
+                } else if (lotId.includes("CLUB") || lotId.includes("HOUSE") || lotId === "CLUB_HOUSE") {
+                  lotData = {
+                    id: "CLUB_HOUSE",
+                    rawId: "Club House",
+                    area: "Área Social",
+                    location: "Zona de Piscinas, Canchas & Beach Club",
+                    status: "common" as any,
+                    statusRaw: "AMENIDAD",
+                    totalPrice: "Área Común",
+                    downPayment: "-",
+                    financing: "-",
+                    finalPayment: "-",
+                  };
                 } else {
                   lotData = {
                     id: lotId,
@@ -338,7 +399,13 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                 }
               }
 
-              const lotGroup = c.parentElement;
+              let lotGroup: HTMLElement = c.parentElement as HTMLElement;
+              if (lotGroup.querySelectorAll("circle").length > 1) {
+                const newG = doc.createElementNS("http://www.w3.org/2000/svg", "g") as unknown as HTMLElement;
+                c.parentElement.insertBefore(newG, c);
+                newG.appendChild(c);
+                lotGroup = newG;
+              }
               lotGroup.setAttribute("id", `LOTGROUP_${lotId}`);
               lotGroup.setAttribute("class", "lot-group-interactive");
 
@@ -367,19 +434,20 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
             }
           });
 
-          // 2. Recolectar todas las formas geométricas candidatas para lotes
+          // 2. Recolectar todas las formas geométricas candidatas para lotes y amenidades
           const candidateShapes: { element: Element; centroid: { x: number; y: number } }[] = [];
-          const allShapes = doc.querySelectorAll("rect, path, polygon");
+          const allShapes = doc.querySelectorAll("rect, path, polygon, polyline");
 
           allShapes.forEach((shape) => {
             const pGroup = shape.closest("g");
-            if (pGroup && (pGroup.querySelector("circle") || pGroup.parentElement?.querySelector("circle"))) {
+            const pGroupId = (pGroup?.getAttribute("id") || "").toUpperCase();
+            if (pGroupId.includes("TEXTOS") || pGroupId.includes("TEXTO")) {
+              return;
+            }
+            if (pGroup && pGroup.querySelector("circle") && pGroup.children.length === 1) {
               return;
             }
             const shapeClass = shape.getAttribute("class") || "";
-            if (shape.tagName.toLowerCase() === "path" && !shapeClass) {
-              return;
-            }
             if (shapeClass.includes("st2") || shapeClass.includes("svg-pin")) {
               return;
             }
@@ -420,38 +488,57 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
             }
             assignedCircleLotIds.add(pair.circle.lotId);
             assignedShapeElements.add(pair.shape);
-            assignedLotShapes.set(pair.circle.lotGroup, pair.shape);
             
-            // Mover la geometría al principio del grupo del lote asignado
-            pair.circle.lotGroup.insertBefore(pair.shape, pair.circle.lotGroup.firstChild);
+            // Si el grupo del lote ya tiene su polígono oficial pre-construido (.lot-polygon), NO insertar una segunda forma duplicada
+            const existingPolygon = pair.circle.lotGroup.querySelector(".lot-polygon");
+            if (existingPolygon) {
+              assignedLotShapes.set(pair.circle.lotGroup, existingPolygon);
+            } else {
+              assignedLotShapes.set(pair.circle.lotGroup, pair.shape);
+              pair.circle.lotGroup.insertBefore(pair.shape, pair.circle.lotGroup.firstChild);
+            }
           });
 
-          // 5. Inyectar pins visuales glassmorphic en cada grupo de lote y limpiar números vectoriales obsoletos
+          // Crear una capa dedicada al final del SVG para TODOS los pines (para que SIEMPRE queden por encima de cualquier polígono/hover)
+          let pinsLayer = doc.querySelector("#ALL_PINS_LAYER");
+          if (!pinsLayer) {
+            pinsLayer = doc.createElementNS("http://www.w3.org/2000/svg", "g");
+            pinsLayer.setAttribute("id", "ALL_PINS_LAYER");
+            pinsLayer.setAttribute("style", "pointer-events: none;");
+            doc.querySelector("svg")?.appendChild(pinsLayer);
+          }
+
+          // 5. Inyectar pins visuales glassmorphic en la capa superior #ALL_PINS_LAYER
           circleItems.forEach((item) => {
             const { cx, cy, lotId, lotGroup, element: c } = item;
 
-            const assignedShape = assignedLotShapes.get(lotGroup);
-
-            // Eliminar cualquier texto/marcador nativo sobrante dentro del grupo del lote,
-            // pero PRESERVAR la geometría interactiva (path, polygon, rect, polyline).
-            Array.from(lotGroup.children).forEach((child) => {
-              if (child === c) return;
-              if (assignedShape && child === assignedShape) return;
+            // Garantizar que el grupo del lote tenga ÚNICAMENTE 1 polígono de contorno (eliminando formas duplicadas)
+            const lotShapes = Array.from(lotGroup.children).filter((child) => {
               const tag = child.tagName.toLowerCase();
-              if (["path", "polygon", "rect", "polyline"].includes(tag) && !(child as Element).classList.contains("svg-pin-rect")) {
-                return;
-              }
-              child.remove();
+              return ["path", "polygon", "rect", "polyline"].includes(tag) && !(child as Element).classList.contains("svg-pin-rect");
             });
+
+            if (lotShapes.length > 1) {
+              // Conservar el primer polígono oficial y eliminar cualquier forma duplicada
+              lotShapes.slice(1).forEach((extra) => extra.remove());
+            }
+
+            c.remove(); // Remover el círculo original para reemplazarlo por la cápsula en la capa superior
 
             let displayLabel = lotId.replace("-", "");
             if (lotId === "PORTERIA") displayLabel = "PORTERÍA";
             if (lotId === "PARQUE_1") displayLabel = "PARQUE 1";
             if (lotId === "PARQUE_2") displayLabel = "PARQUE 2";
+            if (lotId === "CLUB_HOUSE" || lotId.includes("CLUB")) displayLabel = "CLUB HOUSE";
 
             const isLongLabel = displayLabel.length > 5;
-            const fontSize = isLongLabel ? "16" : "24";
-            const badgeWidth = isLongLabel ? Math.max(155, displayLabel.length * 16 + 32) : 110;
+            const fontSize = isLongLabel ? "22" : "28";
+            const badgeWidth = isLongLabel ? Math.max(170, displayLabel.length * 18 + 36) : 115;
+
+            const pinGroup = doc.createElementNS("http://www.w3.org/2000/svg", "g");
+            pinGroup.setAttribute("id", `PINGROUP_${lotId}`);
+            pinGroup.setAttribute("class", "svg-pin-group");
+            pinGroup.setAttribute("style", "pointer-events: none;");
 
             const pinText = doc.createElementNS("http://www.w3.org/2000/svg", "text");
             pinText.setAttribute("x", cx.toString());
@@ -461,28 +548,40 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
             pinText.setAttribute("class", "svg-pin-text");
             pinText.setAttribute("id", `PIN_${lotId}`);
             pinText.setAttribute("font-size", fontSize);
-            pinText.setAttribute("font-weight", isLongLabel ? "700" : "600");
+            pinText.setAttribute("font-weight", "800");
             pinText.setAttribute("style", "transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none;");
             pinText.textContent = displayLabel;
 
             const pinRect = doc.createElementNS("http://www.w3.org/2000/svg", "rect");
             pinRect.setAttribute("x", (cx - badgeWidth / 2).toString());
-            pinRect.setAttribute("y", (cy - 30).toString());
+            pinRect.setAttribute("y", (cy - 33).toString());
             pinRect.setAttribute("width", badgeWidth.toString());
-            pinRect.setAttribute("height", "60");
-            pinRect.setAttribute("rx", "30");
+            pinRect.setAttribute("height", "66");
+            pinRect.setAttribute("rx", "33");
             pinRect.setAttribute("class", "svg-pin-rect");
             pinRect.setAttribute("id", `PIN_RECT_${lotId}`);
             pinRect.setAttribute("style", "transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none;");
 
-            c.replaceWith(pinRect);
-            pinRect.after(pinText);
+            pinGroup.appendChild(pinRect);
+            pinGroup.appendChild(pinText);
+            pinsLayer?.appendChild(pinGroup);
           });
 
           // Serializar el SVG modificado
           const serializer = new XMLSerializer();
-          const modifiedSvgText = serializer.serializeToString(doc);
+          let modifiedSvgText = serializer.serializeToString(doc);
           
+          // Eliminar la declaración XML y prefijos ns0: para evitar que el parser HTML5 rompa el SVG
+          modifiedSvgText = modifiedSvgText
+            .replace(/<\?xml[^>]*\?>/gi, "")
+            .replace(/ns0:/g, "")
+            .replace(/:ns0/g, "")
+            .replace(/xmlns:ns0="[^"]*"/g, "")
+            .trim();
+          
+          // Guardar en la caché en RAM para que el cambio entre etapas sea 100% instantáneo (0ms)
+          svgCacheRef.current[svgUrl] = { svgText: modifiedSvgText, pins: finalPins };
+
           setSvgText(modifiedSvgText);
           setPins(finalPins);
         } catch (e) {
@@ -512,130 +611,126 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
     return { total, available, reserved, sold };
   }, [pins]);
 
-  // Generar reglas CSS dinámicas para pintar e interactuar con los lotes vectoriales del SVG
+  // Generar reglas CSS dinámicas por cada lote usando selectores de atributos ultra-robustos
   const dynamicLotStyles = useMemo(() => {
-    let styles = "";
-    pins.forEach((pin) => {
-      const lotId = pin.lotId;
-      const status = pin.lotData.status;
-      const isSelected = selectedLot?.id === lotId;
-      
-      let baseColor = "#10b981"; // available (Verde)
-      let opacityDefault = "0.16";
-      let opacityHover = "0.36";
-      let strokeColorDefault = "rgba(16, 185, 129, 0.35)";
-      let strokeColorHover = "rgba(16, 185, 129, 0.95)";
-      let cursor = "pointer";
+    return pins
+      .map((pin) => {
+        const lotId = pin.lotId;
+        const status = pin.lotData.status;
+        const isSelected = selectedLot?.id === lotId;
+        const isHovered = hoveredPin?.lotId === lotId;
+        const isAmenity =
+          lotId === "PORTERIA" ||
+          lotId === "PARQUE_1" ||
+          lotId === "PARQUE_2" ||
+          lotId.includes("PARQUE") ||
+          lotId.includes("PORTERIA") ||
+          status === ("common" as any);
 
-      let pinColor = "rgba(16, 185, 129, 0.95)"; // Verde
-      if (status === ("common" as any) || lotId.includes("PARQUE") || lotId.includes("PORTERIA")) {
-        baseColor = "#B35F27"; // Cobre Terracota para Amenidades
-        opacityDefault = "0.30";
-        opacityHover = "0.60";
-        strokeColorDefault = "rgba(179, 95, 39, 0.65)";
-        strokeColorHover = "rgba(179, 95, 39, 0.98)";
-        pinColor = "#B35F27";
-        cursor = "pointer";
-      } else if (status === "reserved") {
-        baseColor = "#f59e0b"; // reserved (Naranja)
-        opacityDefault = "0.16";
-        opacityHover = "0.36";
-        strokeColorDefault = "rgba(245, 158, 11, 0.35)";
-        strokeColorHover = "rgba(245, 158, 11, 0.95)";
-        pinColor = "rgba(245, 158, 11, 0.95)";
-      } else if (status === "blocked") {
-        baseColor = "#ef4444"; // sold (Rojo)
-        opacityDefault = "0.20"; 
-        opacityHover = "0.40";
-        strokeColorDefault = "rgba(239, 68, 68, 0.38)";
-        strokeColorHover = "rgba(239, 68, 68, 0.95)";
-        pinColor = "rgba(239, 68, 68, 0.95)";
-        cursor = "not-allowed";
-      }
+        const isFilteredOut =
+          !isAmenity &&
+          ((status === "available" && !activeFilters.available) ||
+            (status === "reserved" && !activeFilters.reserved) ||
+            (status === "blocked" && !activeFilters.blocked) ||
+            (status === "sold" && !activeFilters.sold));
 
-      // Si está seleccionado, forzar highlight activo
-      if (isSelected) {
-        opacityDefault = "0.35";
-        strokeColorDefault = `${baseColor} !important`;
-      }
-
-      // Ocultar si está filtrado
-      let pinDisplay = "block";
-      if (status === "available" && !activeFilters.available) pinDisplay = "none";
-      if (status === "reserved" && !activeFilters.reserved) pinDisplay = "none";
-      if (status === "blocked" && !activeFilters.sold) pinDisplay = "none";
-
-      styles += `
-        /* Estado por defecto del lote: resaltado translúcido con su color de estado */
-        g#LOTGROUP_${lotId} path,
-        g#LOTGROUP_${lotId} polyline,
-        g#LOTGROUP_${lotId} polygon,
-        g#LOTGROUP_${lotId} rect:not(.svg-pin-rect) {
-          fill: ${baseColor} !important;
-          fill-opacity: ${opacityDefault} !important;
-          stroke: ${strokeColorDefault} !important;
-          stroke-width: ${isSelected ? '3.5px' : '1.5px'} !important;
-          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
-          pointer-events: all !important;
-          cursor: ${cursor} !important;
+        if (isFilteredOut) {
+          return `
+            g[id="LOTGROUP_${lotId}"], g[id="PINGROUP_${lotId}"] {
+              display: none !important;
+            }
+          `;
         }
 
-        /* Hover sobre el lote: rellenar con color de estado (verde/rojo) */
-        g#LOTGROUP_${lotId}:hover path,
-        g#LOTGROUP_${lotId}:hover polyline,
-        g#LOTGROUP_${lotId}:hover polygon,
-        g#LOTGROUP_${lotId}:hover rect:not(.svg-pin-rect) {
-          fill: ${baseColor} !important;
-          fill-opacity: 0.35 !important;
-          stroke: ${strokeColorHover} !important;
-          stroke-width: 4px !important;
-          cursor: ${cursor} !important;
-          filter: drop-shadow(0 0 6px ${baseColor}) !important;
+        let baseColor = "#10b981"; // Verde para disponibles
+        let strokeColorHover = "#059669";
+        let cursor = "pointer";
+
+        if (isAmenity) {
+          baseColor = "#B35F27"; // Cobre Terracota para Amenidades
+          strokeColorHover = "#8D4619";
+          cursor = "pointer"; // Seleccionable con puntero de mano
+        } else if (status === "reserved") {
+          baseColor = "#f59e0b"; // Naranja para Reservados
+          strokeColorHover = "#d97706";
+          cursor = "pointer";
+        } else if (status === "blocked") {
+          baseColor = "#3b82f6"; // Azul Cobalto para Bloqueados
+          strokeColorHover = "#2563eb";
+          cursor = "not-allowed";
+        } else if (status === "sold") {
+          baseColor = "#ef4444"; // Rojo para Vendidos
+          strokeColorHover = "#dc2626";
+          cursor = "not-allowed";
         }
 
-        /* Estilos del rect de fondo glassmorphic (del pin de lote) */
-        g#LOTGROUP_${lotId} rect.svg-pin-rect {
+        const pinDisplay = "block";
+        const pinScale = isHovered || isSelected ? 'scale(1.12)' : 'scale(1)';
+        const pinFill = isHovered ? '#FFFFFF' : 'rgba(255, 255, 255, 0.96)';
+        const pinStroke = isHovered ? baseColor : (isSelected ? '#B35F27' : 'rgba(10, 13, 11, 0.35)');
+        const pinStrokeWidth = isHovered ? '3px' : (isSelected ? '3.5px' : '1.8px');
+
+        const polyFillOpacity = isHovered ? '0.45' : (isAmenity ? '0.35' : '0.22');
+        const polyStroke = isHovered ? strokeColorHover : baseColor;
+        const polyStrokeWidth = isHovered ? '3.5px' : '2px';
+
+        return `
+        /* Polígono del lote o amenidad (capa inferior): controlado de forma única por estado JS */
+        g[id="LOTGROUP_${lotId}"] path,
+        g[id="LOTGROUP_${lotId}"] polyline,
+        g[id="LOTGROUP_${lotId}"] polygon,
+        g[id="LOTGROUP_${lotId}"] rect:not(.svg-pin-rect) {
+          fill: ${baseColor} !important;
+          fill-opacity: ${polyFillOpacity} !important;
+          stroke: ${polyStroke} !important;
+          stroke-width: ${polyStrokeWidth} !important;
+          transition: all 0.25s ease !important;
+          cursor: ${cursor} !important;
+          ${isHovered ? `filter: drop-shadow(0 0 6px ${baseColor}) !important;` : ''}
+        }
+
+        /* Ocultar círculo nativo de Illustrator */
+        g[id="LOTGROUP_${lotId}"] circle.st2,
+        g[id="LOTGROUP_${lotId}"] circle {
+          display: none !important;
+        }
+
+        /* Ocultar capas estáticas de texto del SVG nativo */
+        g[id="LOTGROUP_${lotId}"] text:not(.svg-pin-text) {
+          display: none !important;
+        }
+
+        /* Estilos del rect de fondo (pin de lote) en la capa superior #ALL_PINS_LAYER */
+        g[id="PINGROUP_${lotId}"] rect.svg-pin-rect {
           display: ${pinDisplay} !important;
-          fill: rgba(237, 231, 224, 0.92) !important;
-          stroke: ${isSelected ? '#B35F27' : 'rgba(10, 13, 11, 0.25)'} !important;
-          stroke-width: ${isSelected ? '3px' : '1.5px'} !important;
-          transform: ${isSelected ? 'scale(1.08)' : 'scale(1)'} !important;
+          fill: ${pinFill} !important;
+          stroke: ${pinStroke} !important;
+          stroke-width: ${pinStrokeWidth} !important;
+          transform: ${pinScale} !important;
           transform-origin: ${pin.cx}px ${pin.cy}px !important;
           transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
           pointer-events: none !important;
+          filter: drop-shadow(0 2px 6px rgba(0,0,0,0.18)) !important;
         }
 
-        /* Hover sobre el lote agranda el rect de fondo y cambia el borde al color del estado */
-        g#LOTGROUP_${lotId}:hover rect.svg-pin-rect {
-          fill: rgba(237, 231, 224, 0.98) !important;
-          stroke: ${baseColor} !important;
-          stroke-width: 2.5px !important;
-          transform: scale(1.08) !important;
-        }
-
-        /* Mostrar y animar texto vectorial inyectado */
-        g#LOTGROUP_${lotId} text.svg-pin-text {
+        /* Texto vectorial inyectado (número / nombre) en la capa superior #ALL_PINS_LAYER */
+        g[id="PINGROUP_${lotId}"] text.svg-pin-text {
           display: ${pinDisplay} !important;
-          font-size: ${isSelected ? '28px' : '24px'} !important;
-          font-weight: 700 !important;
+          font-size: ${isSelected || isHovered ? '28px' : '26px'} !important;
+          font-weight: ${isSelected || isHovered ? '900' : '800'} !important;
           fill: #0A0D0B !important;
-          stroke: none !important;
-          transform: ${isSelected ? 'scale(1.08)' : 'scale(1)'} !important;
+          stroke: #FFFFFF !important;
+          stroke-width: 1.5px !important;
+          paint-order: stroke fill !important;
+          transform: ${pinScale} !important;
           transform-origin: ${pin.cx}px ${pin.cy}px !important;
           transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
           pointer-events: none !important;
-        }
-
-        /* Hover sobre el lote agranda el número */
-        g#LOTGROUP_${lotId}:hover text.svg-pin-text {
-          font-size: 28px !important;
-          font-weight: 800 !important;
-          transform: scale(1.08) !important;
         }
       `;
-    });
-    return styles;
-  }, [pins, selectedLot, activeFilters]);
+      })
+      .join("");
+  }, [pins, selectedLot, activeFilters, hoveredPin]);
 
   return (
     <div className={`relative h-[100dvh] ${containerWidthClass} bg-[#EDE7E0] text-[#0A0D0B] select-none overflow-hidden transition-all duration-500 ease-in-out`}>
@@ -679,7 +774,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
       <div className="absolute inset-0 w-full h-full overflow-hidden bg-black/40 shadow-[0_20px_50px_rgba(0,0,0,0.6)] z-10">
           {/* Ocultar textos nativos y líneas perimetrales CAD fuera de los lotes SOLO en el SVG del mapa */}
           <style dangerouslySetInnerHTML={{ __html: `
-            .loom-stage-map-svg svg text {
+            .loom-stage-map-svg svg text:not(.svg-pin-text) {
               display: none !important;
             }
 
@@ -687,8 +782,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
             .loom-stage-map-svg svg path:not(g[id^='LOTGROUP_'] *),
             .loom-stage-map-svg svg polyline:not(g[id^='LOTGROUP_'] *),
             .loom-stage-map-svg svg polygon:not(g[id^='LOTGROUP_'] *),
-            .loom-stage-map-svg svg line:not(g[id^='LOTGROUP_'] *),
-            .loom-stage-map-svg svg rect:not(g[id^='LOTGROUP_'] *) {
+            .loom-stage-map-svg svg line:not(g[id^='LOTGROUP_'] *) {
               display: none !important;
               opacity: 0 !important;
               visibility: hidden !important;

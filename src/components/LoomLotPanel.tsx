@@ -68,18 +68,25 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
             Disponible
           </div>
         );
-      case "reserved":
+      case "blocked":
         return (
-          <div className="flex items-center gap-1 bg-[#f59e0b]/15 text-[#f59e0b] border border-[#f59e0b]/30 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
-            <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 animate-pulse" />
-            Reservado
+          <div className="flex items-center gap-1 bg-[#3b82f6]/15 text-[#3b82f6] border border-[#3b82f6]/30 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+            <AlertCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+            Bloqueado
+          </div>
+        );
+      case "sold":
+        return (
+          <div className="flex items-center gap-1 bg-red-500/15 text-red-600 border border-red-500/30 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+            <AlertCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+            Vendido
           </div>
         );
       default:
         return (
           <div className="flex items-center gap-1 bg-black/10 text-[#0A0D0B]/50 border border-[#0A0D0B]/10 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
             <AlertCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-            Vendido
+            {status.toUpperCase()}
           </div>
         );
     }
@@ -136,8 +143,8 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
             </div>
           </div>
 
-          {/* Sección Financiera solo para Lotes (Oculta para Amenidades) */}
-          {!(lot.status === "common" || lot.statusRaw === "AMENIDAD" || lot.id?.includes("PARQUE") || lot.id?.includes("PORTERIA")) ? (
+          {/* Sección Financiera solo para Lotes Disponibles y Reservados (Oculta para Bloqueados, Vendidos y Amenidades) */}
+          {(lot.status === "available" || lot.status === "reserved") && !(lot.statusRaw === "AMENIDAD" || lot.id?.includes("PARQUE") || lot.id?.includes("PORTERIA") || lot.id?.includes("CLUB")) ? (
             <div className="bg-white/90 border border-[#B35F27]/25 rounded-lg p-3 sm:p-4 space-y-2 sm:space-y-3 shadow-sm">
               <h3 className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-[#B35F27] border-b border-[#B35F27]/20 pb-1 font-bold">
                 Estructura Financiera (COP)
@@ -180,10 +187,18 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
           ) : (
             <div className="bg-white/90 border border-[#B35F27]/25 rounded-lg p-3 sm:p-4 space-y-2 shadow-sm">
               <h3 className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-[#B35F27] border-b border-[#B35F27]/20 pb-1 font-bold">
-                Detalles de la Amenidad
+                {lot.status === "blocked"
+                  ? "Información de Reserva"
+                  : lot.status === "sold"
+                  ? "Estado del Lote"
+                  : "Detalles de la Amenidad"}
               </h3>
               <p className="text-xs text-[#0A0D0B]/80 leading-relaxed font-sans pt-1">
-                Espacio común equipado diseñado para el confort, esparcimiento y seguridad de todos los propietarios de Loom Luxury Residence.
+                {lot.status === "blocked"
+                  ? "Este lote se encuentra en estado de Reserva Administrativa / Bloqueado por la constructora."
+                  : lot.status === "sold"
+                  ? "Este lote ya ha sido adjudicado y vendido en su totalidad."
+                  : "Espacio común equipado diseñado para el confort, esparcimiento y seguridad de todos los propietarios de Loom Luxury Residence."}
               </p>
             </div>
           )}
@@ -201,7 +216,15 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
               <div className="w-full py-2.5 sm:py-3 text-center text-[#B35F27] font-bold uppercase tracking-widest text-[9px] sm:text-[10px] border border-[#B35F27]/30 rounded bg-[#B35F27]/10 shadow-sm">
                 Zona Común Equipada &bull; Proyecto Loom Luxury Residence
               </div>
-            ) : lot.status !== "sold" ? (
+            ) : lot.status === "sold" ? (
+              <div className="w-full py-2.5 sm:py-3 text-center text-red-600 font-bold uppercase tracking-widest text-[9px] sm:text-[10px] border border-red-500/30 rounded bg-red-500/10 shadow-sm">
+                Lote Vendido &bull; No disponible para venta
+              </div>
+            ) : lot.status === "blocked" ? (
+              <div className="w-full py-2.5 sm:py-3 text-center text-[#3b82f6] font-bold uppercase tracking-widest text-[9px] sm:text-[10px] border border-[#3b82f6]/30 rounded bg-[#3b82f6]/10 shadow-sm">
+                Lote Bloqueado &bull; Reserva Administrativa
+              </div>
+            ) : (
               <>
                 <button
                   onClick={() => onEnterShowroom(lot)}
@@ -218,10 +241,6 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
                   Separar Lote
                 </button>
               </>
-            ) : (
-              <div className="w-full py-2.5 sm:py-3 text-center text-[#0A0D0B]/40 uppercase tracking-widest text-[9px] sm:text-[10px] border border-[#0A0D0B]/10 rounded bg-black/5">
-                Lote no disponible
-              </div>
             )}
           </div>
 

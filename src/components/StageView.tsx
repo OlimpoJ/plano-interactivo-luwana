@@ -306,42 +306,46 @@ export default function StageView({ stageId, onBack, onNext }: { stageId: string
                   </div>
                 </div>
 
-                <div className="bg-white/5 p-5 rounded-xl border border-[#CBAA85]/30 bg-gradient-to-br from-white/5 to-transparent">
-                  <p className="text-[#CBAA85] text-xs uppercase tracking-wider mb-2">Valor Total</p>
-                  <p className="text-3xl text-white font-serif">{selectedLotData.totalPrice || 'Por definir'}</p>
-                  <p className="text-white/40 text-sm mt-2">Valor x m²: {selectedLotData.pricePerM2}</p>
-                </div>
+                {(selectedLotData.status === 'available' || selectedLotData.status === 'reserved') && (
+                  <>
+                    <div className="bg-white/5 p-5 rounded-xl border border-[#CBAA85]/30 bg-gradient-to-br from-white/5 to-transparent">
+                      <p className="text-[#CBAA85] text-xs uppercase tracking-wider mb-2">Valor Total</p>
+                      <p className="text-3xl text-white font-serif">{selectedLotData.totalPrice || 'Por definir'}</p>
+                      <p className="text-white/40 text-sm mt-2">Valor x m²: {selectedLotData.pricePerM2}</p>
+                    </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white/5 p-4 rounded-xl border border-white/5">
-                    <p className="text-white/50 text-[10px] uppercase tracking-wider mb-1">Separación</p>
-                    <p className="text-white text-base font-medium">$ 5.000.000</p>
-                  </div>
-                  <div className="bg-white/5 p-4 rounded-xl border border-white/5">
-                    <p className="text-white/50 text-[10px] uppercase tracking-wider mb-1">Cuota Inicial (20%)</p>
-                    <p className="text-white text-base font-medium">{selectedLotData.downPayment}</p>
-                  </div>
-                </div>
-                
-                {selectedLotData.financing && selectedLotData.financing !== '' && (
-                  <div className="bg-white/5 p-4 rounded-xl border border-white/5">
-                    <div className="flex justify-between items-center mb-2">
-                      <p className="text-white/50 text-xs uppercase tracking-wider">Financiación (60%)</p>
-                      <p className="text-white text-base font-medium">
-                        {`$ ${(parseInt((selectedLotData.downPayment || '').replace(/[^\d]/g, ''), 10) * 3 || 0).toLocaleString('en-US')}`}
-                      </p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-white/5 p-4 rounded-xl border border-white/5">
+                        <p className="text-white/50 text-[10px] uppercase tracking-wider mb-1">Separación</p>
+                        <p className="text-white text-base font-medium">$ 10.000.000</p>
+                      </div>
+                      <div className="bg-white/5 p-4 rounded-xl border border-white/5">
+                        <p className="text-white/50 text-[10px] uppercase tracking-wider mb-1">Cuota Inicial (20%)</p>
+                        <p className="text-white text-base font-medium">{selectedLotData.downPayment}</p>
+                      </div>
                     </div>
-                    <div className="flex justify-between items-center pt-2 border-t border-white/10">
-                      <p className="text-white/50 text-[10px] uppercase tracking-wider">36 Cuotas Mensuales de</p>
-                      <p className="text-white/80 text-sm font-medium">{selectedLotData.financing}</p>
+                    
+                    {selectedLotData.financing && selectedLotData.financing !== '' && (
+                      <div className="bg-white/5 p-4 rounded-xl border border-white/5">
+                        <div className="flex justify-between items-center mb-2">
+                          <p className="text-white/50 text-xs uppercase tracking-wider">Financiación (60%)</p>
+                          <p className="text-white text-base font-medium">
+                            {`$ ${(parseInt((selectedLotData.downPayment || '').replace(/[^\d]/g, ''), 10) * 3 || 0).toLocaleString('en-US')}`}
+                          </p>
+                        </div>
+                        <div className="flex justify-between items-center pt-2 border-t border-white/10">
+                          <p className="text-white/50 text-[10px] uppercase tracking-wider">36 Cuotas Mensuales de</p>
+                          <p className="text-white/80 text-sm font-medium">{selectedLotData.financing}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="bg-white/5 p-4 rounded-xl border border-white/5 flex justify-between items-center">
+                      <p className="text-white/50 text-xs uppercase tracking-wider">Cuota Final (20%)</p>
+                      <p className="text-white text-base font-medium">{selectedLotData.downPayment}</p>
                     </div>
-                  </div>
+                  </>
                 )}
-
-                <div className="bg-white/5 p-4 rounded-xl border border-white/5 flex justify-between items-center">
-                  <p className="text-white/50 text-xs uppercase tracking-wider">Cuota Final (20%)</p>
-                  <p className="text-white text-base font-medium">{selectedLotData.downPayment}</p>
-                </div>
               </div>
             )}
 

@@ -36,7 +36,7 @@ const stagesData = [
   {
     id: "ZONA_3",
     name: "Etapa 3",
-    active: false,
+    active: true,
     cx: 1484,
     cy: 1116,
     points: "965.47,808.43 1440.74,778.94 2012.2,1436.58 1515.09,1440.95",
@@ -44,7 +44,7 @@ const stagesData = [
   {
     id: "ZONA_4",
     name: "Etapa 4",
-    active: false,
+    active: true,
     cx: 1941,
     cy: 1098,
     points: "1440.74,778.94 2012.2,1436.58 2437.44,1446.29 2399.42,1302.73 1916.19,754.8",
@@ -52,7 +52,7 @@ const stagesData = [
   {
     id: "ZONA_5",
     name: "Etapa 5",
-    active: false,
+    active: true,
     cx: 2507,
     cy: 1081,
     points: "1916.19,754.8 2755.25,717.93 2919.9,1452.31 2437.44,1446.29 2399.42,1302.73",
@@ -89,21 +89,27 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
     const stats: Record<string, { total: number; available: number; active: boolean; name: string }> = {
       "ZONA_1": { total: 0, available: 0, active: true, name: "Etapa 1" },
       "ZONA_2": { total: 0, available: 0, active: true, name: "Etapa 2" },
-      "ZONA_3": { total: 0, available: 0, active: false, name: "Etapa 3" },
-      "ZONA_4": { total: 0, available: 0, active: false, name: "Etapa 4" },
-      "ZONA_5": { total: 0, available: 0, active: false, name: "Etapa 5" },
+      "ZONA_3": { total: 0, available: 0, active: true, name: "Etapa 3" },
+      "ZONA_4": { total: 0, available: 0, active: true, name: "Etapa 4" },
+      "ZONA_5": { total: 0, available: 0, active: true, name: "Etapa 5" },
       "ZONA_6": { total: 0, available: 0, active: true, name: "Alma Beach" },
     };
 
     // Procesar disponibilidad de lotes del Sheet
     lots.forEach((lot) => {
-      const lotId = lot.id.toUpperCase();
+      const lotId = (lot.rawId || lot.id).toUpperCase();
       let zone = "";
 
       if (lotId.startsWith("A-") || lotId.startsWith("B-") || lotId.startsWith("C-")) {
         zone = "ZONA_1";
       } else if (lotId.startsWith("D-") || lotId.startsWith("E-")) {
         zone = "ZONA_2";
+      } else if (lotId.startsWith("F-") || lotId.startsWith("G-")) {
+        zone = "ZONA_3";
+      } else if (lotId.startsWith("H-") || lotId.startsWith("I-")) {
+        zone = "ZONA_4";
+      } else if (lotId.startsWith("J-") || lotId.startsWith("K-") || lotId.startsWith("L-")) {
+        zone = "ZONA_5";
       }
 
       if (zone && stats[zone]) {
@@ -117,9 +123,9 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
     // Fallbacks si el API aún no carga o está vacía
     if (stats["ZONA_1"].total === 0) stats["ZONA_1"].total = 62;
     if (stats["ZONA_2"].total === 0) stats["ZONA_2"].total = 58;
-    if (stats["ZONA_3"].total === 0) stats["ZONA_3"].total = 32;
-    if (stats["ZONA_4"].total === 0) stats["ZONA_4"].total = 34;
-    if (stats["ZONA_5"].total === 0) stats["ZONA_5"].total = 36;
+    if (stats["ZONA_3"].total === 0) stats["ZONA_3"].total = 66;
+    if (stats["ZONA_4"].total === 0) stats["ZONA_4"].total = 73;
+    if (stats["ZONA_5"].total === 0) stats["ZONA_5"].total = 67;
     if (stats["ZONA_6"].total === 0) stats["ZONA_6"].total = 7;
     stats["ZONA_6"].available = 7;
 
