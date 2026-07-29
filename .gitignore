@@ -41,3 +41,16 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# scratch and temp downloads
+/scratch/
+/temp_download/
+/BACKUPS/
+
+# test and debug scripts
+test*.js
+scratch_sheet.cjs
+st.txt
+svg_analysis.txt
+zonas_marked.png
+zone_groups_analysis.txt
