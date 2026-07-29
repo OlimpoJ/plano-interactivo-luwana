@@ -10,7 +10,8 @@ import LoomSideMenu from "@/components/LoomSideMenu";
 import LoomLocationModal from "@/components/LoomLocationModal";
 import LoomReferralModal from "@/components/LoomReferralModal";
 import { AnimatePresence } from "framer-motion";
-import { Menu, Maximize2, Minimize2 } from "lucide-react";
+import Link from "next/link";
+import { Menu, Maximize2, Minimize2, ArrowLeft } from "lucide-react";
 
 interface Lot {
   id: string;
@@ -56,7 +57,7 @@ function AnimatedCounter({ endValue, duration = 2000 }: { endValue: number; dura
 }
 
 export default function LoomShowroom() {
-  const [view, setView] = useState<"hero" | "map" | "stage" | "showroom">("map");
+  const [view, setView] = useState<"hero" | "map" | "stage" | "showroom">("hero");
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
   const [selectedLot, setSelectedLot] = useState<Lot | null>(null);
   const [lots, setLots] = useState<Lot[]>([]);
@@ -65,6 +66,16 @@ export default function LoomShowroom() {
     sold: 26,
     available: 300
   });
+
+  // Check embed parameter from URL
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("embed") === "true" || params.get("view") === "map") {
+        setView("map");
+      }
+    }
+  }, []);
 
   // Global Overlay UI States
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -262,6 +273,17 @@ export default function LoomShowroom() {
       ) : (
         /* Pantalla Hero de Entrada */
         <main className="loom-theme relative w-full min-h-screen bg-black overflow-hidden flex flex-col text-white select-none">
+          {/* Botón Volver al Showroom Principal */}
+          <div className="absolute top-4 left-4 z-40">
+            <Link
+              href="/"
+              className="flex items-center gap-2 px-4 py-2 bg-black/60 hover:bg-black/90 text-white/80 hover:text-white border border-white/20 rounded-full text-xs font-semibold uppercase tracking-wider backdrop-blur-md transition-all duration-300 shadow-lg cursor-pointer"
+            >
+              <ArrowLeft size={14} />
+              <span>Volver al Showroom</span>
+            </Link>
+          </div>
+
           <section className={styles.heroContainer}>
             {/* Video de Fondo de Loom */}
             <video
