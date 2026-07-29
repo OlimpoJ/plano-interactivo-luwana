@@ -56,7 +56,7 @@ function AnimatedCounter({ endValue, duration = 2000 }: { endValue: number; dura
 }
 
 export default function LoomShowroom() {
-  const [view, setView] = useState<"hero" | "map" | "stage" | "showroom">("hero");
+  const [view, setView] = useState<"hero" | "map" | "stage" | "showroom">("map");
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
   const [selectedLot, setSelectedLot] = useState<Lot | null>(null);
   const [lots, setLots] = useState<Lot[]>([]);

@@ -1,7 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Home, Map, Layout, Download, MapPin, Phone, Sparkles } from "lucide-react";
+import { X, Home, Map, Layout, Download, MapPin, Phone, Sparkles, Compass } from "lucide-react";
+import Link from "next/link";
 
 interface LoomSideMenuProps {
   isOpen: boolean;
@@ -131,6 +132,15 @@ export default function LoomSideMenu({
                 </div>
                 <span className="text-[9px] bg-[#B35F27]/10 px-2 py-0.5 rounded font-mono font-bold">PDF</span>
               </button>
+
+              <Link
+                href="/"
+                onClick={onClose}
+                className="w-full px-4 py-3 rounded-xl bg-[#B35F27]/10 hover:bg-[#B35F27]/20 border border-[#B35F27]/30 transition-all flex items-center gap-3.5 text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#B35F27] cursor-pointer group shadow-sm"
+              >
+                <Compass className="h-4 w-4 text-[#B35F27] group-hover:rotate-45 transition-transform" />
+                <span>Cambiar de Proyecto</span>
+              </Link>
 
               <button
                 onClick={() => {
