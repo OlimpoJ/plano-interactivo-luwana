@@ -27,49 +27,296 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
   // Active Villa Model ("luxury" | "garden")
   const [selectedVilla, setSelectedVilla] = useState<"luxury" | "garden">("luxury");
   
-  // Active Content Sub-tab ("gallery" | "axonometric" | "plans" | "tour360")
-  const [activeTab, setActiveTab] = useState<"gallery" | "axonometric" | "plans" | "tour360">("gallery");
+  // Active Content Sub-tab ("gallery" | "axonometric" | "plans" | "elevations" | "tour360")
+  const [activeTab, setActiveTab] = useState<"gallery" | "axonometric" | "plans" | "elevations" | "tour360">("gallery");
 
   // Fullscreen Lightbox Index State
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-  // Villa 1: Luxury Residence Media
-  const villa1Gallery = [
-    { title: "Fachada Principal - Luxury Residence", src: "/Render Villa 1 Fachada principal (1).jpg", category: "Exterior", isPlaceholder: false },
-    { title: "Interior Living & Dining", src: "/Render Villa 1 Interior 1.jpg", category: "Interior", isPlaceholder: false },
-    { title: "Fachada Posterior & Piscina Privada", src: "/Render Villa 1 Fachada Posterior.jpg", category: "Exterior", isPlaceholder: false },
+  // Shared Photo Gallery (15 Renders HD)
+  const sharedGallery = [
+    {
+      num: "01",
+      title: "GALERIA 01 - FACHADA VISTA 1",
+      category: "Exterior",
+      src: "/loom/renders/luxury/galeria_01_fachada_vista_1.webp",
+      description: "Vista frontal directa de dos residencias. Destaca el diseño modular con celosías de apariencia de madera en el nivel superior, que crean un sombreamiento natural; muros de acabado pétreo en la planta baja; vegetación abundante; y zonas de parqueo al frente.",
+      isPlaceholder: false,
+    },
+    {
+      num: "02",
+      title: "GALERIA 02 - FACHADA VISTA 2",
+      category: "Exterior",
+      src: "/loom/renders/luxury/galeria_02_fachada_vista_2.webp",
+      description: "Perspectiva frontal simétrica de tres módulos residenciales alineados. Se aprecian las cajas de celosía superior con elementos efecto madera para filtrar la luz natural, una cubierta vegetal que cae por los bordes, vegetación integrada y vehículos estacionados a nivel de calle.",
+      isPlaceholder: false,
+    },
+    {
+      num: "03",
+      title: "GALERIA 03 - FACHADA VISTA 3",
+      category: "Exterior",
+      src: "/loom/renders/luxury/galeria_03_fachada_vista_3.webp",
+      description: "Toma angular a nivel de peatón del conjunto residencial. Enfatiza la volumetría en voladizo, la textura de las celosías símil madera, que genera un sombreamiento natural, y la integración de la vegetación a lo largo del sendero vehicular.",
+      isPlaceholder: false,
+    },
+    {
+      num: "04",
+      title: "GALERIA 04 - FACHADA VISTA 4",
+      category: "Exterior",
+      src: "/loom/renders/luxury/galeria_04_fachada_vista_4.webp",
+      description: "Vista dinámica en perspectiva que muestra la continuidad de la fachada a lo largo de la calle. Resalta el juego de luces y sombras creado por los paneles con acabado tipo madera perforada bajo luz natural y el marco de vegetación circundante.",
+      isPlaceholder: false,
+    },
+    {
+      num: "05",
+      title: "GALERIA 05 - FACHADA VISTA 5",
+      category: "Exterior",
+      src: "/loom/renders/luxury/galeria_05_fachada_vista_5.webp",
+      description: "Enfoque desde un ángulo bajo que resalta la escala de las estructuras. Muestra en detalle la entrada peatonal con portones en estilo madera calada, los acabados pétreos y muros con cubierta vegetal integrados con la vegetación del entorno.",
+      isPlaceholder: false,
+    },
+    {
+      num: "06",
+      title: "GALERIA 06 - FACHADA VISTA 6",
+      category: "Detalle Celosía",
+      src: "/loom/renders/luxury/galeria_06_fachada_vista_6.webp",
+      description: "Detalle en primer plano de los paneles de celosía con textura tipo madera. Muestra el diseño calado geométrico que genera un elegante sombreamiento natural al filtrar la luz, complementado con una cubierta de vegetación colgante en la parte superior.",
+      isPlaceholder: false,
+    },
+    {
+      num: "07",
+      title: "GALERIA 07 - HABITACIÓN VISTA 1",
+      category: "Dormitorio Principal",
+      src: "/loom/renders/luxury/galeria_07_habitacion_vista_1.webp",
+      description: "Vista frontal simétrica del dormitorio principal. Resalta la cama con diseño aparente madera, mesas de noche a juego, luminarias tejidas suspendidas y el gran ventanal corredizo que aprovecha la luz natural e integra un patio privado con vegetación.",
+      isPlaceholder: false,
+    },
+    {
+      num: "08",
+      title: "GALERIA 08 - HABITACIÓN VISTA 2",
+      category: "Dormitorio Principal",
+      src: "/loom/renders/luxury/galeria_08_habitacion_vista_2.webp",
+      description: "Dormitorio principal de estilo biofílico e introspectivo. Cuenta con una cama de plataforma con acabado tipo madera, lámparas colgantes de fibra tejida, paredes de estuco cálido bajo iluminación natural y un gran ventanal de piso a techo con vista a un patio interior enriquecido con vegetación.",
+      isPlaceholder: false,
+    },
+    {
+      num: "09",
+      title: "GALERIA 09 - SALA EXTERIOR",
+      category: "Área Social Exterior",
+      src: "/loom/renders/luxury/galeria_09_sala_exterior.webp",
+      description: "Área social abierta que conecta el interior con la piscina. Incluye un espacio bajo techo que brinda un fresco sombreamiento natural, sala lounge, barra de bar, escalera flotante con peldaños de efecto madera, tumbonas sobre un deck al aire libre y abundante vegetación.",
+      isPlaceholder: false,
+    },
+    {
+      num: "10",
+      title: "GALERIA 10 - FACHADA POSTERIOR",
+      category: "Exterior Posterior",
+      src: "/loom/renders/luxury/galeria_10_fachada_posterior.webp",
+      description: "Vista trasera de dos niveles hacia la piscina privada y con proyección a la vista al mar Caribe. Muestra la amplia terraza cubierta del primer nivel, un balcón superior con barandilla de cristal adornado con cubierta de vegetación colgante y ventanales corredizos que maximizan la entrada de luz natural.",
+      isPlaceholder: false,
+    },
+    {
+      num: "11",
+      title: "GALERIA 11 - SALA INTERIOR",
+      category: "Interior Social",
+      src: "/loom/renders/luxury/galeria_11_sala_interior.webp",
+      description: "Espacio de sala interior orientado hacia el área social y la piscina. Cuenta con mobiliario en tonos neutros, alfombra tejida, puertas correderas de celosía con apariencia madera para proporcionar un agradable sombreamiento natural, luz natural y vistas a la vegetación.",
+      isPlaceholder: false,
+    },
+    {
+      num: "12",
+      title: "GALERIA 12 - COCINA ALTILLO VISTA 1",
+      category: "Interior Cocina",
+      src: "/loom/renders/luxury/galeria_12_cocina_vista_1.webp",
+      description: "Vista integral de la zona social de planta abierta. Integra una cocina con muebles de acabado tipo madera, iluminación artesanal, sala de estar aprovechando la luz natural, escalera flotante con vegetación en su base y amplias mamparas correderas hacia la terraza.",
+      isPlaceholder: false,
+    },
+    {
+      num: "13",
+      title: "GALERIA 13 - BAÑO VISTA 1",
+      category: "Interior Baño",
+      src: "/loom/renders/luxury/galeria_13_bano_vista_1.webp",
+      description: "Baño de diseño minimalista con muros y pisos de acabado pétreo. Incluye lavabo sobre encimera flotante símil madera, ducha con mampara de cristal transparente y grifería negra moderna junto a una ventana que aporta luz natural directa y vistas a la vegetación.",
+      isPlaceholder: false,
+    },
+    {
+      num: "14",
+      title: "GALERIA 14 - BAÑO VISTA 2",
+      category: "Interior Baño",
+      src: "/loom/renders/luxury/galeria_14_bano_vista_2.webp",
+      description: "Perspectiva alternativa del baño que resalta la amplitud del espacio. Destaca la combinación de acabados pétreos y detalles en tonos y textura tipo madera, la entrada de luz natural a la zona de ducha y detalles de integración de vegetación exterior.",
+      isPlaceholder: false,
+    },
+    {
+      num: "15",
+      title: "GALERIA 15 - ALTILLO VISTA 1",
+      category: "Rooftop Lounge",
+      src: "/loom/renders/luxury/galeria_15_altillo_vista_1.webp",
+      description: "Exclusiva terraza en el altillo con pérgola de apariencia madera ofreciendo sombreamiento natural. Cuenta con un área lounge, bancas integradas en acabado pétreo, bases efecto madera, jacuzzi elevable, vegetación integrada y una espectacular vista panorámica al mar Caribe.",
+      isPlaceholder: false,
+    },
   ];
 
-  const villa1Plans = [
-    { title: "Planta Arquitectónica - Nivel 1 (198.00 m²)", src: "/loom/placeholder_missing.svg", isPlaceholder: true, specs: "Acceso, Parqueadero, Espejo de Agua, Alcoba, Baño, Cocina, Sala, Deck, Piscina" },
-    { title: "Planta Arquitectónica - Nivel 2 (76.04 m²)", src: "/loom/placeholder_missing.svg", isPlaceholder: true, specs: "Escalera Interna, Alcobas Secundarias, Baños Privados, Terraza" },
-    { title: "Planta Arquitectónica - Nivel 3 (79.13 m²)", src: "/loom/placeholder_missing.svg", isPlaceholder: true, specs: "Habitación Master, Jacuzzi, Terraza Sunbed, Bar Exclusivo" },
+  // Shared 3D Axonometrics (2 Renders HD)
+  const sharedAxonometrics = [
+    {
+      num: "01",
+      title: "Axonometría 3D - Isometría Nivel 1 & 2",
+      category: "Axonometría 3D",
+      src: "/loom/renders/axonometrics/axonometria_01.webp",
+      description: "Vista isométrica 3D en perspectiva general que destaca la volumetría de la residencia, la integración del espejo de agua, áreas sociales en primer nivel y la celosía biofílica en niveles superiores.",
+      isPlaceholder: false,
+    },
+    {
+      num: "02",
+      title: "Axonometría 3D - Isometría Rooftop & Altillo",
+      category: "Axonometría 3D",
+      src: "/loom/renders/axonometrics/axonometria_02.webp",
+      description: "Desglose isométrico 3D de la cubierta y la zona del altillo lounge. Muestra la distribución de la pérgola en acabado madera, jacuzzi elevable y terraza panorámica.",
+      isPlaceholder: false,
+    },
   ];
 
-  const villa1Axonometrics = [
-    { title: "Axonometría 3D - Nivel 1 & Jardín Biofílico", src: "/loom/placeholder_missing.svg", isPlaceholder: true },
-    { title: "Axonometría 3D - Nivel 2 & Terrazas Privadas", src: "/loom/placeholder_missing.svg", isPlaceholder: true },
-    { title: "Axonometría 3D - Nivel 3 & Rooftop Lounge", src: "/loom/placeholder_missing.svg", isPlaceholder: true },
+  // Luxury Residence Architectural Plans (4 Levels)
+  const luxuryPlans = [
+    {
+      num: "01",
+      title: "Planta Arquitectónica - Nivel 1 (198.00 m²)",
+      category: "Planta Arquitectónica",
+      src: "/loom/renders/plans/luxury_planta_01.webp",
+      specs: "Acceso, Parqueadero, Espejo de Agua, Alcoba, Baño, Cocina, Sala, Deck, Piscina",
+      description: "Distribución completa del primer nivel. Incluye zona de estacionamiento frontal, vestíbulo de entrada con espejo de agua, amplia zona social integrada (sala y comedor), cocina tipo americana, deck exterior y piscina privada.",
+      isPlaceholder: false,
+    },
+    {
+      num: "02",
+      title: "Planta Arquitectónica - Nivel 2 (76.04 m²)",
+      category: "Planta Arquitectónica",
+      src: "/loom/renders/plans/luxury_planta_02.webp",
+      specs: "Escalera Interna, Alcobas Secundarias, Baños Privados, Balcones",
+      description: "Distribución del segundo nivel. Alberga dormitorios secundarios con baños en suite y vestidores privados, aprovechando los ventanales hacia las fachadas principal y posterior.",
+      isPlaceholder: false,
+    },
+    {
+      num: "03",
+      title: "Planta Arquitectónica - Nivel 3 - Altillo (79.13 m²)",
+      category: "Planta Arquitectónica",
+      src: "/loom/renders/plans/luxury_planta_03.webp",
+      specs: "Habitación Master, Jacuzzi, Terraza Sunbed, Bar Exclusivo",
+      description: "Planta del tercer nivel o altillo master suite. Espacio privado con habitación principal, jacuzzi hidromasaje exterior y terraza privada con vista al mar.",
+      isPlaceholder: false,
+    },
+    {
+      num: "04",
+      title: "Planta de Cubierta",
+      category: "Planta Arquitectónica",
+      src: "/loom/renders/plans/luxury_planta_04_cubierta.webp",
+      specs: "Pérgola, Cubiertas Vegetales, Colectores y Remates",
+      description: "Planta superior de cubierta que muestra la disposición de pérgolas de sombreado biofílico, vegetación integrada en bordes y acabados arquitectónicos.",
+      isPlaceholder: false,
+    },
   ];
 
-  // Villa 2: Garden Edition Media (Placeholders until assets are provided)
-  const villa2Gallery = [
-    { title: "Fachada Principal - Garden Edition", src: "/loom/placeholder_missing.svg", isPlaceholder: true, category: "Exterior" },
-    { title: "Interior Salón Biofílico", src: "/loom/placeholder_missing.svg", isPlaceholder: true, category: "Interior" },
-    { title: "Jardín Extendido & Terraza", src: "/loom/placeholder_missing.svg", isPlaceholder: true, category: "Exterior" },
+  // Garden Edition Architectural Plans (4 Levels)
+  const gardenPlans = [
+    {
+      num: "01",
+      title: "Planta Arquitectónica - Nivel 1 - Jardín Biofílico (150.00 m²)",
+      category: "Planta Arquitectónica",
+      src: "/loom/renders/plans/garden_nivel_01.webp",
+      specs: "Acceso Peatonal, Parqueadero, Jardín Privado Extendido, Sala, Cocina, Ducha Externa",
+      description: "Planta del primer nivel de la versión Garden Edition. Destaca la expansión de jardines interiores y patio privado envolvente con vegetación nativa.",
+      isPlaceholder: false,
+    },
+    {
+      num: "02",
+      title: "Planta Arquitectónica - Nivel 2 (65.00 m²)",
+      category: "Planta Arquitectónica",
+      src: "/loom/renders/plans/garden_nivel_02.webp",
+      specs: "Dormitorio de Huéspedes, Estudio/Estar, Baño Privado, Balcón Verde",
+      description: "Distribución del segundo nivel optimizada para privacidad y frescura biofílica con vistas al jardín central.",
+      isPlaceholder: false,
+    },
+    {
+      num: "03",
+      title: "Planta Arquitectónica - Nivel 3 (59.04 m²)",
+      category: "Planta Arquitectónica",
+      src: "/loom/renders/plans/garden_nivel_03.webp",
+      specs: "Suite Principal, Vestidor, Baño Master, Terraza Biofílica",
+      description: "Planta de la suite principal en el tercer nivel con balcón rodeado de paneles de madera perforada y jardineras integradas.",
+      isPlaceholder: false,
+    },
+    {
+      num: "04",
+      title: "Planta de Cubierta",
+      category: "Planta Arquitectónica",
+      src: "/loom/renders/plans/garden_nivel_04_cubierta.webp",
+      specs: "Pérgola de Sombra Natural, Cubierta Vegetal",
+      description: "Planta de techos y cubiertas verdes para Garden Edition con aislamiento térmico natural.",
+      isPlaceholder: false,
+    },
   ];
 
-  const currentGallery = selectedVilla === "luxury" ? villa1Gallery : villa2Gallery;
-  const currentPlans = villa1Plans;
-  const currentAxonometrics = villa1Axonometrics;
+  // Shared Architectural Elevations & Sections (4 Drawings)
+  const sharedElevations = [
+    {
+      num: "01",
+      title: "Alzado 01 - Fachada Principal (Vista Calle)",
+      category: "Alzado / Elevación",
+      src: "/loom/renders/elevations/alzado_01.webp",
+      description: "Elevación arquitectónica de la fachada frontal. Detalla la altura total de los tres niveles, los paneles de celosía superior de apariencia madera, acabados de estuco y vegetación colgante.",
+      isPlaceholder: false,
+    },
+    {
+      num: "02",
+      title: "Alzado 02 - Fachada Posterior (Vista Piscina)",
+      category: "Alzado / Elevación",
+      src: "/loom/renders/elevations/alzado_02.webp",
+      description: "Elevación arquitectónica posterior orientada hacia la zona social y piscina privada. Muestra los ventanales correderos de piso a techo y balcones superiores.",
+      isPlaceholder: false,
+    },
+    {
+      num: "03",
+      title: "Alzado 03 - Corte Longitudinal L1",
+      category: "Corte Arquitectónico",
+      src: "/loom/renders/elevations/alzado_03.webp",
+      description: "Corte arquitectónico longitudinal que revela la circulación vertical (escalera flotante), alturas libres de entrepiso y la conexión fluida entre sala interior y deck de piscina.",
+      isPlaceholder: false,
+    },
+    {
+      num: "04",
+      title: "Alzado 04 - Corte Transversal L2",
+      category: "Corte Arquitectónico",
+      src: "/loom/renders/elevations/alzado_04.webp",
+      description: "Corte arquitectónico transversal mostrando el perfil estructural, el altillo master en nivel 3 y la integración con el patio exterior.",
+      isPlaceholder: false,
+    },
+  ];
+
+  const currentGallery = sharedGallery;
+  const currentAxonometrics = sharedAxonometrics;
+  const currentPlans = selectedVilla === "luxury" ? luxuryPlans : gardenPlans;
+  const currentElevations = sharedElevations;
 
   // Obtenemos la lista activa según la pestaña seleccionada
   const getActiveMediaList = useCallback(() => {
     if (activeTab === "gallery") return currentGallery;
     if (activeTab === "axonometric") return currentAxonometrics;
     if (activeTab === "plans") return currentPlans;
+    if (activeTab === "elevations") return currentElevations;
     return [];
-  }, [activeTab, currentGallery, currentAxonometrics, currentPlans]);
+  }, [activeTab, currentGallery, currentAxonometrics, currentPlans, currentElevations]);
+
+  // 360 Tour Interactive Scenes (5 HD Scenarios extracted from QR codes)
+  const tour360List = [
+    { id: "fachada", label: "Fachada Principal", category: "Exterior", url: "https://kuula.co/share/collection/7TMZx?logo=0&info=0&fs=1&vr=0&sd=1&thumbs=1" },
+    { id: "sala", label: "Sala & Comedor", category: "Interior Social", url: "https://kuula.co/share/collection/7TKQ2?logo=0&info=0&fs=1&vr=0&sd=1&thumbs=1" },
+    { id: "habitacion", label: "Suite Principal", category: "Dormitorio Master", url: "https://kuula.co/share/collection/7TKzy?logo=0&info=0&fs=1&vr=0&sd=1&thumbs=1" },
+    { id: "bano", label: "Baño Suite Master", category: "Interior Baño", url: "https://kuula.co/share/collection/7TndH?logo=0&info=0&fs=1&vr=0&sd=1&thumbs=1" },
+    { id: "altillo", label: "Altillo & Rooftop", category: "Rooftop Lounge", url: "https://kuula.co/share/collection/7T6Y1?logo=0&info=0&fs=1&vr=0&sd=1&thumbs=1" },
+  ];
+
+  const [active360Index, setActive360Index] = useState<number>(0);
 
   const activeMediaList = getActiveMediaList();
 
@@ -189,7 +436,8 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
               { id: "gallery", label: "1. Galería de Fotos" },
               { id: "axonometric", label: "2. Axonometrías 3D" },
               { id: "plans", label: "3. Plantas Arquitectónicas" },
-              { id: "tour360", label: "4. Recorrido 360°" },
+              { id: "elevations", label: "4. Alzados" },
+              { id: "tour360", label: "5. Recorrido 360°" },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -272,30 +520,32 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
                       Axonometrías 3D Isométricas
                     </h3>
                     <span className="text-[10px] text-[#B35F27] uppercase tracking-widest font-semibold">
-                      Diagramas de Distribución
+                      {currentAxonometrics.length} Diagramas
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {currentAxonometrics.map((item, idx) => (
                       <div
                         key={idx}
                         onClick={() => setLightboxIndex(idx)}
-                        className="group relative rounded-xl overflow-hidden border border-[#0A0D0B]/10 bg-white/60 aspect-[4/3] cursor-pointer hover:border-[#B35F27] transition-all duration-300 shadow-sm"
+                        className="group relative rounded-xl overflow-hidden border border-[#0A0D0B]/10 bg-white/80 p-4 cursor-pointer hover:border-[#B35F27] transition-all duration-300 flex flex-col justify-between shadow-sm"
                       >
-                        <img
-                          src={item.src}
-                          alt={item.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
-                        
-                        <div className="absolute top-3 right-3 px-2 py-0.5 bg-[#B35F27] text-[#EDE7E0] text-[9px] font-bold uppercase tracking-wider rounded">
-                          IMAGEN FALTANTE
+                        <div className="relative aspect-[4/3] rounded-lg overflow-hidden mb-3 bg-[#EDE7E0] border border-[#0A0D0B]/10">
+                          <img
+                            src={item.src}
+                            alt={item.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
                         </div>
-
-                        <div className="absolute bottom-3 left-3 right-3">
-                          <p className="text-xs font-semibold text-white">{item.title}</p>
+                        <div>
+                          <span className="text-[9px] uppercase tracking-widest text-[#B35F27] font-mono block font-semibold">
+                            {item.category}
+                          </span>
+                          <h4 className="text-xs font-bold text-[#0A0D0B] mb-1">{item.title}</h4>
+                          <p className="text-[10px] text-[#0A0D0B]/70 leading-relaxed line-clamp-2">
+                            {item.description}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -314,34 +564,31 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
                 >
                   <div className="flex justify-between items-center border-b border-[#0A0D0B]/10 pb-3">
                     <h3 className="text-sm font-serif font-bold text-[#0A0D0B] uppercase tracking-wider">
-                      Plantas Arquitectónicas por Nivel
+                      Plantas Arquitectónicas por Nivel &bull; {selectedVilla === "luxury" ? "Luxury Residence" : "Garden Edition"}
                     </h3>
-                    <span className="text-[10px] text-[#0A0D0B]/60 uppercase tracking-widest">
-                      3 Niveles
+                    <span className="text-[10px] text-[#B35F27] uppercase tracking-widest font-semibold">
+                      {currentPlans.length} Plantas
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {currentPlans.map((item, idx) => (
                       <div
                         key={idx}
                         onClick={() => setLightboxIndex(idx)}
                         className="group relative rounded-xl overflow-hidden border border-[#0A0D0B]/10 bg-white/80 p-4 cursor-pointer hover:border-[#B35F27] transition-all duration-300 flex flex-col justify-between shadow-sm"
                       >
-                        <div className="relative aspect-[4/3] rounded-lg overflow-hidden mb-3 bg-[#EDE7E0] border border-[#0A0D0B]/10">
+                        <div className="relative aspect-[4/3] rounded-lg overflow-hidden mb-3 bg-white border border-[#0A0D0B]/10">
                           <img
                             src={item.src}
                             alt={item.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500"
                           />
-                          <div className="absolute top-2 right-2 px-2 py-0.5 bg-[#B35F27] text-[#EDE7E0] text-[9px] font-bold uppercase tracking-wider rounded">
-                            PLANO FALTANTE
-                          </div>
                         </div>
 
                         <div>
                           <h4 className="text-xs font-bold text-[#0A0D0B] mb-1">{item.title}</h4>
-                          <p className="text-[10px] text-[#0A0D0B]/60 leading-relaxed uppercase tracking-wider line-clamp-2">
+                          <p className="text-[10px] text-[#B35F27] font-mono leading-relaxed uppercase tracking-wider line-clamp-2">
                             {item.specs}
                           </p>
                         </div>
@@ -351,7 +598,55 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
                 </motion.div>
               )}
 
-              {/* TAB 4: TOUR 360° */}
+              {/* TAB 4: ALZADOS */}
+              {activeTab === "elevations" && (
+                <motion.div
+                  key="elevations"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="space-y-4"
+                >
+                  <div className="flex justify-between items-center border-b border-[#0A0D0B]/10 pb-3">
+                    <h3 className="text-sm font-serif font-bold text-[#0A0D0B] uppercase tracking-wider">
+                      Alzados &amp; Cortes Arquitectónicos
+                    </h3>
+                    <span className="text-[10px] text-[#B35F27] uppercase tracking-widest font-semibold">
+                      {currentElevations.length} Planos
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {currentElevations.map((item, idx) => (
+                      <div
+                        key={idx}
+                        onClick={() => setLightboxIndex(idx)}
+                        className="group relative rounded-xl overflow-hidden border border-[#0A0D0B]/10 bg-white/80 p-4 cursor-pointer hover:border-[#B35F27] transition-all duration-300 flex flex-col justify-between shadow-sm"
+                      >
+                        <div className="relative aspect-[4/3] rounded-lg overflow-hidden mb-3 bg-white border border-[#0A0D0B]/10">
+                          <img
+                            src={item.src}
+                            alt={item.title}
+                            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500"
+                          />
+                        </div>
+
+                        <div>
+                          <span className="text-[9px] uppercase tracking-widest text-[#B35F27] font-mono block font-semibold">
+                            {item.category}
+                          </span>
+                          <h4 className="text-xs font-bold text-[#0A0D0B] mb-1">{item.title}</h4>
+                          <p className="text-[10px] text-[#0A0D0B]/70 leading-relaxed line-clamp-2">
+                            {item.description}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* TAB 5: TOUR 360° MULTI-ESCENARIOS */}
               {activeTab === "tour360" && (
                 <motion.div
                   key="tour360"
@@ -360,17 +655,36 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
                   exit={{ opacity: 0, y: -10 }}
                   className="space-y-4"
                 >
-                  <div className="flex justify-between items-center border-b border-[#0A0D0B]/10 pb-3">
+                  <div className="flex flex-wrap justify-between items-center border-b border-[#0A0D0B]/10 pb-3 gap-2">
                     <h3 className="text-sm font-serif font-bold text-[#0A0D0B] uppercase tracking-wider flex items-center gap-2">
-                      <span>Recorrido Virtual 360° Interactivo</span>
-                      <span className="px-2 py-0.5 bg-[#699385]/20 border border-[#699385]/40 text-[#699385] text-[9px] font-mono rounded-full font-bold">EN VIVO</span>
+                      <span>Recorridos Virtuales 360° Interactivos</span>
+                      <span className="px-2 py-0.5 bg-[#699385]/20 border border-[#699385]/40 text-[#699385] text-[9px] font-mono rounded-full font-bold">5 ESCENARIOS HD</span>
                     </h3>
                   </div>
 
-                  <div className="relative rounded-2xl overflow-hidden border border-[#0A0D0B]/10 bg-white/80 aspect-[16/10] sm:aspect-[16/9] min-h-[360px] shadow-lg">
+                  {/* 360 Sub-location selector pills */}
+                  <div className="flex flex-wrap gap-2">
+                    {tour360List.map((item, idx) => (
+                      <button
+                        key={item.id}
+                        onClick={() => setActive360Index(idx)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+                          active360Index === idx
+                            ? "bg-[#B35F27] text-[#EDE7E0] shadow-md shadow-[#B35F27]/20"
+                            : "bg-white/80 border border-[#0A0D0B]/10 text-[#0A0D0B]/70 hover:bg-[#0A0D0B] hover:text-[#EDE7E0]"
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Main 360 Viewport iframe */}
+                  <div className="relative rounded-2xl overflow-hidden border border-[#0A0D0B]/10 bg-white/80 aspect-[16/10] sm:aspect-[16/9] min-h-[380px] shadow-lg">
                     <iframe
-                      src="https://kuula.co/share/collection/7TKQ2?logo=0&info=0&fs=1&vr=0&sd=1&thumbs=1"
-                      title="Tour Virtual 360° Loom"
+                      key={tour360List[active360Index].url}
+                      src={tour360List[active360Index].url}
+                      title={`Tour Virtual 360° ${tour360List[active360Index].label}`}
                       className="w-full h-full border-none"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; xr-spatial-tracking"
                       allowFullScreen
@@ -407,26 +721,26 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-[#EDE7E0]/95 backdrop-blur-2xl flex flex-col justify-between p-4 sm:p-6 select-none"
+            className="fixed inset-0 z-50 bg-[#EDE7E0]/95 backdrop-blur-2xl flex flex-col justify-between p-3 sm:p-5 select-none overflow-hidden"
           >
             {/* Lightbox Header */}
-            <div className="flex justify-between items-center z-20 max-w-7xl mx-auto w-full border-b border-[#0A0D0B]/10 pb-3">
+            <div className="flex justify-between items-center z-20 max-w-7xl mx-auto w-full border-b border-[#0A0D0B]/10 pb-2.5">
               <div className="flex items-center gap-3">
                 <span className="text-[10px] uppercase tracking-[0.3em] text-[#B35F27] font-bold">
-                  Showroom Visualizer &bull; Foto {lightboxIndex + 1} de {activeMediaList.length}
+                  Showroom Visualizer &bull; {lightboxIndex + 1} de {activeMediaList.length}
                 </span>
                 <span className="hidden sm:inline-block px-2.5 py-0.5 bg-[#B35F27]/15 border border-[#B35F27]/30 text-[#B35F27] text-[9px] font-bold rounded-full uppercase tracking-wider">
                   Navegación &lt; &gt;
                 </span>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 <h3 className="text-xs sm:text-base font-serif font-bold text-[#0A0D0B] max-w-[280px] sm:max-w-md truncate">
                   {activeMedia.title}
                 </h3>
                 <button
                   onClick={() => setLightboxIndex(null)}
-                  className="p-2.5 bg-white border border-[#0A0D0B]/15 hover:bg-[#B35F27] hover:text-[#EDE7E0] text-[#0A0D0B] rounded-full transition-all duration-300 cursor-pointer shadow-md active:scale-95"
+                  className="p-2 bg-white border border-[#0A0D0B]/15 hover:bg-[#B35F27] hover:text-[#EDE7E0] text-[#0A0D0B] rounded-full transition-all duration-300 cursor-pointer shadow-md active:scale-95"
                   title="Cerrar (Esc)"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -437,43 +751,55 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
             </div>
 
             {/* Lightbox Main Image & Navigation Arrows */}
-            <div className="relative flex-1 flex justify-center items-center my-2 sm:my-4 overflow-hidden w-full max-w-7xl mx-auto">
-              
+            <div className="relative flex-1 flex justify-center items-center my-1 sm:my-2 overflow-hidden w-full max-w-7xl mx-auto">
+
               {/* Previous Image Arrow Button */}
               {activeMediaList.length > 1 && (
                 <button
                   onClick={handlePrevImage}
-                  className="absolute left-2 sm:left-4 z-30 p-3 sm:p-4 bg-white/90 hover:bg-[#B35F27] border border-[#0A0D0B]/15 hover:border-[#B35F27] text-[#0A0D0B] hover:text-[#EDE7E0] rounded-full transition-all duration-300 backdrop-blur-md shadow-xl active:scale-90 cursor-pointer group"
-                  title="Foto Anterior (Flecha Izquierda)"
+                  className="absolute left-2 sm:left-4 z-30 p-2.5 sm:p-3.5 bg-white/90 hover:bg-[#B35F27] border border-[#0A0D0B]/15 hover:border-[#B35F27] text-[#0A0D0B] hover:text-[#EDE7E0] rounded-full transition-all duration-300 backdrop-blur-md shadow-xl active:scale-90 cursor-pointer group"
+                  title="Anterior (Flecha Izquierda)"
                 >
-                  <svg className="w-6 h-6 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
               )}
 
-              {/* Center Media Image */}
+              {/* Center Media Image & Description Box */}
               <AnimatePresence mode="wait">
-                <motion.img
+                <motion.div
                   key={activeMedia.src}
                   initial={{ opacity: 0, scale: 0.96 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.96 }}
                   transition={{ duration: 0.25 }}
-                  src={activeMedia.src}
-                  alt={activeMedia.title}
-                  className="max-w-full max-h-[75vh] sm:max-h-[80vh] object-contain rounded-xl shadow-2xl border border-[#0A0D0B]/10 bg-white"
-                />
+                  className="flex flex-col items-center justify-center max-w-full max-h-full px-2"
+                >
+                  <img
+                    src={activeMedia.src}
+                    alt={activeMedia.title}
+                    className="max-w-full max-h-[50vh] sm:max-h-[54vh] object-contain rounded-xl shadow-2xl border border-[#0A0D0B]/10 bg-white"
+                  />
+                  {(activeMedia as any).description && (
+                    <div className="mt-2.5 max-w-3xl w-full px-4 py-2.5 bg-[#0A0D0B]/90 backdrop-blur-md text-[#EDE7E0] border border-white/10 rounded-xl text-xs sm:text-sm font-sans text-center leading-relaxed shadow-xl max-h-[16vh] overflow-y-auto overscroll-contain">
+                      <span className="text-[9px] text-[#EBD9AB] uppercase tracking-widest font-mono block mb-0.5">
+                        {(activeMedia as any).category || "Descripción Arquitectónica"}
+                      </span>
+                      {(activeMedia as any).description}
+                    </div>
+                  )}
+                </motion.div>
               </AnimatePresence>
 
               {/* Next Image Arrow Button */}
               {activeMediaList.length > 1 && (
                 <button
                   onClick={handleNextImage}
-                  className="absolute right-2 sm:right-4 z-30 p-3 sm:p-4 bg-white/90 hover:bg-[#B35F27] border border-[#0A0D0B]/15 hover:border-[#B35F27] text-[#0A0D0B] hover:text-[#EDE7E0] rounded-full transition-all duration-300 backdrop-blur-md shadow-xl active:scale-90 cursor-pointer group"
-                  title="Siguiente Foto (Flecha Derecha)"
+                  className="absolute right-2 sm:right-4 z-30 p-2.5 sm:p-3.5 bg-white/90 hover:bg-[#B35F27] border border-[#0A0D0B]/15 hover:border-[#B35F27] text-[#0A0D0B] hover:text-[#EDE7E0] rounded-full transition-all duration-300 backdrop-blur-md shadow-xl active:scale-90 cursor-pointer group"
+                  title="Siguiente (Flecha Derecha)"
                 >
-                  <svg className="w-6 h-6 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
@@ -481,7 +807,7 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
             </div>
 
             {/* Lightbox Footer & Thumbnail Navigation Bar */}
-            <div className="flex flex-col items-center gap-2 z-20 max-w-7xl mx-auto w-full border-t border-[#0A0D0B]/10 pt-3">
+            <div className="flex flex-col items-center gap-1.5 z-20 max-w-7xl mx-auto w-full border-t border-[#0A0D0B]/10 pt-2.5">
               {/* Thumbnail Strip */}
               {activeMediaList.length > 1 && (
                 <div className="flex items-center gap-2 overflow-x-auto max-w-full pb-1 px-2">
@@ -501,8 +827,8 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
                 </div>
               )}
 
-              <div className="text-center text-[10px] sm:text-xs text-[#0A0D0B]/70 uppercase tracking-widest font-sans font-medium">
-                Loom Luxury Residence &bull; Lote {selectedLot.rawId} ({selectedLot.area} m²) &bull; Use las flechas &lt; &gt; o del teclado para navegar
+              <div className="text-center text-[10px] text-[#0A0D0B]/70 uppercase tracking-widest font-sans font-medium">
+                Loom Luxury Residence &bull; Lote {selectedLot.rawId} ({selectedLot.area} m²) &bull; Navegue con las flechas o el teclado
               </div>
             </div>
           </motion.div>
