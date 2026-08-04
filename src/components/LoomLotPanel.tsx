@@ -30,10 +30,20 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
   const [showReferralModal, setShowReferralModal] = useState(false);
   const [referrer, setReferrer] = useState<string | null>(null);
 
-  // Leer referidor de sessionStorage
+  // Leer referidor de sessionStorage y notificar iframe parent si aplica
   useEffect(() => {
     if (typeof window !== "undefined") {
       setReferrer(sessionStorage.getItem("loom_ref"));
+
+      if (lot && window.parent !== window) {
+        window.parent.postMessage({
+          type: 'LOT_SELECTED',
+          payload: {
+            lotId: lot.id,
+            price: lot.totalPrice
+          }
+        }, '*');
+      }
     }
   }, [lot]);
 
@@ -41,8 +51,19 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
 
   // Lógica del botón de separar lote (atribución)
   const handleSeparateClick = () => {
+    if (typeof window !== "undefined" && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'LOT_SELECTED',
+        payload: {
+          lotId: lot.id,
+          price: lot.totalPrice
+        }
+      }, '*');
+      return;
+    }
+
     if (referrer === "patrimofy") {
-      window.open("https://www.patrimofy.com/es/loom#contacto", "_blank");
+      window.location.href = "https://www.patrimofy.com/es/loom#contacto";
     } else if (referrer === "chichaus") {
       window.open("https://www.loomalmabeach.com/contacto/", "_blank");
     } else {

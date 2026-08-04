@@ -112,13 +112,18 @@ export default function LoomShowroom() {
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
-  // Guardar el parámetro de referido ?ref= de la URL
+  // Guardar y leer el parámetro de referido ?ref= de la URL
+  const [referrer, setReferrer] = useState<string | null>(null);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const ref = params.get("ref");
       if (ref) {
         sessionStorage.setItem("loom_ref", ref.toLowerCase());
+        setReferrer(ref.toLowerCase());
+      } else {
+        setReferrer(sessionStorage.getItem("loom_ref"));
       }
     }
   }, []);
