@@ -359,7 +359,7 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
 
       {/* Top Navigation Bar */}
       <header className="relative z-30 w-full px-4 sm:px-8 py-4 bg-[#EDE7E0]/90 backdrop-blur-xl border-b border-[#0A0D0B]/10 flex flex-wrap justify-between items-center gap-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 ml-11 sm:ml-14">
           <button
             onClick={onBack}
             className="flex items-center gap-2 px-3.5 py-1.5 bg-[#B35F27] hover:bg-[#964d1d] active:scale-95 border border-[#B35F27] rounded-full text-xs font-bold text-[#EDE7E0] uppercase tracking-wider transition-all duration-300 shadow-md cursor-pointer"
