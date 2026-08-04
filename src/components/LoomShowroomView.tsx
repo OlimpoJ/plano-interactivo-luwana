@@ -702,8 +702,8 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
             <span className="text-[10px] uppercase tracking-[0.25em] text-[#B35F27] font-bold">
               Ficha Técnica del Lote
             </span>
-            <span className="text-[10px] text-[#0A0D0B]/50 uppercase tracking-widest">
-              Etapa {stageId}
+            <span className="text-[10px] text-[#0A0D0B]/50 uppercase tracking-widest font-mono font-semibold">
+              {stageId ? (stageId.toLowerCase().startsWith("etapa_") ? `ETAPA ${stageId.replace(/[^0-9]/g, "")}` : stageId.toUpperCase()) : "ETAPA 1"}
             </span>
           </div>
 
@@ -735,8 +735,12 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
                 <span className="text-lg font-serif font-bold text-[#0A0D0B] mt-1">{selectedLot.area} m²</span>
               </div>
               <div className="bg-[#EDE7E0]/60 border border-[#0A0D0B]/10 rounded-xl p-3.5 flex flex-col">
-                <span className="text-[10px] uppercase tracking-wider text-[#0A0D0B]/60 font-medium">Ubicación</span>
-                <span className="text-sm font-semibold text-[#0A0D0B] mt-1 truncate">{selectedLot.location || `Etapa ${stageId}`}</span>
+                <span className="text-[10px] uppercase tracking-wider text-[#0A0D0B]/60 font-medium">Tipo Ubicación</span>
+                <span className="text-sm font-semibold text-[#0A0D0B] mt-1 truncate">
+                  {selectedLot.location && !selectedLot.location.toLowerCase().includes("etapa")
+                    ? selectedLot.location
+                    : "Lote Medianero"}
+                </span>
               </div>
             </div>
 
@@ -759,24 +763,6 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
                 <div>
                   <span className="text-[9px] uppercase tracking-wider text-white/50 block">Contraentrega</span>
                   <span className="font-semibold text-white/90">{selectedLot.finalPayment}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Villa Models Compatibility Banner */}
-            <div className="border border-[#B35F27]/20 bg-[#B35F27]/5 rounded-xl p-3.5 flex flex-col gap-2">
-              <span className="text-[10px] uppercase tracking-widest text-[#B35F27] font-bold flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#B35F27]" />
-                Modelos de Villa Arquitectónica Aprobados
-              </span>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="bg-white/80 p-2 rounded-lg border border-[#0A0D0B]/5">
-                  <strong className="block font-serif text-[#0A0D0B]">Luxury Residence</strong>
-                  <span className="text-[10px] text-[#0A0D0B]/60 font-mono">353.17 m² &bull; 3 Niveles</span>
-                </div>
-                <div className="bg-white/80 p-2 rounded-lg border border-[#0A0D0B]/5">
-                  <strong className="block font-serif text-[#0A0D0B]">Garden Edition</strong>
-                  <span className="text-[10px] text-[#0A0D0B]/60 font-mono">274.04 m² &bull; Jardín Biofílico</span>
                 </div>
               </div>
             </div>
