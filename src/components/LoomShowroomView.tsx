@@ -696,19 +696,91 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
           </div>
         </section>
 
-        {/* Right Pane (5 cols on LG+): Interactive Zoom Lot Canvas */}
-        <section className="lg:col-span-5 flex flex-col min-h-[420px] lg:min-h-full">
-          <div className="flex justify-between items-center mb-2 px-1">
+        {/* Right Pane (5 cols on LG+): Detailed Lot Specifications & Pricing Card */}
+        <section className="lg:col-span-5 flex flex-col gap-4">
+          <div className="flex justify-between items-center px-1">
             <span className="text-[10px] uppercase tracking-[0.25em] text-[#B35F27] font-bold">
-              Plano de Ubicación del Lote
+              Ficha Técnica del Lote
             </span>
             <span className="text-[10px] text-[#0A0D0B]/50 uppercase tracking-widest">
-              Vista Cinemática Centrada
+              Etapa {stageId}
             </span>
           </div>
 
-          <div className="flex-1 w-full h-full min-h-[400px] rounded-2xl overflow-hidden border border-[#0A0D0B]/10 shadow-sm">
-            <LoomLotZoomCanvas stageId={stageId} selectedLot={selectedLot} />
+          <div className="bg-white/80 backdrop-blur-md border border-[#0A0D0B]/10 rounded-2xl p-5 sm:p-6 shadow-md flex flex-col justify-between gap-6">
+            
+            {/* Header Badge & Title */}
+            <div className="flex justify-between items-start border-b border-[#0A0D0B]/10 pb-4">
+              <div>
+                <span className="text-[10px] uppercase tracking-[0.2em] text-[#B35F27] font-mono font-bold block">
+                  Reserva Caribe &bull; Loom
+                </span>
+                <h2 className="text-2xl font-serif font-bold text-[#0A0D0B] mt-0.5">
+                  Lote {selectedLot.rawId}
+                </h2>
+              </div>
+              <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full border ${
+                selectedLot.statusRaw === "DISPONIBLE" || !selectedLot.statusRaw
+                  ? "bg-[#699385]/15 text-[#699385] border-[#699385]/30"
+                  : "bg-[#B35F27]/15 text-[#B35F27] border-[#B35F27]/30"
+              }`}>
+                {selectedLot.statusRaw || "DISPONIBLE"}
+              </span>
+            </div>
+
+            {/* Main Stats Grid */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-[#EDE7E0]/60 border border-[#0A0D0B]/10 rounded-xl p-3.5 flex flex-col">
+                <span className="text-[10px] uppercase tracking-wider text-[#0A0D0B]/60 font-medium">Área Total</span>
+                <span className="text-lg font-serif font-bold text-[#0A0D0B] mt-1">{selectedLot.area} m²</span>
+              </div>
+              <div className="bg-[#EDE7E0]/60 border border-[#0A0D0B]/10 rounded-xl p-3.5 flex flex-col">
+                <span className="text-[10px] uppercase tracking-wider text-[#0A0D0B]/60 font-medium">Ubicación</span>
+                <span className="text-sm font-semibold text-[#0A0D0B] mt-1 truncate">{selectedLot.location || `Etapa ${stageId}`}</span>
+              </div>
+            </div>
+
+            {/* Financial Breakdown Card */}
+            <div className="bg-[#0A0D0B] text-[#EDE7E0] rounded-xl p-4 sm:p-5 space-y-3 shadow-inner">
+              <div className="flex justify-between items-baseline border-b border-white/10 pb-2.5">
+                <span className="text-xs uppercase tracking-wider text-[#EBD9AB] font-mono">Valor Total Inversión</span>
+                <span className="text-xl font-serif font-bold text-[#EDE7E0]">{selectedLot.totalPrice}</span>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-2 text-xs pt-1">
+                <div>
+                  <span className="text-[9px] uppercase tracking-wider text-white/50 block">Cuota Inicial</span>
+                  <span className="font-semibold text-white/90">{selectedLot.downPayment}</span>
+                </div>
+                <div>
+                  <span className="text-[9px] uppercase tracking-wider text-white/50 block">Financiación</span>
+                  <span className="font-semibold text-white/90">{selectedLot.financing}</span>
+                </div>
+                <div>
+                  <span className="text-[9px] uppercase tracking-wider text-white/50 block">Contraentrega</span>
+                  <span className="font-semibold text-white/90">{selectedLot.finalPayment}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Villa Models Compatibility Banner */}
+            <div className="border border-[#B35F27]/20 bg-[#B35F27]/5 rounded-xl p-3.5 flex flex-col gap-2">
+              <span className="text-[10px] uppercase tracking-widest text-[#B35F27] font-bold flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#B35F27]" />
+                Modelos de Villa Arquitectónica Aprobados
+              </span>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="bg-white/80 p-2 rounded-lg border border-[#0A0D0B]/5">
+                  <strong className="block font-serif text-[#0A0D0B]">Luxury Residence</strong>
+                  <span className="text-[10px] text-[#0A0D0B]/60 font-mono">353.17 m² &bull; 3 Niveles</span>
+                </div>
+                <div className="bg-white/80 p-2 rounded-lg border border-[#0A0D0B]/5">
+                  <strong className="block font-serif text-[#0A0D0B]">Garden Edition</strong>
+                  <span className="text-[10px] text-[#0A0D0B]/60 font-mono">274.04 m² &bull; Jardín Biofílico</span>
+                </div>
+              </div>
+            </div>
+
           </div>
         </section>
 

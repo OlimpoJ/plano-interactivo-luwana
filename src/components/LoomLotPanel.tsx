@@ -53,7 +53,7 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
   const handleSeparateClick = () => {
     if (typeof window !== "undefined" && window.parent !== window) {
       window.parent.postMessage({
-        type: 'LOT_SELECTED',
+        type: 'LOT_SEPARATE_CLICKED',
         payload: {
           lotId: lot.id,
           price: lot.totalPrice
