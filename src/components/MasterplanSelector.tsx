@@ -9,7 +9,7 @@ const ZONES = [
   { id: "ZONA_3", label: "CLUB DE PLAYA Y AMENIDADES", img: "/LUWANA_3_thumb.jpg", imgMobile: "/LUWANA_3_thumb_vertical.jpg" },
 ];
 
-export default function MastterplanSelector({ onSelectZone }: { onSelectZone: (id: string) => void }) {
+export default function MasterplanSelector({ onSelectZone }: { onSelectZone: (id: string) => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredZone, setHoveredZone] = useState<string | null>(null);
   const [hoveredZoneId, setHoveredZoneId] = useState<string | null>(null);
@@ -24,10 +24,10 @@ export default function MastterplanSelector({ onSelectZone }: { onSelectZone: (i
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center py-6 sm:py-20 px-2 sm:px-8">
       
-      {/* Fondo difuminado (Usamos el mismo JPG del masterplan pero muy difuminado y oscuro) */}
+      {/* Fondo difuminado */}
       <div className="absolute inset-0 z-0 overflow-hidden bg-black">
         <img
-          src="/LUWANA_GENERAL.jpg"
+          src="/LUWANA_1_bg.jpg"
           alt="Background blur"
           className="w-full h-full object-cover opacity-20 blur-xl scale-110 pointer-events-none"
         />
@@ -57,7 +57,7 @@ export default function MastterplanSelector({ onSelectZone }: { onSelectZone: (i
             onMouseMove={handleMouseMove}
             className="relative w-full h-full rounded-xl sm:rounded-2xl overflow-hidden bg-black shadow-2xl border border-white/5"
           >
-            {/* 1. Fondo particionado con las 3 imágenes. Usamos el aspect ratio exacto combinado para que las costuras (seams) sean perfectas sin recortes ni distorsión. */}
+            {/* 1. Fondo particionado con las 3 imágenes */}
             <div className="flex flex-col landscape:flex-row w-full portrait:aspect-[3/16] landscape:aspect-[16/3] cursor-pointer">
               {ZONES.map((zone, index) => (
                 <div 

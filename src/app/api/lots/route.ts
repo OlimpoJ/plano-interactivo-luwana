@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
 
-export const dynamic = 'force-dynamic';
 export const revalidate = 10; // Auto-sincronización en tiempo real cada 10 segundos desde Google Sheets
 
 async function fetchGoogleSheetViaCsv(spreadsheetId: string): Promise<string[][] | null> {
@@ -12,7 +11,7 @@ async function fetchGoogleSheetViaCsv(spreadsheetId: string): Promise<string[][]
 
   for (const url of urls) {
     try {
-      const res = await fetch(url, { cache: 'no-store' });
+      const res = await fetch(url, { next: { revalidate: 10 } });
       if (res.ok) {
         const text = await res.text();
         const rows = parseCsvText(text);
@@ -78,7 +77,7 @@ export async function GET(request: Request) {
     const project = searchParams.get('project') || 'luwana';
 
     let spreadsheetId = '';
-    let targetSheetName = '';
+    const targetSheetName = '';
 
     if (project === 'loom') {
       spreadsheetId = (process.env.GOOGLE_SHEET_ID_LOOM || '1IDsSyLELPYdV6eZFTt6d0Q5C5iWl3bm1ukUgbE-rJoA').replace(/^"|"$/g, '');
@@ -110,7 +109,7 @@ export async function GET(request: Request) {
         }
         const response = await sheets.spreadsheets.values.get({
           spreadsheetId,
-          range: `${sheetName}!A1:Z500`,
+          range: `${sheetName}!A1:Z1000`,
         });
         rows = (response.data.values || []) as string[][];
       }
@@ -154,7 +153,7 @@ export async function GET(request: Request) {
     const lots = rows.slice(headerRowIdx + 1).filter(row => {
       return row[idColIdx] && row[idColIdx].trim() !== '' && !row[idColIdx].trim().toUpperCase().includes('LOTE');
     }).map(row => {
-      let rawId = row[idColIdx].trim();
+      const rawId = row[idColIdx].trim();
       let parsedId = rawId;
 
       if (project === 'loom') {
@@ -199,10 +198,11 @@ export async function GET(request: Request) {
       totalLots: lots.length,
       lots,
     });
-  } catch (error: any) {
-    console.error('API Error:', error);
+  } catch (error: unknown) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown API Error';
+    console.error('API Error:', errorMsg);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: errorMsg },
       { status: 500 }
     );
   }

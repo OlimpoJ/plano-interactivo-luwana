@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -10,12 +10,13 @@ interface ImageCarouselProps {
 }
 
 export default function ImageCarousel({ images, altText = "Image" }: ImageCarouselProps) {
+    const [prevImages, setPrevImages] = useState(images);
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    // Reset index if images change drastically
-    useEffect(() => {
+    if (prevImages !== images) {
+        setPrevImages(images);
         setCurrentIndex(0);
-    }, [images]);
+    }
 
     const handleNext = () => {
         setCurrentIndex((prev) => (prev + 1) % images.length);

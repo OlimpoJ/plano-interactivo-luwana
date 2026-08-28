@@ -21,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={`${playfair.variable} ${montserrat.variable}`} suppressHydrationWarning>
-      <body>
+      <body suppressHydrationWarning className="antialiased">
         <ClientScripts />
         {children}
         <LegalFooter />

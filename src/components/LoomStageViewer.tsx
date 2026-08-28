@@ -182,12 +182,43 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
   const [svgText, setSvgText] = useState<string>("");
   const [pins, setPins] = useState<ParsedPin[]>([]);
   const [hoveredPin, setHoveredPin] = useState<ParsedPin | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [activeFilters, setActiveFilters] = useState({
     available: true,
     reserved: true,
     blocked: true,
     sold: true,
   });
+
+  const hasAutoSelectedRef = useRef<boolean>(false);
+
+  // Deep linking: auto-seleccionar lote si viene en ?lot= en URL (solo una vez al cargar)
+  useEffect(() => {
+    if (typeof window !== "undefined" && pins.length > 0 && !hasAutoSelectedRef.current) {
+      const params = new URLSearchParams(window.location.search);
+      const lotParam = params.get("lot");
+      if (lotParam) {
+        const found = pins.find(
+          (p) =>
+            p.lotId.toUpperCase() === lotParam.toUpperCase() ||
+            p.lotData.rawId.toUpperCase() === lotParam.toUpperCase()
+        );
+        if (found) {
+          hasAutoSelectedRef.current = true;
+          onSelectLot(found.lotData);
+        }
+      }
+    }
+  }, [pins, onSelectLot]);
+
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    return pins.filter(
+      (p) =>
+        p.lotId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.lotData.rawId.toLowerCase().includes(searchQuery.toLowerCase())
+    ).slice(0, 5);
+  }, [searchQuery, pins]);
 
   const STAGE_CONFIGS: Record<string, { name: string; svgUrl: string; bgImage: string }> = {
     etapa_1: { name: "Etapa 1", svgUrl: "/loom/loom_stage_1.svg", bgImage: "/loom/loom_stage_1_bg.webp" },
@@ -238,8 +269,10 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
   // Cargar y procesar el SVG de la etapa
   useEffect(() => {
     if (!svgUrl) {
-      setSvgText("");
-      setPins([]);
+      queueMicrotask(() => {
+        setSvgText("");
+        setPins([]);
+      });
       return;
     }
 
@@ -349,7 +382,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                     rawId: "Portería",
                     area: "Área Común",
                     location: "Acceso Principal 24/7",
-                    status: "common" as any,
+                    status: "common",
                     statusRaw: "AMENIDAD",
                     totalPrice: "Área Común",
                     downPayment: "-",
@@ -363,7 +396,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                     rawId: `Parque ${pNum}`,
                     area: "686 m²",
                     location: "Zona Verde & Senderos",
-                    status: "common" as any,
+                    status: "common",
                     statusRaw: "AMENIDAD",
                     totalPrice: "Área Común",
                     downPayment: "-",
@@ -376,7 +409,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
                     rawId: "Club House",
                     area: "Área Social",
                     location: "Zona de Piscinas, Canchas & Beach Club",
-                    status: "common" as any,
+                    status: "common",
                     statusRaw: "AMENIDAD",
                     totalPrice: "Área Común",
                     downPayment: "-",
@@ -625,7 +658,7 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
           lotId === "PARQUE_2" ||
           lotId.includes("PARQUE") ||
           lotId.includes("PORTERIA") ||
-          status === ("common" as any);
+          status === "common";
 
         const isFilteredOut =
           !isAmenity &&
@@ -748,8 +781,8 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
         <div className="absolute inset-0 bg-gradient-to-tr from-[#EDE7E0]/80 via-[#F5F1EC]/60 to-[#EDE7E0]/80 pointer-events-none" />
       </div>
 
-      {/* Botón Flotante Master Plan (Sobre la imagen, desplazado para no colisionar con el menú) */}
-      <div className="absolute top-4 left-16 sm:left-18 z-30 pointer-events-auto">
+      {/* Barra Superior Flotante de Controles (Master Plan + Búsqueda Rápida de Lotes) */}
+      <div className="absolute top-4 left-16 sm:left-18 z-30 flex items-center gap-2 pointer-events-auto">
         <button 
           onClick={onBack}
           className="flex items-center justify-center gap-1.5 px-3.5 py-1.5 bg-[#B35F27] hover:bg-[#964d1d] active:scale-95 border border-[#B35F27] rounded-full text-[9px] uppercase tracking-wider text-[#EDE7E0] font-bold backdrop-blur-md transition-all duration-300 shadow-md cursor-pointer"
@@ -760,11 +793,55 @@ export default function LoomStageViewer({ stageId, lots, selectedLot, onSelectLo
           </svg>
           <span className="hidden sm:inline">Master Plan</span>
         </button>
+
+        {/* Buscador Rápido de Lote */}
+        {!isAmenities && (
+          <div className="relative">
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-white/90 border border-[#0A0D0B]/15 rounded-full shadow-md backdrop-blur-md">
+              <svg className="w-3 h-3 text-[#B35F27]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Buscar lote (ej: B-22)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bg-transparent text-[10px] text-[#0A0D0B] placeholder-[#0A0D0B]/40 focus:outline-none w-24 sm:w-36 font-semibold"
+              />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery("")} className="text-[#0A0D0B]/40 hover:text-[#0A0D0B] text-xs">
+                  &times;
+                </button>
+              )}
+            </div>
+
+            {/* Resultados de Búsqueda */}
+            {searchResults.length > 0 && (
+              <div className="absolute top-full left-0 mt-1.5 w-48 bg-[#EDE7E0] border border-[#B35F27]/30 rounded-xl p-1.5 shadow-2xl backdrop-blur-xl z-50 space-y-1">
+                {searchResults.map((pin) => (
+                  <button
+                    key={pin.lotId}
+                    onClick={() => {
+                      onSelectLot(pin.lotData);
+                      setSearchQuery("");
+                    }}
+                    className="w-full flex items-center justify-between p-1.5 rounded-lg hover:bg-white text-left transition-colors text-[11px]"
+                  >
+                    <span className="font-serif font-bold text-[#0A0D0B]">{pin.lotId}</span>
+                    <span className="text-[8px] uppercase font-bold text-[#B35F27] bg-[#B35F27]/10 px-1.5 py-0.5 rounded">
+                      {pin.lotData.statusRaw || pin.lotData.status}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Panel de Filtros / Resumen de Amenidades Flotante */}
       {isAmenities && (
-        <div className="absolute top-4 right-4 z-30 pointer-events-auto bg-[#699385]/20 border border-[#699385]/40 px-3 py-1.5 rounded-full text-[9px] font-semibold text-[#699385] tracking-widest uppercase backdrop-blur-md flex items-center gap-2 shadow-md">
+        <div className="absolute top-4 right-16 z-30 pointer-events-auto bg-[#699385]/20 border border-[#699385]/40 px-3 py-1.5 rounded-full text-[9px] font-semibold text-[#699385] tracking-widest uppercase backdrop-blur-md flex items-center gap-2 shadow-md">
           <span className="h-1.5 w-1.5 rounded-full bg-[#699385] animate-pulse"></span>
           Amenidades: 7
         </div>

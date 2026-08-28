@@ -113,12 +113,18 @@ export default function OrbitViewer360({ lots, selectedLot, onSelectLot }: Orbit
         if (!isDragging) return;
         setIsDragging(false);
         const dx = e.clientX - dragStartX.current;
-        if (Math.abs(dx) > 50) dx < 0 ? next() : prev();
+        if (Math.abs(dx) > 50) {
+            if (dx < 0) next();
+            else prev();
+        }
     };
     const handleTouchStart = (e: React.TouchEvent) => { dragStartX.current = e.touches[0].clientX; };
     const handleTouchEnd = (e: React.TouchEvent) => {
         const dx = e.changedTouches[0].clientX - dragStartX.current;
-        if (Math.abs(dx) > 40) dx < 0 ? next() : prev();
+        if (Math.abs(dx) > 40) {
+            if (dx < 0) next();
+            else prev();
+        }
     };
 
     // Compute parallax direction offset for entering image (very subtle)

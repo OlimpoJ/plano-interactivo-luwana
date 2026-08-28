@@ -146,7 +146,7 @@ export default function LoomLocationModal({ isOpen, onClose }: LoomLocationModal
           {/* Footer */}
           <div className="px-5 py-4 sm:px-8 border-t border-[#0A0D0B]/10 bg-[#EDE7E0] flex justify-between items-center">
             <span className="text-[10px] text-[#0A0D0B]/50 uppercase tracking-widest hidden sm:inline">
-              Coordenadas: 10°31'07.0"N 75°29'06.4"W
+              {"Coordenadas: 10°31'07.0\"N 75°29'06.4\"W"}
             </span>
             <button
               onClick={onClose}

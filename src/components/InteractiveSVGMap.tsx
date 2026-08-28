@@ -116,8 +116,10 @@ export default function InteractiveSVGMap({ svgUrl, bgImage, lots, selectedLot, 
             }
 
             const svgShape = shape as SVGElement;
-            const safeStatus = (['available', 'reserved', 'sold', 'common'] as const).includes(status as any)
-                ? (status as 'available' | 'reserved' | 'sold' | 'common')
+            const allowedStatuses = ['available', 'reserved', 'sold', 'common'] as const;
+            type AllowedStatus = (typeof allowedStatuses)[number];
+            const safeStatus: AllowedStatus = (allowedStatuses as readonly string[]).includes(status)
+                ? (status as AllowedStatus)
                 : 'sold';
             
             // Apply styles with !important to override any SVG-level CSS classes or inline styles

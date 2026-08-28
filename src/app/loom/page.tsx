@@ -67,12 +67,30 @@ export default function LoomShowroom() {
     available: 300
   });
 
-  // Check embed parameter from URL
+  // Check embed & deep linking parameters from URL
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      if (params.get("embed") === "true" || params.get("view") === "map") {
-        setView("map");
+      const stageParam = params.get("stage");
+      const lotParam = params.get("lot");
+      
+      if (stageParam) {
+        let normalizedStage = stageParam.toLowerCase();
+        if (!normalizedStage.startsWith("etapa_")) {
+          normalizedStage = `etapa_${normalizedStage}`;
+        }
+        queueMicrotask(() => {
+          setSelectedStage(normalizedStage);
+          setView("stage");
+        });
+      } else if (lotParam) {
+        queueMicrotask(() => {
+          setView("stage");
+        });
+      } else if (params.get("embed") === "true" || params.get("view") === "map") {
+        queueMicrotask(() => {
+          setView("map");
+        });
       }
     }
   }, []);
@@ -123,7 +141,13 @@ export default function LoomShowroom() {
         sessionStorage.setItem("loom_ref", ref.toLowerCase());
         setReferrer(ref.toLowerCase());
       } else {
-        setReferrer(sessionStorage.getItem("loom_ref"));
+        const stored = sessionStorage.getItem("loom_ref");
+        if (stored) {
+          setReferrer(stored);
+        } else if (window.location.hostname.includes("patrimofy.com")) {
+          sessionStorage.setItem("loom_ref", "patrimofy");
+          setReferrer("patrimofy");
+        }
       }
     }
   }, []);
@@ -138,8 +162,8 @@ export default function LoomShowroom() {
         if (data.success && data.lots) {
           setLots(data.lots);
           const total = data.lots.length;
-          const available = data.lots.filter((l: any) => l.status === 'available').length;
-          const sold = data.lots.filter((l: any) => l.status === 'sold').length;
+          const available = data.lots.filter((l: { status: string }) => l.status === 'available').length;
+          const sold = data.lots.filter((l: { status: string }) => l.status === 'sold').length;
 
           setStats({
             total: total > 0 ? total : 326,
@@ -155,7 +179,28 @@ export default function LoomShowroom() {
   }, []);
 
   const handleOpenContact = () => {
-    setIsReferralModalOpen(true);
+    const currentRef = typeof window !== "undefined"
+      ? sessionStorage.getItem("loom_ref") || (window.location.hostname.includes("patrimofy.com") ? "patrimofy" : referrer)
+      : referrer;
+
+    if (currentRef === "patrimofy" || (typeof window !== "undefined" && window.location.hostname.includes("patrimofy.com") && currentRef !== "chichaus")) {
+      window.open("https://www.patrimofy.com/es/loom#contacto", "_blank");
+    } else if (currentRef === "chichaus") {
+      window.open("https://www.loomalmabeach.com/#contacto", "_blank");
+    } else {
+      setIsReferralModalOpen(true);
+    }
+  };
+
+  const handleCloseLotPanel = () => {
+    setSelectedLot(null);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (url.searchParams.has("lot")) {
+        url.searchParams.delete("lot");
+        window.history.replaceState({}, "", url.pathname + (url.search ? url.search : ""));
+      }
+    }
   };
 
   const handleNavigateToShowroom = () => {
@@ -269,7 +314,7 @@ export default function LoomShowroom() {
             {selectedLot && (
               <LoomLotPanel
                 lot={selectedLot}
-                onClose={() => setSelectedLot(null)}
+                onClose={handleCloseLotPanel}
                 onEnterShowroom={(lot) => setView("showroom")}
               />
             )}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { MapPin, Compass, ArrowLeft } from "lucide-react";
-import MastterplanSelector from "@/components/MastterplanSelector";
+import MasterplanSelector from "@/components/MasterplanSelector";
 import StageView from "@/components/StageView";
 import styles from "../Hero.module.css";
 import { getMediaUrl } from "@/utils/media";
@@ -55,7 +55,7 @@ export default function LuwanaPage() {
         
         if (data.success && data.lots) {
           const total = data.lots.length;
-          const available = data.lots.filter((l: any) => l.status === 'available').length;
+          const available = data.lots.filter((l: { status: string }) => l.status === 'available').length;
           const sold = total - available;
 
           setStats({
@@ -74,8 +74,23 @@ export default function LuwanaPage() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      if (params.get('embed') === 'true') {
-        setView("map");
+      const ref = params.get('ref');
+      if (ref) {
+        sessionStorage.setItem("luwana_ref", ref.toLowerCase());
+      } else if (window.location.hostname.includes("patrimofy.com")) {
+        sessionStorage.setItem("luwana_ref", "patrimofy");
+      }
+
+      const stageParam = params.get('stage');
+      if (stageParam) {
+        queueMicrotask(() => {
+          setSelectedStage(stageParam);
+          setView("stage");
+        });
+      } else if (params.get('embed') === 'true' || params.get('view') === 'map') {
+        queueMicrotask(() => {
+          setView("map");
+        });
       }
     }
   }, []);
@@ -91,7 +106,7 @@ export default function LuwanaPage() {
 
   if (view === "map") {
     return (
-      <MastterplanSelector 
+      <MasterplanSelector 
         onSelectZone={(zoneId) => {
           setSelectedStage(zoneId);
           setView("stage");
@@ -142,7 +157,7 @@ export default function LuwanaPage() {
               <button 
                 onClick={() => setView("map")}
                 className={styles.primaryBtn}
-                style={{ backgroundColor: "#CBAA85", color: "#000" }}
+                style={{ backgroundColor: "#A58E74", color: "#EFE9E1" }}
               >
                 <Compass size={16} />
                 Ingresa al Plano Interactivo Luwana
@@ -180,7 +195,7 @@ export default function LuwanaPage() {
               </div>
             </div>
             <div className={styles.locationSmall}>
-              <MapPin size={16} color="#CBAA85" /> Zona Norte, Cartagena
+              <MapPin size={16} color="#A58E74" /> Zona Norte, Cartagena
             </div>
           </div>
         </div>

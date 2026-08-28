@@ -82,7 +82,7 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
     available: number;
     active: boolean;
   } | null>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0, isRightHalf: false });
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Estadísticas globales de las etapas calculadas dinámicamente desde el Sheet
@@ -137,9 +137,12 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
     setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x,
+      y,
+      isRightHalf: x > rect.width / 2,
     });
   };
 
@@ -388,9 +391,12 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
                           const touch = e.touches[0];
                           if (touch && containerRef.current) {
                             const rect = containerRef.current.getBoundingClientRect();
+                            const touchX = touch.clientX - rect.left;
+                            const touchY = touch.clientY - rect.top;
                             setMousePos({
-                              x: touch.clientX - rect.left,
-                              y: touch.clientY - rect.top,
+                              x: touchX,
+                              y: touchY,
+                              isRightHalf: touchX > rect.width / 2,
                             });
                           }
                           if (stats) {
@@ -420,9 +426,7 @@ export default function LoomMasterplanSelector({ lots, onSelectStage, onBack }: 
                   exit={{ opacity: 0, scale: 0.95, y: 15 }}
                   className="absolute z-40 pointer-events-none p-3.5 rounded-lg border bg-[#0c1524]/90 border-[#dbaa67]/40 shadow-2xl backdrop-blur-md min-w-[200px]"
                   style={{
-                    left: containerRef.current && mousePos.x > containerRef.current.getBoundingClientRect().width / 2
-                      ? mousePos.x - 220
-                      : mousePos.x + 20,
+                    left: mousePos.isRightHalf ? mousePos.x - 220 : mousePos.x + 20,
                     top: mousePos.y - 40,
                   }}
                 >

@@ -7,6 +7,22 @@ import { Compass, MapPin, Sparkles, ArrowRight, ShieldCheck, Waves, Building2 } 
 export default function RootShowroomPage() {
   const [luwanaStats, setLuwanaStats] = useState({ available: 21, total: 122 });
   const [loomStats, setLoomStats] = useState({ available: 278, total: 326 });
+  const [isPatrimofy, setIsPatrimofy] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get("ref");
+      if (ref === "patrimofy" || window.location.hostname.includes("patrimofy.com")) {
+        setIsPatrimofy(true);
+        sessionStorage.setItem("loom_ref", "patrimofy");
+        sessionStorage.setItem("luwana_ref", "patrimofy");
+      } else if (ref === "chichaus") {
+        sessionStorage.setItem("loom_ref", "chichaus");
+        sessionStorage.setItem("luwana_ref", "chichaus");
+      }
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchStats() {
@@ -17,12 +33,12 @@ export default function RootShowroomPage() {
         ]);
 
         if (resLuwana?.success && resLuwana.lots) {
-          const avail = resLuwana.lots.filter((l: any) => l.status === 'available').length;
+          const avail = resLuwana.lots.filter((l: { status: string }) => l.status === 'available').length;
           setLuwanaStats({ available: avail, total: resLuwana.lots.length || 122 });
         }
 
         if (resLoom?.success && resLoom.lots) {
-          const avail = resLoom.lots.filter((l: any) => l.status === 'available').length;
+          const avail = resLoom.lots.filter((l: { status: string }) => l.status === 'available').length;
           setLoomStats({ available: avail, total: resLoom.lots.length || 326 });
         }
       } catch (e) {
@@ -51,7 +67,7 @@ export default function RootShowroomPage() {
           </div>
           <div>
             <span className="text-[10px] uppercase tracking-[0.25em] text-[#CBAA85] font-bold block">
-              Patrimofy &amp; Chichaus
+              {isPatrimofy ? "Comercializador Oficial: Patrimofy" : "Patrimofy & Chichaus"}
             </span>
             <span className="text-sm font-serif font-semibold text-white tracking-wide">
               Showroom Inmobiliario de Lujo
@@ -126,7 +142,7 @@ export default function RootShowroomPage() {
             {/* Pie de tarjeta con Botón */}
             <div className="p-6 sm:p-8 pt-0">
               <Link
-                href="/luwana"
+                href={isPatrimofy ? "/luwana?ref=patrimofy" : "/luwana"}
                 className="w-full py-3.5 px-6 bg-[#CBAA85] hover:bg-[#b8956e] text-black font-bold uppercase tracking-widest text-xs rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-[#CBAA85]/20 group-hover:scale-[1.02] cursor-pointer"
               >
                 <span>Explorar Luwana</span>
@@ -178,7 +194,7 @@ export default function RootShowroomPage() {
             {/* Pie de tarjeta con Botón */}
             <div className="p-6 sm:p-8 pt-0">
               <Link
-                href="/loom"
+                href={isPatrimofy ? "/loom?ref=patrimofy" : "/loom"}
                 className="w-full py-3.5 px-6 bg-[#B35F27] hover:bg-[#964d1d] text-white font-bold uppercase tracking-widest text-xs rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-[#B35F27]/25 group-hover:scale-[1.02] cursor-pointer"
               >
                 <span>Explorar Loom</span>
@@ -194,7 +210,7 @@ export default function RootShowroomPage() {
 
       {/* Footer */}
       <footer className="relative z-10 w-full max-w-7xl mx-auto px-6 py-6 border-t border-white/10 text-center text-xs text-white/40 flex flex-col sm:flex-row justify-between items-center gap-2">
-        <p>&copy; {new Date().getFullYear()} Patrimofy &amp; Chichaus &bull; Showroom Inmobiliario de Lujo</p>
+        <p>&copy; {new Date().getFullYear()} {isPatrimofy ? "Patrimofy Real Estate" : "Patrimofy & Chichaus"} &bull; Showroom Inmobiliario de Lujo</p>
         <p className="text-[10px] uppercase tracking-wider text-white/30">Cartagena de Indias, Colombia</p>
       </footer>
 

@@ -19,6 +19,7 @@ import {
   Sparkles
 } from "lucide-react";
 import LoomLotZoomCanvas from "./LoomLotZoomCanvas";
+import LoomReferralModal from "./LoomReferralModal";
 
 interface Lot {
   id: string;
@@ -58,12 +59,28 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
   // Lightbox a pantalla completa real
   const [lightboxOpen, setLightboxOpen] = useState<boolean>(false);
 
+  // Modal de selección de inmobiliaria / asesoría comercial
+  const [showReferralModal, setShowReferralModal] = useState<boolean>(false);
+
   // Referidor para atribución
   const [referrer, setReferrer] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setReferrer(sessionStorage.getItem("loom_ref"));
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get("ref");
+      if (ref) {
+        sessionStorage.setItem("loom_ref", ref.toLowerCase());
+        setReferrer(ref.toLowerCase());
+      } else {
+        const stored = sessionStorage.getItem("loom_ref");
+        if (stored) {
+          setReferrer(stored);
+        } else if (window.location.hostname.includes("patrimofy.com")) {
+          sessionStorage.setItem("loom_ref", "patrimofy");
+          setReferrer("patrimofy");
+        }
+      }
     }
   }, []);
 
@@ -358,19 +375,23 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
       window.parent.postMessage({
         type: 'LOT_SEPARATE_CLICKED',
         payload: {
-          lotId: selectedLot.id,
+          lotId: selectedLot.rawId || selectedLot.id,
           price: selectedLot.totalPrice
         }
       }, '*');
       return;
     }
 
-    if (referrer === "patrimofy") {
-      window.location.href = "https://www.patrimofy.com/es/loom#contacto";
-    } else if (referrer === "chichaus") {
-      window.open("https://www.loomalmabeach.com/contacto/", "_blank");
+    const currentRef = typeof window !== "undefined" 
+      ? sessionStorage.getItem("loom_ref") || (window.location.hostname.includes("patrimofy.com") ? "patrimofy" : referrer) 
+      : referrer;
+
+    if (currentRef === "patrimofy" || (typeof window !== "undefined" && window.location.hostname.includes("patrimofy.com") && currentRef !== "chichaus")) {
+      window.open("https://www.patrimofy.com/es/loom#contacto", "_blank");
+    } else if (currentRef === "chichaus") {
+      window.open("https://www.loomalmabeach.com/#contacto", "_blank");
     } else {
-      window.location.href = "https://www.patrimofy.com/es/loom#contacto";
+      setShowReferralModal(true);
     }
   };
 
@@ -644,19 +665,21 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
             </span>
 
             <div className="grid grid-cols-1 gap-1.5 2xl:gap-3">
-              {[
-                { id: "gallery", label: "1. Galería de Fotos (15 Renders)", icon: ImageIcon, count: 15 },
-                { id: "axonometric", label: "2. Axonometrías 3D (2 Renders)", icon: Layers, count: 2 },
-                { id: "plans", label: "3. Plantas Arquitectónicas (4 Niveles)", icon: Building2, count: 4 },
-                { id: "elevations", label: "4. Alzados & Cortes (4 Planos)", icon: Compass, count: 4 },
-                { id: "tour360", label: "5. Recorrido 360° (5 Escenarios)", icon: Eye, count: 5 },
-              ].map((tab) => {
+              {(
+                [
+                  { id: "gallery" as const, label: "1. Galería Renderizada (15 Renders)", icon: ImageIcon, count: 15 },
+                  { id: "axonometric" as const, label: "2. Vista Axonométrica (1 Isométrica)", icon: Layers, count: 1 },
+                  { id: "plans" as const, label: "3. Plantas Arquitectónicas (4 Niveles)", icon: Building2, count: 4 },
+                  { id: "elevations" as const, label: "4. Alzados & Cortes (4 Planos)", icon: Compass, count: 4 },
+                  { id: "tour360" as const, label: "5. Recorrido 360° (5 Escenarios)", icon: Eye, count: 5 },
+                ]
+              ).map((tab) => {
                 const IconComponent = tab.icon;
                 const isActive = activeTab === tab.id;
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => handleTabChange(tab.id as any)}
+                    onClick={() => handleTabChange(tab.id)}
                     className={`w-full flex items-center justify-between px-3.5 py-2.5 2xl:px-6 2xl:py-4 rounded-xl text-xs 2xl:text-base min-[2500px]:text-lg font-semibold uppercase tracking-wider transition-all duration-300 cursor-pointer text-left ${
                       isActive
                         ? "bg-[#B35F27] text-[#EDE7E0] shadow-md shadow-[#B35F27]/20"
@@ -837,6 +860,13 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Modal de Selección de Inmobiliaria / Asesoría Comercial */}
+      <LoomReferralModal
+        isOpen={showReferralModal}
+        onClose={() => setShowReferralModal(false)}
+        lotRawId={selectedLot.rawId}
+      />
 
     </div>
   );
