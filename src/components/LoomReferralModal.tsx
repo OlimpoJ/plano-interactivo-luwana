@@ -44,7 +44,7 @@ export default function LoomReferralModal({ isOpen, onClose, lotRawId }: LoomRef
           <div className="space-y-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#B35F27]/10 border border-[#B35F27]/30 text-[#B35F27] text-[10px] font-bold uppercase tracking-widest rounded-full">
               <ShieldCheck className="h-3.5 w-3.5" />
-              <span>Canales Autorizados</span>
+              <span>Únicas Firmas Comercializadoras</span>
             </div>
             <h3 className="text-xl sm:text-2xl font-serif text-[#0A0D0B] font-bold">
               Selecciona tu Firma Asesora
@@ -52,11 +52,11 @@ export default function LoomReferralModal({ isOpen, onClose, lotRawId }: LoomRef
             <p className="text-xs text-[#0A0D0B]/75 leading-relaxed font-sans">
               {lotRawId ? (
                 <>
-                  Para brindarte asesoría personalizada y directa en la separación del <strong>Lote {lotRawId}</strong>, por favor elige una de las 2 firmas autorizadas:
+                  Para brindarte asesoría personalizada y directa en la separación del <strong>Lote {lotRawId}</strong>, por favor elige una de nuestras 2 únicas firmas comercializadoras autorizadas:
                 </>
               ) : (
                 <>
-                  Para brindarte atención inmediata sobre el proyecto <strong>LOOM Luxury Residence Cartagena</strong>, elige tu firma de preferencia entre los 2 canales autorizados:
+                  Para brindarte atención inmediata sobre el proyecto <strong>LOOM Luxury Residence Cartagena</strong>, elige tu firma de preferencia entre nuestras 2 únicas firmas comercializadoras autorizadas:
                 </>
               )}
             </p>
@@ -84,7 +84,7 @@ export default function LoomReferralModal({ isOpen, onClose, lotRawId }: LoomRef
 
           <div className="pt-2 border-t border-[#0A0D0B]/10 flex items-center justify-center gap-1.5 text-[9px] text-[#0A0D0B]/60 uppercase tracking-wider font-semibold">
             <ShieldCheck className="h-3 w-3 text-[#B35F27]" />
-            <span>Patrimofy &amp; Chichaus &bull; Canales autorizados de comercialización</span>
+            <span>Patrimofy &amp; Chichaus &bull; Únicas firmas comercializadoras autorizadas</span>
           </div>
         </motion.div>
       </div>

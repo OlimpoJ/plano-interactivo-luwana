@@ -44,7 +44,7 @@ export default function LuwanaReferralModal({ isOpen, onClose, lotRawId }: Luwan
           <div className="space-y-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#A58E74]/15 border border-[#A58E74]/30 text-[#A58E74] text-[10px] font-bold uppercase tracking-widest rounded-full">
               <ShieldCheck className="h-3.5 w-3.5" />
-              <span>Canales Autorizados</span>
+              <span>Únicas Firmas Comercializadoras</span>
             </div>
             <h3 className="text-xl sm:text-2xl font-serif text-[#152A2D] font-bold">
               Selecciona tu Firma Asesora
@@ -52,11 +52,11 @@ export default function LuwanaReferralModal({ isOpen, onClose, lotRawId }: Luwan
             <p className="text-xs text-[#152A2D]/75 leading-relaxed font-sans">
               {lotRawId ? (
                 <>
-                  Para brindarte asesoría personalizada y directa en la separación del <strong>Lote {lotRawId}</strong>, por favor elige una de las 2 firmas autorizadas:
+                  Para brindarte asesoría personalizada y directa en la separación del <strong>Lote {lotRawId}</strong>, por favor elige una de nuestras 2 únicas firmas comercializadoras autorizadas:
                 </>
               ) : (
                 <>
-                  Para brindarte atención inmediata sobre el proyecto <strong>Luwana Beach Residence Cartagena</strong>, elige tu firma de preferencia entre los 2 canales autorizados:
+                  Para brindarte atención inmediata sobre el proyecto <strong>Luwana Beach Residence Cartagena</strong>, elige tu firma de preferencia entre nuestras 2 únicas firmas comercializadoras autorizadas:
                 </>
               )}
             </p>
@@ -84,7 +84,7 @@ export default function LuwanaReferralModal({ isOpen, onClose, lotRawId }: Luwan
 
           <div className="pt-2 border-t border-[#152A2D]/10 flex items-center justify-center gap-1.5 text-[9px] text-[#152A2D]/60 uppercase tracking-wider font-semibold">
             <ShieldCheck className="h-3 w-3 text-[#A58E74]" />
-            <span>Patrimofy &amp; Chichaus &bull; Canales autorizados de comercialización</span>
+            <span>Patrimofy &amp; Chichaus &bull; Únicas firmas comercializadoras autorizadas</span>
           </div>
         </motion.div>
       </div>
