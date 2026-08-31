@@ -1,7 +1,22 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { X, CheckCircle, AlertCircle, Phone, Layout, Calculator } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  X, 
+  CheckCircle, 
+  AlertCircle, 
+  Phone, 
+  Layout, 
+  Calculator, 
+  Ruler, 
+  Maximize2, 
+  ZoomIn, 
+  ZoomOut, 
+  RotateCcw, 
+  Info,
+  Layers,
+  Sparkles
+} from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import LoomReferralModal from "./LoomReferralModal";
 
@@ -31,6 +46,11 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
   const [downPaymentPct, setDownPaymentPct] = useState<number>(20);
   const [financingMonths, setFinancingMonths] = useState<number>(36);
 
+  // Lightbox Modal para el plano arquitectónico en alta resolución
+  const [isPlanLightboxOpen, setIsPlanLightboxOpen] = useState(false);
+  const [lightboxZoom, setLightboxZoom] = useState<number>(1);
+  const [imgLoadError, setImgLoadError] = useState<boolean>(false);
+
   const [referrer, setReferrer] = useState<string | null>(null);
 
   useEffect(() => {
@@ -50,6 +70,23 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
         }
       }
     }
+  }, []);
+
+  // Reset zoom y error cuando cambia el lote
+  useEffect(() => {
+    setLightboxZoom(1);
+    setImgLoadError(false);
+  }, [lot?.id]);
+
+  // Manejador tecla Escape para cerrar Lightbox
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsPlanLightboxOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   // Notificar iframe parent si aplica
@@ -86,6 +123,32 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
     };
   }, [parsedPriceNum, downPaymentPct, financingMonths]);
 
+  // Desglose de Manzana y Número de Lote
+  const lotDetails = useMemo(() => {
+    if (!lot) return { block: "", number: "", isAmenity: true, imageSrc: "" };
+    const isAmenity = lot.status === "common" || 
+                      lot.statusRaw === "AMENIDAD" || 
+                      lot.id?.includes("PARQUE") || 
+                      lot.id?.includes("PORTERIA") || 
+                      lot.id?.includes("CLUB");
+
+    const identifier = lot.rawId || lot.id || "";
+    const match = identifier.match(/([A-Za-z])-?(\d+)/);
+    let block = "";
+    let number = "";
+    let imageSrc = "";
+
+    if (match) {
+      block = match[1].toUpperCase();
+      number = match[2].padStart(2, '0');
+      imageSrc = `/loom/lots/${block}-${number}.webp`;
+    } else {
+      imageSrc = `/loom/lots/${identifier}.webp`;
+    }
+
+    return { block, number, isAmenity, imageSrc };
+  }, [lot]);
+
   if (!lot) return null;
 
   // Lógica del botón de separar lote (atribución)
@@ -115,7 +178,7 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
   };
 
   const getStatusBadge = (status: string) => {
-    if (status === "common" || lot.statusRaw === "AMENIDAD" || lot.id?.includes("PARQUE") || lot.id?.includes("PORTERIA")) {
+    if (lotDetails.isAmenity) {
       return (
         <div className="flex items-center gap-1 bg-[#B35F27]/15 text-[#B35F27] border border-[#B35F27]/40 px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider">
           <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
@@ -171,9 +234,7 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
             <div>
               <span className="text-[8px] sm:text-[10px] uppercase tracking-[0.2em] text-[#B35F27] font-bold block">LOOM Luxury Residence</span>
               <h2 className="text-lg sm:text-2xl font-serif text-[#0A0D0B] font-bold tracking-wide mt-0.5">
-                {lot.status === "common" || lot.statusRaw === "AMENIDAD" || lot.id?.includes("PARQUE") || lot.id?.includes("PORTERIA") 
-                  ? lot.rawId 
-                  : `Lote ${lot.rawId}`}
+                {lotDetails.isAmenity ? lot.rawId : `Lote ${lot.rawId}`}
               </h2>
             </div>
             <div>
@@ -183,6 +244,7 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
           <button
             onClick={onClose}
             className="p-1.5 hover:bg-black/5 border border-[#0A0D0B]/10 hover:border-[#0A0D0B]/20 rounded-full transition-all duration-300 group cursor-pointer"
+            title="Cerrar detalles del lote"
           >
             <X className="h-4 w-4 sm:h-5 sm:w-5 text-[#0A0D0B]/70 group-hover:text-[#0A0D0B]" />
           </button>
@@ -201,12 +263,93 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
             </div>
             <div className="pl-2">
               <span className="text-[8px] sm:text-[9px] uppercase tracking-widest text-[#0A0D0B]/50 block font-bold">Tipología</span>
-              <span className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#0A0D0B] mt-0.5 block">{lot.location || "MEDIANERO"}</span>
+              <span className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#0A0D0B] mt-0.5 block">
+                {lot.location || "MEDIANERO"}
+              </span>
             </div>
           </div>
 
+          {/* ============================================================ */}
+          {/* 📐 SECCIÓN: PLANO ARQUITECTÓNICO & MEDIDAS INDIVIDUALES      */}
+          {/* ============================================================ */}
+          {!lotDetails.isAmenity && !imgLoadError && (
+            <div className="bg-white/90 border border-[#B35F27]/25 rounded-2xl p-3 sm:p-4 shadow-sm space-y-2.5">
+              {/* Header de la tarjeta */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-[#B35F27]">
+                  <Ruler className="h-4 w-4" />
+                  <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#0A0D0B]">
+                    Plano & Medidas del Lote
+                  </span>
+                </div>
+                {lotDetails.block && (
+                  <span className="text-[9px] font-mono font-bold uppercase tracking-wider bg-[#B35F27]/10 text-[#B35F27] border border-[#B35F27]/20 px-2 py-0.5 rounded-md">
+                    Mz {lotDetails.block} &bull; Lote {lotDetails.number}
+                  </span>
+                )}
+              </div>
+
+              {/* Contenedor Interactivo de la Imagen del Lote */}
+              <div 
+                onClick={() => setIsPlanLightboxOpen(true)}
+                className="relative w-full aspect-square bg-[#0A0D0B]/[0.03] rounded-xl overflow-hidden border border-[#0A0D0B]/10 cursor-pointer group shadow-inner flex items-center justify-center transition-all duration-300 hover:border-[#B35F27]/50"
+              >
+                <img
+                  src={lotDetails.imageSrc}
+                  alt={`Plano y medidas del Lote ${lot.rawId || lot.id}`}
+                  className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
+                  onError={() => setImgLoadError(true)}
+                />
+
+                {/* Overlay flotante al pasar el cursor */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-between p-2.5">
+                  <span className="text-white text-[10px] font-semibold flex items-center gap-1.5 backdrop-blur-md bg-black/50 px-2.5 py-1 rounded-full border border-white/20">
+                    <Maximize2 className="h-3 w-3 text-[#EBD9AB]" />
+                    Ampliar medidas (HD)
+                  </span>
+                  <span className="text-[9px] text-[#EBD9AB] font-mono font-bold bg-[#B35F27]/80 px-2 py-0.5 rounded">
+                    1080p
+                  </span>
+                </div>
+
+                {/* Botón de lupa permanente en esquina */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsPlanLightboxOpen(true);
+                  }}
+                  className="absolute top-2 right-2 p-1.5 rounded-full bg-white/90 text-[#0A0D0B] shadow-md border border-[#0A0D0B]/10 hover:bg-[#B35F27] hover:text-white transition-colors duration-200"
+                  title="Ver en pantalla completa"
+                >
+                  <ZoomIn className="h-3.5 w-3.5" />
+                </button>
+              </div>
+
+              {/* Parámetros dimensionales y nota de cotas */}
+              <div className="grid grid-cols-2 gap-2 text-[10px] sm:text-[11px] pt-0.5">
+                <div className="bg-[#EDE7E0]/60 p-2 rounded-lg border border-[#0A0D0B]/5">
+                  <span className="text-[8px] uppercase tracking-wider text-[#0A0D0B]/50 font-bold block">Área Registrada</span>
+                  <span className="font-serif font-bold text-[#0A0D0B] text-xs block mt-0.5">
+                    {lot.area.includes("m²") ? lot.area : `${lot.area} m²`}
+                  </span>
+                </div>
+                <div className="bg-[#EDE7E0]/60 p-2 rounded-lg border border-[#0A0D0B]/5">
+                  <span className="text-[8px] uppercase tracking-wider text-[#0A0D0B]/50 font-bold block">Tipología</span>
+                  <span className="font-semibold text-[#0A0D0B] text-xs capitalize truncate block mt-0.5">
+                    {lot.location || "Medianero"}
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-[9px] text-[#0A0D0B]/60 leading-tight italic flex items-center gap-1.5 pt-0.5">
+                <Info className="h-3 w-3 text-[#B35F27] shrink-0" />
+                <span>Cotas perimetrales y linderos exactos en metros según plano arquitectónico.</span>
+              </p>
+            </div>
+          )}
+
           {/* Sección Financiera solo para Lotes Disponibles y Reservados */}
-          {(lot.status === "available" || lot.status === "reserved") && !(lot.statusRaw === "AMENIDAD" || lot.id?.includes("PARQUE") || lot.id?.includes("PORTERIA") || lot.id?.includes("CLUB")) ? (
+          {(lot.status === "available" || lot.status === "reserved") && !lotDetails.isAmenity ? (
             <div className="space-y-3">
               {/* Tarjeta de Valor Total */}
               <div className="bg-[#0A0D0B] text-[#EDE7E0] rounded-2xl p-4 sm:p-5 shadow-md space-y-1">
@@ -308,7 +451,7 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
 
         {/* Botones de Acción Fijos Inferiores */}
         <div className="p-4 sm:p-5 border-t border-[#0A0D0B]/10 bg-[#EDE7E0] space-y-2">
-          {lot.status === "common" || lot.statusRaw === "AMENIDAD" || lot.id?.includes("PARQUE") || lot.id?.includes("PORTERIA") ? (
+          {lotDetails.isAmenity ? (
             <div className="w-full py-3 text-center text-[#B35F27] font-bold uppercase tracking-widest text-[10px] border border-[#B35F27]/30 rounded-xl bg-[#B35F27]/10 shadow-sm">
               Zona Común Equipada &bull; Proyecto Loom
             </div>
@@ -340,6 +483,115 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
           )}
         </div>
       </motion.div>
+
+      {/* ============================================================ */}
+      {/* 🔍 LIGHTBOX MODAL: PLANO Y MEDIDAS EN ALTA RESOLUCIÓN        */}
+      {/* ============================================================ */}
+      <AnimatePresence>
+        {isPlanLightboxOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-[#0A0D0B]/95 backdrop-blur-2xl flex flex-col justify-between p-4 sm:p-6"
+            onClick={() => setIsPlanLightboxOpen(false)}
+          >
+            {/* Header del Lightbox */}
+            <div 
+              className="flex justify-between items-center w-full max-w-6xl mx-auto z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-[#B35F27]/20 border border-[#B35F27]/40 text-[#EBD9AB]">
+                  <Ruler className="h-5 w-5" />
+                </div>
+                <div>
+                  <span className="text-[9px] uppercase tracking-[0.25em] text-[#EBD9AB] font-mono font-bold block">
+                    LOOM LUXURY RESIDENCE &bull; PLANO TÉCNICO OFICIAL
+                  </span>
+                  <h3 className="text-base sm:text-xl font-serif font-bold text-white tracking-wide">
+                    Lote <span className="text-[#B35F27]">{lot.rawId || lot.id}</span> &bull; {lot.area.includes("m²") ? lot.area : `${lot.area} m²`}
+                  </h3>
+                </div>
+              </div>
+
+              {/* Botones de Control de Zoom & Cerrar */}
+              <div className="flex items-center gap-2">
+                <div className="hidden sm:flex items-center gap-1 bg-white/10 backdrop-blur-md rounded-xl p-1 border border-white/15">
+                  <button
+                    onClick={() => setLightboxZoom(prev => Math.max(0.75, prev - 0.25))}
+                    className="p-1.5 hover:bg-white/20 rounded-lg text-white transition-colors"
+                    title="Reducir zoom"
+                  >
+                    <ZoomOut className="h-4 w-4" />
+                  </button>
+                  <span className="text-xs font-mono font-bold text-[#EBD9AB] px-2">
+                    {Math.round(lightboxZoom * 100)}%
+                  </span>
+                  <button
+                    onClick={() => setLightboxZoom(prev => Math.min(3, prev + 0.25))}
+                    className="p-1.5 hover:bg-white/20 rounded-lg text-white transition-colors"
+                    title="Aumentar zoom"
+                  >
+                    <ZoomIn className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setLightboxZoom(1)}
+                    className="p-1.5 hover:bg-white/20 rounded-lg text-white/70 hover:text-white transition-colors"
+                    title="Restablecer zoom"
+                  >
+                    <RotateCcw className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => setIsPlanLightboxOpen(false)}
+                  className="p-2 sm:p-2.5 rounded-full bg-white/10 hover:bg-[#B35F27] border border-white/20 text-white transition-all cursor-pointer"
+                  title="Cerrar (Esc)"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Contenedor Central de la Imagen con Zoom */}
+            <div 
+              className="flex-1 flex items-center justify-center overflow-hidden my-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <motion.div
+                animate={{ scale: lightboxZoom }}
+                transition={{ type: "spring", stiffness: 200, damping: 25 }}
+                className="max-w-4xl max-h-[75vh] p-2 bg-white rounded-2xl shadow-2xl border border-white/20 overflow-hidden flex items-center justify-center"
+              >
+                <img
+                  src={lotDetails.imageSrc}
+                  alt={`Plano Lote ${lot.rawId}`}
+                  className="max-w-full max-h-[70vh] object-contain select-none"
+                />
+              </motion.div>
+            </div>
+
+            {/* Footer Informativo del Lightbox */}
+            <div 
+              className="w-full max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center text-white/70 text-xs z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-1 rounded-full bg-[#B35F27]/20 border border-[#B35F27]/40 text-[#EBD9AB] font-bold text-[10px] uppercase">
+                  Tipología: {lot.location || "Medianero"}
+                </span>
+                <span className="text-[11px] text-white/80">
+                  Medidas de linderos, fondos y frentes expresadas en metros lineales (m).
+                </span>
+              </div>
+              <span className="text-[10px] font-mono text-white/50">
+                Presiona Esc para cerrar
+              </span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Modal de Selección de Inmobiliaria */}
       <LoomReferralModal

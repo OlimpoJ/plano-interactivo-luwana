@@ -16,7 +16,9 @@ import {
   Phone,
   Info,
   Building2,
-  Sparkles
+  Sparkles,
+  Ruler,
+  ZoomIn
 } from "lucide-react";
 import LoomLotZoomCanvas from "./LoomLotZoomCanvas";
 import LoomReferralModal from "./LoomReferralModal";
@@ -324,7 +326,34 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
     { id: "altillo", label: "Altillo & Rooftop", category: "Rooftop Lounge", url: "https://kuula.co/share/collection/7T6Y1?logo=0&info=0&fs=1&vr=0&sd=1&thumbs=1" },
   ];
 
-  const currentPlans = selectedVilla === "luxury" ? luxuryPlans : gardenPlans;
+  const formattedStage = stageId
+    ? stageId.toLowerCase().startsWith("etapa_")
+      ? `Etapa ${stageId.replace(/[^0-9]/g, "")}`
+      : `Etapa ${stageId}`
+    : "Etapa 1";
+
+  const locationTypeDisplay = selectedLot.location && !selectedLot.location.toLowerCase().includes("etapa")
+    ? selectedLot.location
+    : "Lote Medianero";
+
+  const lotIdentifier = selectedLot.rawId || selectedLot.id || "";
+  const match = lotIdentifier.match(/([A-Za-z])-?(\d+)/);
+  const blockLetter = match ? match[1].toUpperCase() : "";
+  const lotNumber = match ? match[2].padStart(2, '0') : "";
+  const individualLotPlanSrc = blockLetter && lotNumber ? `/loom/lots/${blockLetter}-${lotNumber}.webp` : `/loom/lots/${lotIdentifier}.webp`;
+
+  const lotPlanItem = {
+    num: "00",
+    title: `Plano Técnico y Medidas del Lote ${selectedLot.rawId || selectedLot.id}`,
+    category: "Plano del Lote",
+    src: individualLotPlanSrc,
+    specs: `Área: ${selectedLot.area} m² • Ubicación: ${locationTypeDisplay}`,
+    description: `Plano arquitectónico oficial del lote ${selectedLot.rawId || selectedLot.id} con cotas y linderos exactos en metros (frente, fondo, laterales).`,
+  };
+
+  const currentPlans = selectedVilla === "luxury" 
+    ? [lotPlanItem, ...luxuryPlans] 
+    : [lotPlanItem, ...gardenPlans];
 
   const getActiveMediaList = useCallback(() => {
     if (activeTab === "gallery") return sharedGallery;
@@ -397,16 +426,6 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
 
   const currentMediaItem = activeTab !== "tour360" ? activeMediaList[activeIndex] : null;
   const currentTourItem = activeTab === "tour360" ? tour360List[activeIndex] : null;
-
-  const formattedStage = stageId
-    ? stageId.toLowerCase().startsWith("etapa_")
-      ? `Etapa ${stageId.replace(/[^0-9]/g, "")}`
-      : `Etapa ${stageId}`
-    : "Etapa 1";
-
-  const locationTypeDisplay = selectedLot.location && !selectedLot.location.toLowerCase().includes("etapa")
-    ? selectedLot.location
-    : "Lote Medianero";
 
   return (
     <div className="relative w-full h-screen bg-[#0A0D0B] text-[#EDE7E0] flex flex-col overflow-hidden font-sans select-none">
@@ -624,6 +643,71 @@ export default function LoomShowroomView({ selectedLot, stageId, onBack }: LoomS
                 <strong className="text-xs 2xl:text-base min-[2500px]:text-xl font-semibold text-[#0A0D0B] truncate block mt-0.5">{locationTypeDisplay}</strong>
               </div>
             </div>
+          </div>
+
+          {/* ============================================================ */}
+          {/* 📐 SECCIÓN: PLANO ARQUITECTÓNICO & MEDIDAS EN EL SHOWROOM   */}
+          {/* ============================================================ */}
+          <div className="bg-white/80 border border-[#B35F27]/25 rounded-2xl p-3.5 2xl:p-5 min-[2500px]:p-7 shadow-sm space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-[#B35F27]">
+                <Ruler className="h-4 w-4 2xl:h-5 2xl:w-5" />
+                <span className="text-[10px] 2xl:text-xs min-[2500px]:text-sm font-bold uppercase tracking-wider text-[#0A0D0B]">
+                  Plano & Medidas del Lote
+                </span>
+              </div>
+              {blockLetter && (
+                <span className="text-[9px] 2xl:text-xs font-mono font-bold uppercase tracking-wider bg-[#B35F27]/10 text-[#B35F27] border border-[#B35F27]/20 px-2 py-0.5 rounded-md">
+                  Mz {blockLetter} &bull; Lote {lotNumber}
+                </span>
+              )}
+            </div>
+
+            {/* Contenedor de la Imagen con Click para ver en el visor principal / Lightbox */}
+            <div 
+              onClick={() => {
+                setActiveTab("plans");
+                setActiveIndex(0);
+              }}
+              className="relative w-full aspect-square bg-[#0A0D0B]/[0.03] rounded-xl overflow-hidden border border-[#0A0D0B]/10 cursor-pointer group shadow-inner flex items-center justify-center transition-all duration-300 hover:border-[#B35F27]/50"
+              title="Ver plano y medidas en el visor central"
+            >
+              <img
+                src={individualLotPlanSrc}
+                alt={`Plano y medidas del Lote ${selectedLot.rawId || selectedLot.id}`}
+                className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
+              />
+
+              {/* Overlay al pasar el cursor */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-between p-2.5">
+                <span className="text-white text-[10px] 2xl:text-xs font-semibold flex items-center gap-1.5 backdrop-blur-md bg-black/50 px-2.5 py-1 rounded-full border border-white/20">
+                  <Maximize2 className="h-3 w-3 text-[#EBD9AB]" />
+                  Ver en Visor Central
+                </span>
+                <span className="text-[9px] 2xl:text-xs text-[#EBD9AB] font-mono font-bold bg-[#B35F27]/80 px-2 py-0.5 rounded">
+                  1080p
+                </span>
+              </div>
+
+              {/* Botón de lupa directo a pantalla completa */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveTab("plans");
+                  setActiveIndex(0);
+                  setLightboxOpen(true);
+                }}
+                className="absolute top-2 right-2 p-1.5 rounded-full bg-white/90 text-[#0A0D0B] shadow-md border border-[#0A0D0B]/10 hover:bg-[#B35F27] hover:text-white transition-colors duration-200"
+                title="Ver medidas a pantalla completa"
+              >
+                <ZoomIn className="h-3.5 w-3.5 2xl:h-4 2xl:w-4" />
+              </button>
+            </div>
+
+            <p className="text-[9px] 2xl:text-xs text-[#0A0D0B]/60 leading-tight italic flex items-center gap-1.5 pt-0.5">
+              <Info className="h-3 w-3 2xl:h-4 2xl:w-4 text-[#B35F27] shrink-0" />
+              <span>Cotas perimetrales y linderos según plano arquitectónico oficial.</span>
+            </p>
           </div>
 
           {/* Villa Model Selector Bar */}
