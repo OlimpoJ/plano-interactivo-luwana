@@ -15,10 +15,17 @@ import {
   RotateCcw, 
   Info,
   Layers,
-  Sparkles
+  Sparkles,
+  MessageCircle
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import LoomReferralModal from "./LoomReferralModal";
+import { 
+  initReferralTracking, 
+  getActiveAdvisor, 
+  buildLotWhatsAppUrl, 
+  Advisor 
+} from "@/lib/referralTracking";
 
 interface Lot {
   id: string;
@@ -51,22 +58,28 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
   const [lightboxZoom, setLightboxZoom] = useState<number>(1);
   const [imgLoadError, setImgLoadError] = useState<boolean>(false);
 
+  const [assignedAdvisor, setAssignedAdvisor] = useState<Advisor | null>(null);
   const [referrer, setReferrer] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const ref = params.get("ref");
-      if (ref) {
-        sessionStorage.setItem("loom_ref", ref.toLowerCase());
-        setReferrer(ref.toLowerCase());
+      const adv = initReferralTracking();
+      if (adv) {
+        setAssignedAdvisor(adv);
+        setReferrer(adv.agency.toLowerCase());
       } else {
-        const stored = sessionStorage.getItem("loom_ref");
-        if (stored) {
-          setReferrer(stored);
-        } else if (window.location.hostname.includes("patrimofy.com")) {
-          sessionStorage.setItem("loom_ref", "patrimofy");
-          setReferrer("patrimofy");
+        const active = getActiveAdvisor();
+        if (active) {
+          setAssignedAdvisor(active);
+          setReferrer(active.agency.toLowerCase());
+        } else {
+          const stored = sessionStorage.getItem("loom_ref");
+          if (stored) {
+            setReferrer(stored);
+          } else if (window.location.hostname.includes("patrimofy.com")) {
+            sessionStorage.setItem("loom_ref", "patrimofy");
+            setReferrer("patrimofy");
+          }
         }
       }
     }
@@ -151,25 +164,54 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
 
   if (!lot) return null;
 
-  // Lógica del botón de separar lote (atribución)
+  // Lógica del botón de separar lote (atribución y WhatsApp de asesor)
   const handleSeparateClick = () => {
     if (typeof window !== "undefined" && window.parent !== window) {
       window.parent.postMessage({
         type: 'LOT_SEPARATE_CLICKED',
         payload: {
           lotId: lot.rawId || lot.id,
-          price: lot.totalPrice
+          price: lot.totalPrice,
+          advisor: assignedAdvisor?.slug || null,
         }
       }, '*');
       return;
     }
 
+    const currentAdvisor = assignedAdvisor || getActiveAdvisor();
+
+    // 1. Si hay un asesor asignado por link / cookie, abrir directo su WhatsApp
+    if (currentAdvisor) {
+      const waUrl = buildLotWhatsAppUrl(
+        {
+          id: lot.id,
+          rawId: lot.rawId,
+          price: lot.totalPrice,
+          area: lot.area,
+        },
+        "LOOM Luxury Residence",
+        currentAdvisor
+      );
+      window.open(waUrl, "_blank");
+      return;
+    }
+
+    // 2. Si viene de una inmobiliaria general o dominio Patrimofy
     const currentRef = typeof window !== "undefined" 
       ? sessionStorage.getItem("loom_ref") || (window.location.hostname.includes("patrimofy.com") ? "patrimofy" : referrer) 
       : referrer;
 
     if (currentRef === "patrimofy" || (typeof window !== "undefined" && window.location.hostname.includes("patrimofy.com") && currentRef !== "chichaus")) {
-      window.open("https://www.patrimofy.com/es/loom#contacto", "_blank");
+      const waUrl = buildLotWhatsAppUrl(
+        {
+          id: lot.id,
+          rawId: lot.rawId,
+          price: lot.totalPrice,
+          area: lot.area,
+        },
+        "LOOM Luxury Residence"
+      );
+      window.open(waUrl, "_blank");
     } else if (currentRef === "chichaus") {
       window.open("https://www.loomalmabeach.com/#contacto", "_blank");
     } else {
@@ -442,11 +484,16 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
           )}
 
           {/* Alerta de Atribución */}
-          {referrer && (
+          {assignedAdvisor ? (
+            <div className="bg-[#B35F27]/15 border border-[#B35F27]/35 rounded-xl p-2.5 text-[10px] text-[#0A0D0B] leading-relaxed uppercase tracking-wider text-center font-semibold flex items-center justify-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse shrink-0" />
+              <span>Tu Asesor: <strong>{assignedAdvisor.name}</strong> &bull; {assignedAdvisor.agency}</span>
+            </div>
+          ) : referrer ? (
             <div className="bg-[#B35F27]/10 border border-[#B35F27]/30 rounded-xl p-2.5 text-[9px] sm:text-[10px] text-[#0A0D0B]/80 leading-relaxed uppercase tracking-wider text-center font-medium">
               Asesoría comercializada por <strong className="text-[#0A0D0B] font-bold">{referrer === "patrimofy" ? "Patrimofy" : "Chichaus"}</strong>
             </div>
-          )}
+          ) : null}
         </div>
 
         {/* Botones de Acción Fijos Inferiores */}
@@ -476,8 +523,8 @@ export default function LoomLotPanel({ lot, onClose, onEnterShowroom }: LoomLotP
                 onClick={handleSeparateClick}
                 className="w-full py-3 bg-white hover:bg-white/80 border border-[#0A0D0B]/15 text-[#0A0D0B] font-bold rounded-xl uppercase tracking-[0.15em] text-xs transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-sm"
               >
-                <Phone className="h-4 w-4 text-[#B35F27]" />
-                <span>Separar Lote</span>
+                {assignedAdvisor ? <MessageCircle className="h-4 w-4 text-[#25D366]" /> : <Phone className="h-4 w-4 text-[#B35F27]" />}
+                <span>{assignedAdvisor ? `Separar por WhatsApp (${assignedAdvisor.name.split(" ")[0]})` : "Separar Lote"}</span>
               </button>
             </>
           )}

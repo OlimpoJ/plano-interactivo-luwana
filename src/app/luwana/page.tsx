@@ -7,6 +7,7 @@ import StageView from "@/components/StageView";
 import styles from "../Hero.module.css";
 import { getMediaUrl } from "@/utils/media";
 import Link from "next/link";
+import { initReferralTracking } from "@/lib/referralTracking";
 
 function AnimatedCounter({ endValue, duration = 2000 }: { endValue: number; duration?: number }) {
   const [count, setCount] = useState(0);
@@ -73,6 +74,7 @@ export default function LuwanaPage() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      initReferralTracking();
       const params = new URLSearchParams(window.location.search);
       const ref = params.get('ref');
       if (ref) {

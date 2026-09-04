@@ -11,7 +11,13 @@ import LoomLocationModal from "@/components/LoomLocationModal";
 import LoomReferralModal from "@/components/LoomReferralModal";
 import { AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { Menu, Maximize2, Minimize2, ArrowLeft } from "lucide-react";
+import { Menu, Maximize2, Minimize2, ArrowLeft, MessageCircle } from "lucide-react";
+import { 
+  initReferralTracking, 
+  getActiveAdvisor, 
+  buildGeneralProjectWhatsAppUrl, 
+  Advisor 
+} from "@/lib/referralTracking";
 
 interface Lot {
   id: string;
@@ -130,23 +136,29 @@ export default function LoomShowroom() {
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
-  // Guardar y leer el parámetro de referido ?ref= de la URL
+  // Asesor asignado para contacto directo y atribución
+  const [assignedAdvisor, setAssignedAdvisor] = useState<Advisor | null>(null);
   const [referrer, setReferrer] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const ref = params.get("ref");
-      if (ref) {
-        sessionStorage.setItem("loom_ref", ref.toLowerCase());
-        setReferrer(ref.toLowerCase());
+      const adv = initReferralTracking();
+      if (adv) {
+        setAssignedAdvisor(adv);
+        setReferrer(adv.agency.toLowerCase());
       } else {
-        const stored = sessionStorage.getItem("loom_ref");
-        if (stored) {
-          setReferrer(stored);
-        } else if (window.location.hostname.includes("patrimofy.com")) {
-          sessionStorage.setItem("loom_ref", "patrimofy");
-          setReferrer("patrimofy");
+        const active = getActiveAdvisor();
+        if (active) {
+          setAssignedAdvisor(active);
+          setReferrer(active.agency.toLowerCase());
+        } else {
+          const stored = sessionStorage.getItem("loom_ref");
+          if (stored) {
+            setReferrer(stored);
+          } else if (window.location.hostname.includes("patrimofy.com")) {
+            sessionStorage.setItem("loom_ref", "patrimofy");
+            setReferrer("patrimofy");
+          }
         }
       }
     }
@@ -179,12 +191,22 @@ export default function LoomShowroom() {
   }, []);
 
   const handleOpenContact = () => {
+    const currentAdvisor = assignedAdvisor || getActiveAdvisor();
+
+    // 1. Si hay un asesor asignado por link / cookie, abrir directo su WhatsApp
+    if (currentAdvisor) {
+      const waUrl = buildGeneralProjectWhatsAppUrl("LOOM Luxury Residence", currentAdvisor);
+      window.open(waUrl, "_blank");
+      return;
+    }
+
     const currentRef = typeof window !== "undefined"
       ? sessionStorage.getItem("loom_ref") || (window.location.hostname.includes("patrimofy.com") ? "patrimofy" : referrer)
       : referrer;
 
     if (currentRef === "patrimofy" || (typeof window !== "undefined" && window.location.hostname.includes("patrimofy.com") && currentRef !== "chichaus")) {
-      window.open("https://www.patrimofy.com/es/loom#contacto", "_blank");
+      const waUrl = buildGeneralProjectWhatsAppUrl("LOOM Luxury Residence");
+      window.open(waUrl, "_blank");
     } else if (currentRef === "chichaus") {
       window.open("https://www.loomalmabeach.com/#contacto", "_blank");
     } else {
@@ -247,6 +269,17 @@ export default function LoomShowroom() {
       </div>
 
       <div className="fixed top-4 right-4 z-40 flex items-center gap-2 pointer-events-auto">
+        {assignedAdvisor && (
+          <button
+            onClick={handleOpenContact}
+            className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#EDE7E0]/95 text-[#0A0D0B] border border-[#B35F27]/35 shadow-xl backdrop-blur-md text-[11px] font-semibold uppercase tracking-wider transition-all duration-300 hover:scale-105 cursor-pointer"
+            title={`Contactar a tu asesor ${assignedAdvisor.name} por WhatsApp`}
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span>Asesor: <strong className="text-[#B35F27]">{assignedAdvisor.name.split(" ")[0]}</strong></span>
+            <MessageCircle size={14} className="text-[#25D366] shrink-0" />
+          </button>
+        )}
         <button
           onClick={toggleFullscreen}
           className="p-2.5 sm:p-3 rounded-full bg-[#EDE7E0]/90 text-[#0A0D0B] border border-[#0A0D0B]/15 shadow-xl backdrop-blur-md hover:bg-[#EDE7E0] hover:text-[#B35F27] transition-all duration-300 group cursor-pointer"

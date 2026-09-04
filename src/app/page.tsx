@@ -3,23 +3,28 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Compass, MapPin, Sparkles, ArrowRight, ShieldCheck, Waves, Building2 } from "lucide-react";
+import { initReferralTracking, getActiveAdvisor, Advisor } from "@/lib/referralTracking";
 
 export default function RootShowroomPage() {
   const [luwanaStats, setLuwanaStats] = useState({ available: 21, total: 122 });
   const [loomStats, setLoomStats] = useState({ available: 278, total: 326 });
+  const [assignedAdvisor, setAssignedAdvisor] = useState<Advisor | null>(null);
   const [isPatrimofy, setIsPatrimofy] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const ref = params.get("ref");
-      if (ref === "patrimofy" || window.location.hostname.includes("patrimofy.com")) {
-        setIsPatrimofy(true);
-        sessionStorage.setItem("loom_ref", "patrimofy");
-        sessionStorage.setItem("luwana_ref", "patrimofy");
-      } else if (ref === "chichaus") {
-        sessionStorage.setItem("loom_ref", "chichaus");
-        sessionStorage.setItem("luwana_ref", "chichaus");
+      const adv = initReferralTracking();
+      if (adv) {
+        setAssignedAdvisor(adv);
+        if (adv.agency.toLowerCase() === "patrimofy") setIsPatrimofy(true);
+      } else {
+        const active = getActiveAdvisor();
+        if (active) {
+          setAssignedAdvisor(active);
+          if (active.agency.toLowerCase() === "patrimofy") setIsPatrimofy(true);
+        } else if (window.location.hostname.includes("patrimofy.com")) {
+          setIsPatrimofy(true);
+        }
       }
     }
   }, []);
@@ -66,8 +71,17 @@ export default function RootShowroomPage() {
             <Compass className="h-5 w-5 text-[#CBAA85] animate-pulse" />
           </div>
           <div>
-            <span className="text-[10px] uppercase tracking-[0.25em] text-[#CBAA85] font-bold block">
-              {isPatrimofy ? "Comercializador Oficial: Patrimofy" : "Patrimofy & Chichaus"}
+            <span className="text-[10px] uppercase tracking-[0.25em] text-[#CBAA85] font-bold block flex items-center gap-1.5">
+              {assignedAdvisor ? (
+                <>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Tu Asesor: {assignedAdvisor.name} &bull; {assignedAdvisor.agency}</span>
+                </>
+              ) : isPatrimofy ? (
+                "Comercializador Oficial: Patrimofy"
+              ) : (
+                "Patrimofy & Chichaus"
+              )}
             </span>
             <span className="text-sm font-serif font-semibold text-white tracking-wide">
               Showroom Inmobiliario de Lujo

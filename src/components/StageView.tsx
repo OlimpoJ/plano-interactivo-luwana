@@ -2,8 +2,14 @@
 
 import React, { useEffect, useRef, useState, useCallback, memo, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Search, CheckCircle, AlertCircle, Phone, Calculator, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Search, CheckCircle, AlertCircle, Phone, Calculator, X, MessageCircle } from "lucide-react";
 import LuwanaReferralModal from "./LuwanaReferralModal";
+import { 
+  initReferralTracking, 
+  getActiveAdvisor, 
+  buildLotWhatsAppUrl, 
+  Advisor 
+} from "@/lib/referralTracking";
 
 export interface StageLotData {
   id: string;
@@ -223,23 +229,31 @@ export default function StageView({ stageId, onBack, onNext }: StageViewProps) {
   const [filterStatus, setFilterStatus] = useState<"all" | "available" | "reserved" | "sold">("all");
   const [showReferralModal, setShowReferralModal] = useState<boolean>(false);
   
+  // Asesor asignado para contacto directo por WhatsApp y atribución
+  const [assignedAdvisor, setAssignedAdvisor] = useState<Advisor | null>(null);
+
   // Referidor para atribución comercial en Luwana
   const [referrer, setReferrer] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const ref = params.get("ref");
-      if (ref) {
-        sessionStorage.setItem("luwana_ref", ref.toLowerCase());
-        setReferrer(ref.toLowerCase());
+      const adv = initReferralTracking();
+      if (adv) {
+        setAssignedAdvisor(adv);
+        setReferrer(adv.agency.toLowerCase());
       } else {
-        const stored = sessionStorage.getItem("luwana_ref");
-        if (stored) {
-          setReferrer(stored);
-        } else if (window.location.hostname.includes("patrimofy.com")) {
-          sessionStorage.setItem("luwana_ref", "patrimofy");
-          setReferrer("patrimofy");
+        const active = getActiveAdvisor();
+        if (active) {
+          setAssignedAdvisor(active);
+          setReferrer(active.agency.toLowerCase());
+        } else {
+          const stored = sessionStorage.getItem("luwana_ref");
+          if (stored) {
+            setReferrer(stored);
+          } else if (window.location.hostname.includes("patrimofy.com")) {
+            sessionStorage.setItem("luwana_ref", "patrimofy");
+            setReferrer("patrimofy");
+          }
         }
       }
     }
@@ -310,7 +324,7 @@ export default function StageView({ stageId, onBack, onNext }: StageViewProps) {
     }
   }, []);
 
-  // Lógica de separación de lote con soporte de atribución y modal
+  // Lógica de separación de lote con soporte de atribución, WhatsApp de asesor y modal
   const handleSeparateClick = () => {
     if (!selectedLotData) return;
 
@@ -319,18 +333,47 @@ export default function StageView({ stageId, onBack, onNext }: StageViewProps) {
         type: 'LOT_SEPARATE_CLICKED',
         payload: {
           lotId: selectedLotData.rawId,
-          price: selectedLotData.totalPrice
+          price: selectedLotData.totalPrice,
+          advisor: assignedAdvisor?.slug || null,
         }
       }, '*');
       return;
     }
 
+    const currentAdvisor = assignedAdvisor || getActiveAdvisor();
+
+    // 1. Si hay un asesor asignado por link / cookie, abrir directo su WhatsApp
+    if (currentAdvisor) {
+      const waUrl = buildLotWhatsAppUrl(
+        {
+          id: selectedLotData.id,
+          rawId: selectedLotData.rawId,
+          price: selectedLotData.totalPrice,
+          area: selectedLotData.area,
+        },
+        "Luwana Beach Residence",
+        currentAdvisor
+      );
+      window.open(waUrl, "_blank");
+      return;
+    }
+
+    // 2. Si viene de una inmobiliaria general o dominio Patrimofy
     const currentRef = typeof window !== "undefined" 
       ? sessionStorage.getItem("luwana_ref") || (window.location.hostname.includes("patrimofy.com") ? "patrimofy" : referrer) 
       : referrer;
 
     if (currentRef === "patrimofy" || (typeof window !== "undefined" && window.location.hostname.includes("patrimofy.com") && currentRef !== "chichaus")) {
-      window.open("https://patrimofy.com/es/luwana#contacto", "_blank");
+      const waUrl = buildLotWhatsAppUrl(
+        {
+          id: selectedLotData.id,
+          rawId: selectedLotData.rawId,
+          price: selectedLotData.totalPrice,
+          area: selectedLotData.area,
+        },
+        "Luwana Beach Residence"
+      );
+      window.open(waUrl, "_blank");
     } else if (currentRef === "chichaus") {
       window.open("https://chichaus.com/", "_blank");
     } else {
@@ -620,11 +663,16 @@ export default function StageView({ stageId, onBack, onNext }: StageViewProps) {
               )}
 
               {/* Alerta de Atribución si viene con link referido o dominio */}
-              {referrer && (
+              {assignedAdvisor ? (
+                <div className="mt-4 bg-[#A58E74]/20 border border-[#A58E74]/40 rounded-xl p-2.5 text-[10px] text-[#152A2D] leading-relaxed uppercase tracking-wider text-center font-semibold flex items-center justify-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse shrink-0" />
+                  <span>Tu Asesor: <strong>{assignedAdvisor.name}</strong> &bull; {assignedAdvisor.agency}</span>
+                </div>
+              ) : referrer ? (
                 <div className="mt-4 bg-[#A58E74]/15 border border-[#A58E74]/40 rounded-xl p-2.5 text-[9px] sm:text-[10px] text-[#152A2D]/80 leading-relaxed uppercase tracking-wider text-center font-medium">
                   Asesoría comercializada por <strong className="text-[#152A2D] font-bold">{referrer === "patrimofy" ? "Patrimofy" : "Chichaus"}</strong>
                 </div>
-              )}
+              ) : null}
             </div>
 
             {/* Bottom Actions */}
@@ -634,8 +682,8 @@ export default function StageView({ stageId, onBack, onNext }: StageViewProps) {
                   onClick={handleSeparateClick}
                   className="w-full py-3.5 px-4 rounded-xl bg-[#A58E74] hover:bg-[#8e785f] text-[#EFE9E1] font-bold uppercase tracking-wider text-xs transition-all shadow-lg shadow-[#A58E74]/25 flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.01]"
                 >
-                  <Phone size={14} />
-                  <span>Separar Lote {selectedLotData.rawId}</span>
+                  {assignedAdvisor ? <MessageCircle size={15} className="text-[#25D366]" /> : <Phone size={14} />}
+                  <span>{assignedAdvisor ? `Separar por WhatsApp (${assignedAdvisor.name.split(" ")[0]})` : `Separar Lote ${selectedLotData.rawId}`}</span>
                 </button>
               )}
               <button 
